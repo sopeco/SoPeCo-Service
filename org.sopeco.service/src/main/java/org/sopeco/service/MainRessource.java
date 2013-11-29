@@ -10,26 +10,11 @@ import javax.ws.rs.core.Response;
 public class MainRessource {
 
 	@GET
-	@Produces("text/plain")
+	@Produces(MediaType.TEXT_PLAIN)
 	public Response loginRequest() {
- 
 		String output = "6A1337B7";
 		return Response.status(200).entity(output).build();
  
 	}
-	
-  @GET
-  @Produces(MediaType.TEXT_XML)
-  public String sayXMLHello() {
-	  
-    return "<?xml version=\"1.0\"?>" + "<hello> Hello Jersey" + "</hello>";
-    
-  }
-
-  @GET
-  @Produces(MediaType.TEXT_HTML)
-  public String sayHtmlHello() {
-    return "<html> " + "<title>" + "Hello Jersey" + "</title>" + "<body><h1>" + "Hello Jersey" + "</body></h1>" + "</html> ";
-  }
 	
 }
