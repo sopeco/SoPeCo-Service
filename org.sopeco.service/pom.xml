@@ -1,102 +1,94 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.sopeco.service</groupId>
-  <artifactId>org.sopeco.service</artifactId>
-  <packaging>war</packaging>
-  <version>0.0.1-SNAPSHOT</version>
-  <name>Software Performance Toolkit - Service</name>
-  
-  <properties>
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  
-  <dependencies>
-      
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.10</version>
-    </dependency>
-    
-    <dependency>
-		<groupId>com.sun.jersey</groupId>
-		<artifactId>jersey-server</artifactId>
-		<version>1.17.1</version>
-	</dependency>
-     
-	<dependency>
-		<groupId>com.sun.jersey</groupId>
-		<artifactId>jersey-core</artifactId>
-		<version>1.17.1</version>
-	</dependency>
-    
-	<dependency>
-		<groupId>asm</groupId>
-		<artifactId>asm</artifactId>
-		<version>3.3.1</version>
-	</dependency>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	
-	<!-- <dependency>
-		<groupId>com.sun.jersey</groupId>
-		<artifactId>jersey-test-framework</artifactId>
-		<version>1.1.2-ea</version>
-	</dependency>-->
-            
-    <dependency>
-		<groupId>com.sun.jersey.jersey-test-framework</groupId>
-		<artifactId>jersey-test-framework-grizzly2</artifactId>
-		<version>1.17.1</version>
-	</dependency>
-            
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.sopeco.service</groupId>
+	<artifactId>org.sopeco.service</artifactId>
+	<packaging>war</packaging>
+	<version>0.0.1-SNAPSHOT</version>
+	<name>Software Performance Toolkit - Service</name>
 	
-	<dependency>
-	    <groupId>com.sun.jersey</groupId>
-	    <artifactId>jersey-servlet</artifactId>
-	    <version>1.17.1</version>
-	</dependency>
-    
-  </dependencies>
+	<!-- ================Properties================= -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
   
-  <build>
-    <finalName>org.sopeco.service</finalName>
-    
-    <plugins>
-        
-        <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-compiler-plugin</artifactId>
-	        <version>3.0</version>
-	        <configuration>
-	           <source>1.7</source>
-	           <target>1.7</target>
-	        </configuration> 
-		</plugin>
-        
-        <plugin>
-			<groupId>org.apache.maven.plugins</groupId>
-			<artifactId>maven-war-plugin</artifactId>
-			<version>2.4</version>
-			<configuration>
-				<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-				<webResources>
-					<resource>
-						<directory>target</directory>
 	
-						<includes>
-							<include>**/images/*</include>
-							<include>**/*.css</include>
-							<include>**/*.html</include>
-							<include>**/*.jsp</include>
-							<include>**/*.ico</include>
-						</includes>
-					</resource>
-				</webResources>
-			</configuration>
-		</plugin>
+	<!-- ================Dependencies================= -->
+	<dependencies>
+
+	    <!-- =====Project dependenices===== -->
+	    
+	    <!-- jersey dependencies used for the servlets -->
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+	    
+		<dependency>
+			<groupId>com.sun.jersey</groupId>
+			<artifactId>jersey-core</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+	           
+		<!-- Unittesting dependencies -->
+		<dependency>
+			<groupId>com.sun.jersey.jersey-test-framework</groupId>
+			<artifactId>jersey-test-framework-grizzly2</artifactId>
+			<version>1.17.1</version>
+		</dependency>
+	
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.10</version>
+		</dependency>
+           
+    </dependencies>
+  
+	<!-- ================BUILD OPTIONS================= -->
+	<build>
+    	<finalName>org.sopeco.service</finalName>
+    	
+    	<plugins>
+	        
+    	    <!-- used to set the Java version -->
+			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <version>3.0</version>
+		        <configuration>
+		           <source>1.7</source>
+		           <target>1.7</target>
+		        </configuration> 
+			</plugin>
+			
+			<!-- layout of the created WAR file -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.4</version>
+				<configuration>
+				    
+					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+					<webResources>
+						<resource>
+							<directory>target</directory>
+							<includes>
+								<include>**/images/*</include>
+								<include>**/*.css</include>
+								<include>**/*.html</include>
+								<include>**/*.jsp</include>
+								<include>**/*.ico</include>
+							</includes>
+						</resource>
+					</webResources>
+					
+				</configuration>
+			</plugin>
+			
+		</plugins>
     
-    </plugins>
-    
-  </build>
+	</build>
   
 </project>
