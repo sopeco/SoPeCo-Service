@@ -5,6 +5,7 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+        <wb-resource deploy-path="/WEB-INF/classes" source-path="/persistence"/>
         <dependent-module archiveName="org.sopeco.persistence-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.persistence/org.sopeco.persistence">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -15,6 +16,12 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="org.sopeco.config-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.config/org.sopeco.config">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.core-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.core/org.sopeco.core">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.engine-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.engine/org.sopeco.engine">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="context-root" value="org.sopeco.service"/>

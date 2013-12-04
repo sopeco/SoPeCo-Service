@@ -15,7 +15,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 public class LoginTest extends JerseyTest {
 
 	private static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
-	private static final String PACKAGE_NAME_REST = "org.sopeco.service.login";
+	private static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
 	private static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
 	
 	public LoginTest() {

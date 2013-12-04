@@ -1,4 +1,4 @@
-package org.sopeco.service.login;
+package org.sopeco.service.rest;
 
 import org.sopeco.service.shared.LoginData;
 

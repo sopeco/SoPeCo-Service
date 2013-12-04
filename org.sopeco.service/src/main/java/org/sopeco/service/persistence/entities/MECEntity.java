@@ -7,7 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class MECEntitiy implements Serializable {
+public class MECEntity implements Serializable {
 
 	private static final long serialVersionUID = 3093838427924558713L;
 

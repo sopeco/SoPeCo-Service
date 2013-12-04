@@ -39,7 +39,14 @@
 			<artifactId>org.sopeco.persistence</artifactId>
 			<version>${sopeco.version}</version>
 		</dependency>
-	    
+		
+	    <!-- org.sopeco.engine denpendency within this package -->
+		<dependency>
+			<groupId>org.sopeco.core</groupId>
+			<artifactId>org.sopeco.core</artifactId>
+			<version>${sopeco.version}</version>
+		</dependency>
+		
 	    <!-- jersey dependencies used for the servlets -->
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
