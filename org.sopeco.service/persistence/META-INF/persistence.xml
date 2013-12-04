@@ -26,17 +26,17 @@
 	    
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
 
-		<class>org.sopeco.service.persistence.entities.MECEntitiy</class>
 		<class>org.sopeco.service.persistence.entities.ScenarioDetails</class>
+		<class>org.sopeco.service.persistence.entities.MECEntity</class>
 		
-		<class>org.sopeco.service.persistence.entities.accounts.Account</class>
-		<class>org.sopeco.service.persistence.entities.accounts.AccountDetails</class>
+		<class>org.sopeco.service.persistence.entities.account.Account</class>
+		<class>org.sopeco.service.persistence.entities.account.AccountDetails</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:sopeco-jpa;create=true" />
-			<property name="javax.persistence.jdbc.user" value="spc-service" />
-			<property name="javax.persistence.jdbc.password" value="spc-service" />
+			<property name="javax.persistence.jdbc.user" value="app" />
+			<property name="javax.persistence.jdbc.password" value="app" />
 
 			<property name="eclipselink.target-database" value="Derby" />
 			<property name="eclipselink.ddl-generation" value="create-tables" />
