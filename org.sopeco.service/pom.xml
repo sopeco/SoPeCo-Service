@@ -7,35 +7,57 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Software Performance Toolkit - Service</name>
 	
-	<!-- ================Properties================= -->
+	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version>
+		<jersey.version>1.17.1</jersey.version>
 	</properties>
-  
 	
-	<!-- ================Dependencies================= -->
+	<!-- ================REPOSITORIES================= -->
+	<repositories>
+	    
+		<repository>
+			<id>LPE Releases</id>
+			<name>LPE-releases</name>
+			<url>http://i43vm-saas.ipd.uka.de:8081/artifactory/sopeco-release-local</url>
+		</repository>
+
+		<repository>
+			<id>remote-repos</id>
+			<name>Remote Repositories</name>
+			<url>http://i43vm-saas.ipd.uka.de:8081/artifactory/remote-repos</url>
+		</repository>
+		
+	</repositories>
+  
+	<!-- ================DEPENDENCIES================= -->
 	<dependencies>
 	    
-	    <!-- =====Project dependenices===== -->
+		<dependency>
+			<groupId>org.sopeco.core</groupId>
+			<artifactId>org.sopeco.persistence</artifactId>
+			<version>${sopeco.version}</version>
+		</dependency>
 	    
 	    <!-- jersey dependencies used for the servlets -->
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-server</artifactId>
-			<version>1.17.1</version>
+			<version>${jersey.version}</version>
 		</dependency>
 	    
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
 			<artifactId>jersey-core</artifactId>
-			<version>1.17.1</version>
+			<version>${jersey.version}</version>
 		</dependency>
 	           
 		<!-- Unittesting dependencies -->
 		<dependency>
 			<groupId>com.sun.jersey.jersey-test-framework</groupId>
 			<artifactId>jersey-test-framework-grizzly2</artifactId>
-			<version>1.17.1</version>
+			<version>${jersey.version}</version>
 		</dependency>
 	
 		<dependency>
@@ -44,6 +66,27 @@
 			<version>4.10</version>
 		</dependency>
            
+       <!-- 
+       <dependency>
+			<groupId>com.owlike</groupId>
+			<artifactId>genson</artifactId>
+			<version>0.98</version>
+		</dependency>
+		-->
+
+		<dependency>
+			<groupId>org.codehaus.jackson</groupId>
+			<artifactId>jackson-jaxrs</artifactId>
+			<version>1.9.13</version>
+		</dependency>
+
+<dependency>
+    <groupId>org.codehaus.jackson</groupId>
+    <artifactId>jackson-xc</artifactId>
+    <version>1.9.12</version>
+</dependency>
+               
+        
     </dependencies>
   
 	<!-- ================BUILD OPTIONS================= -->
@@ -52,7 +95,7 @@
     	
     	<plugins>
 	        
-    	    <!-- used to set the Java version -->
+    	    <!-- used to set the Java version Maven compiles with -->
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-compiler-plugin</artifactId>

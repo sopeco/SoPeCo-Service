@@ -5,6 +5,18 @@
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
         <wb-resource deploy-path="/" source-path="/target/m2e-wtp/web-resources"/>
         <wb-resource deploy-path="/" source-path="/src/main/webapp"/>
+        <dependent-module archiveName="org.sopeco.persistence-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.persistence/org.sopeco.persistence">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.util-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.util/org.sopeco.util">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.hyperic.sigar-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.hyperic.sigar/org.sopeco.hyperic.sigar">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.config-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.config/org.sopeco.config">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="org.sopeco.service"/>
         <property name="java-output-path" value="/org.sopeco.service/target/classes"/>
     </wb-module>
