@@ -13,12 +13,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Login {
 
-	final static String ACCESS_TOKEN = "6A1337B7";
+	/**
+	 * A unique access token for the beginning. Afterwarsd the accesstoken has to be
+	 * gernerated automatically when a client first requests the service.
+	 */
+	private final static String ACCESS_TOKEN = "6A1337B7";
 	
+	/**
+	 * Returns the client an accesstoken, when he wants to request the
+	 * service. The client identifies via this accesstoken every time
+	 * it requests a service (like registering a MEC).
+	 * 
+	 * @return Login data for the client in a {@link org.sopeco.service.shared.LoginData}
+	 *  	   object.
+	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response loginRequest() {
 		
+		// create the POJO to give the client a LoginData class
 		LoginData loginData = new LoginData(ACCESS_TOKEN);
 		return Response.status(201).entity(loginData).build();
  
