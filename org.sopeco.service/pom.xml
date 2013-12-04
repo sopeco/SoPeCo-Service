@@ -65,15 +65,8 @@
 			<artifactId>junit</artifactId>
 			<version>4.10</version>
 		</dependency>
-           
-       <!-- 
-       <dependency>
-			<groupId>com.owlike</groupId>
-			<artifactId>genson</artifactId>
-			<version>0.98</version>
-		</dependency>
-		-->
-
+         
+		<!-- JSON data exchange -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-jaxrs</artifactId>

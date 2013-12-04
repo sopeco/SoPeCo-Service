@@ -6,49 +6,40 @@ import java.io.IOException;
 
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
 
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.spi.container.servlet.WebComponent;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class LoginTest extends JerseyTest {
-	private static WebAppDescriptor appDescriptor;
-	static{
-		appDescriptor= new WebAppDescriptor.Builder(new String []{"org.codehaus.jackson.jaxrs","org.sopeco.service.login"})
-		.initParam("com.sun.jersey.api.json.POJOMappingFeature", "true")
-//		.initParam("jersey.config.server.provider.packages", "org.codehaus.jackson.jaxrs;org.sopeco.service.login")
-		.build();
-	}
-	private static final String PACKAGE_NAME = "org.sopeco.service.login;org.codehaus.jackson.jaxrs";
+
+	private static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
+	private static final String PACKAGE_NAME_REST = "org.sopeco.service.login";
+	private static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
 	
 	public LoginTest() {
-		super(appDescriptor);
+		super();
     }
 	
-	
-//	@Override
-//    public WebAppDescriptor configure() {
-//        return new WebAppDescriptor.Builder()
-//            	.initParam(WebComponent.RESOURCE_CONFIG_CLASS,
-//                      ClassNamesResourceConfig.class.getName())
-//                .initParam(
-//                      ClassNamesResourceConfig.PROPERTY_CLASSNAMES,
-//                      TodoResource.class.getName() + ";"
-//                              + MockTodoServiceProvider.class.getName() + ";"
-//                              + NotFoundMapper.class.getName()).build();
-//    }
+	/**
+	 * Configure is called on the object creation of a JerseyTest.
+	 * It's used to configure where the JerseyTest can find JSON,
+	 * the REST service to test and the JSON POJO.
+	 * 
+	 * @return the configuration
+	 */
+	@Override
+    public WebAppDescriptor configure() {
+        return new WebAppDescriptor.Builder(
+        		new String []{PACKAGE_NAME_JSON, PACKAGE_NAME_REST})
+				.initParam(PACKAGE_NAME_POJO, "true")
+				.build();
+    }
 	
     @Test
     public void test() throws IllegalArgumentException, IOException {
-    	
         WebResource webResource = resource().path("login");
-        
         assertEquals("{\"accessToken\":\"6A1337B7\"}", webResource.accept(MediaType.APPLICATION_JSON).get(String.class));
     }
 	
