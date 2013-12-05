@@ -17,7 +17,10 @@ import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.persistence.entities.account.Account;
 
-
+/**
+ * 
+ * @author Peter Merkert
+ */
 public final class ServicePersistenceProvider {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServicePersistenceProvider.class.getName());
@@ -25,7 +28,10 @@ public final class ServicePersistenceProvider {
 	private EntityManagerFactory emf;
 
 	/**
-	 * Constructor.
+	 * The contructor sets the {@link EntityManagerFactory}. It's used
+	 * to load, store and remove items from the database.
+	 * 
+	 * @param factory the EntityManagerFactory
 	 */
 	ServicePersistenceProvider(EntityManagerFactory factory) {
 		emf = factory;

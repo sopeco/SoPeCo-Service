@@ -55,7 +55,8 @@ public final class ServicePersistenceProviderFactory {
 	public static final String SERVER_URL_SUFFIX = ";create=true";
 
 	/**
-	 * Hidden constructor as all methods are accessible static way.
+	 * Hidden constructor as a contructor is available in a static way
+	 * called {@link ServicePersistenceProviderFactory.createServicePersistenceProvider}.
 	 */
 	private ServicePersistenceProviderFactory() {
 	}
@@ -79,7 +80,7 @@ public final class ServicePersistenceProviderFactory {
 	 * Creates a configuration map, which contains the connection url to the
 	 * database.
 	 * 
-	 * @return
+	 * @return configuration for database
 	 */
 	private static Map<String, Object> getConfigOverrides() {
 		Map<String, Object> configOverrides = new HashMap<String, Object>();
@@ -88,9 +89,9 @@ public final class ServicePersistenceProviderFactory {
 	}
 
 	/**
-	 * Builds the connection-url of the ui-database.
+	 * Builds the connection-url of the SoPeCo service database.
 	 * 
-	 * @return connection-url
+	 * @return connection-url to the database
 	 */
 	private static String getServerUrl() {
 		
