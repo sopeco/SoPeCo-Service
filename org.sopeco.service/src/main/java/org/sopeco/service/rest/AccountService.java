@@ -14,6 +14,7 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.HTTPStatus;
 import org.sopeco.service.persistence.entities.account.Account;
 import org.sopeco.service.security.Crypto;
+import org.sopeco.service.shared.Message;
 import org.sopeco.service.persistence.ServicePersistence;
 
 @Path("account")
@@ -28,10 +29,13 @@ public class AccountService {
 								  @PathParam("password") String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
-		createAccount(username, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
+		boolean status = createAccount(username, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
 		
-		return Response.status(HTTPStatus.Created).build();
- 
+		if (status) {
+			return Response.status(HTTPStatus.Created).build();
+		}
+		
+		return Response.status(HTTPStatus.Forbidden).entity(new Message("Account with the name " + username + " already exists")).build();
 	}
 	
 	private boolean createAccount(String accountName, String password, String dbHost, int dbPort) {
