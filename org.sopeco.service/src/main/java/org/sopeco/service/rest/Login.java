@@ -1,5 +1,6 @@
 package org.sopeco.service.rest;
 
+import org.sopeco.service.configuration.HTTPStatus;
 import org.sopeco.service.shared.LoginData;
 
 import javax.ws.rs.GET;
@@ -31,7 +32,7 @@ public class Login {
 		
 		// create the POJO to give the client a LoginData class
 		LoginData loginData = new LoginData(ACCESS_TOKEN);
-		return Response.status(201).entity(loginData).build();
+		return Response.status(HTTPStatus.Created).entity(loginData).build();
  
 	}
 	

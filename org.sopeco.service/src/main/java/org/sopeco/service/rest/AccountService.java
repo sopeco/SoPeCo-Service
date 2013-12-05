@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
+import org.sopeco.service.configuration.HTTPStatus;
 import org.sopeco.service.persistence.entities.account.Account;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.persistence.ServicePersistence;
@@ -29,7 +30,7 @@ public class AccountService {
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
 		createAccount(username, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
 		
-		return Response.status(201).build();
+		return Response.status(HTTPStatus.Created).build();
  
 	}
 	
