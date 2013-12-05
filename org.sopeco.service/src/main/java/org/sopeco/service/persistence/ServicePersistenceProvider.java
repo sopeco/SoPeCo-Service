@@ -18,6 +18,8 @@ import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.persistence.entities.account.Account;
 
 /**
+ * Visiblity of methods is worldwide, but contructor can only be accessed
+ * via the {@link ServicePersistence} class.
  * 
  * @author Peter Merkert
  */
@@ -72,7 +74,12 @@ public final class ServicePersistenceProvider {
 
 
 	/********************************************************************/
-
+	/**
+	 * The methods are taken out of the WebUI from Marius Oehler.
+	 * 
+	 * @param object the object to store
+	 * @return the state of the stored item
+	 */
 	private <T> T store(T object) {
 		EntityManager em = emf.createEntityManager();
 		T managedObject = null;

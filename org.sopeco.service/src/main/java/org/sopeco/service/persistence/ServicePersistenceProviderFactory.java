@@ -39,9 +39,14 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 /**
+ * Factory class to create a {@link ServicePersistenceProvider} object
+ * and access the database to load, store and remove items.
+ * With this factory the persistence provider is configured.
+ * 
+ * Visibility for factory is only class and package wide!
  * 
  * @author Marius Oehler
- * 
+ * @author Peter Merkert
  */
 public final class ServicePersistenceProviderFactory {
 
@@ -50,9 +55,9 @@ public final class ServicePersistenceProviderFactory {
 	/**
 	 * Database settings for JDBC
 	 */
-	public static final String DB_URL = "javax.persistence.jdbc.url";
-	public static final String SERVER_URL_PREFIX = "jdbc:derby://";
-	public static final String SERVER_URL_SUFFIX = ";create=true";
+	private static final String DB_URL = "javax.persistence.jdbc.url";
+	private static final String SERVER_URL_PREFIX = "jdbc:derby://";
+	private static final String SERVER_URL_SUFFIX = ";create=true";
 
 	/**
 	 * Hidden constructor as a contructor is available in a static way
@@ -66,7 +71,7 @@ public final class ServicePersistenceProviderFactory {
 	 * 
 	 * @return ServicePersistenceProvider to access database
 	 */
-	public static ServicePersistenceProvider createServicePersistenceProvider() {
+	static ServicePersistenceProvider createServicePersistenceProvider() {
 		try {
 			EntityManagerFactory factory = Persistence.createEntityManagerFactory("sopeco-service", getConfigOverrides());
 			return new ServicePersistenceProvider(factory);
