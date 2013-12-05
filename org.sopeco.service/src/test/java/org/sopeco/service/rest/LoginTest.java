@@ -1,4 +1,4 @@
-package org.sopeco.service.test;
+package org.sopeco.service.rest;
 
 import static org.junit.Assert.assertEquals;
 
@@ -7,6 +7,7 @@ import java.io.IOException;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
+import org.sopeco.service.configuration.test.TestConfiguration;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -14,10 +15,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class LoginTest extends JerseyTest {
 
-	private static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
-	private static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
-	private static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
-	
 	public LoginTest() {
 		super();
     }
@@ -32,15 +29,14 @@ public class LoginTest extends JerseyTest {
 	@Override
     public WebAppDescriptor configure() {
         return new WebAppDescriptor.Builder(
-        		new String []{PACKAGE_NAME_JSON, PACKAGE_NAME_REST})
-				.initParam(PACKAGE_NAME_POJO, "true")
+        		new String []{TestConfiguration.PACKAGE_NAME_JSON, TestConfiguration.PACKAGE_NAME_REST})
+				.initParam(TestConfiguration.PACKAGE_NAME_POJO, "true")
 				.build();
     }
 	
     @Test
-    public void test() throws IllegalArgumentException, IOException {
+    public void loginTest() throws IllegalArgumentException, IOException {
         WebResource webResource = resource().path("login");
         assertEquals("{\"accessToken\":\"6A1337B7\"}", webResource.accept(MediaType.APPLICATION_JSON).get(String.class));
     }
-	
 }
