@@ -10,7 +10,7 @@
 	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version>
+		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
 		<jersey.version>1.17.1</jersey.version>
 	</properties>
 	
@@ -115,16 +115,16 @@
 				    
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
 					<webResources>
+						
+						<!-- automatically include the persistence.xml -->
 						<resource>
-							<directory>target</directory>
+							<directory>persistence</directory>
+							<targetPath>/</targetPath>
 							<includes>
-								<include>**/images/*</include>
-								<include>**/*.css</include>
-								<include>**/*.html</include>
-								<include>**/*.jsp</include>
-								<include>**/*.ico</include>
+								<include>**/META-INF/*</include>
 							</includes>
 						</resource>
+						
 					</webResources>
 					
 				</configuration>
