@@ -7,8 +7,9 @@ import java.io.IOException;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
-import org.sopeco.service.configuration.test.TestConfiguration;
+import org.sopeco.service.configuration.TestConfiguration;
 
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
@@ -34,13 +35,17 @@ public class AccountServiceTest extends JerseyTest {
 				.build();
     }
 	
-    
+	@Test
     public void createExistingAccount() throws IllegalArgumentException, IOException {
     	String username = "test";
     	String password = "test";
-    	
+
         WebResource webResource = resource().path("account").path("create").path(username).path(password);
-        assertEquals("{\"message\":\"Account with the name test already exists\"}", webResource.accept(MediaType.APPLICATION_JSON).get(String.class));
+        ClientResponse client = webResource.head();
+        
+        assertEquals(403, client.getStatus());
+        
+        //assertEquals("{\"message\":\"Account with the name test already exists\"}", webResource.accept(APPLICATION_JSON).get(String.class));
     }
 	
 }

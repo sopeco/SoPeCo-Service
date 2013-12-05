@@ -7,7 +7,7 @@ import java.io.IOException;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
-import org.sopeco.service.configuration.test.TestConfiguration;
+import org.sopeco.service.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.test.framework.JerseyTest;

@@ -1,4 +1,4 @@
-package org.sopeco.service.configuration.test;
+package org.sopeco.service.configuration;
 
 public final class TestConfiguration {
 
