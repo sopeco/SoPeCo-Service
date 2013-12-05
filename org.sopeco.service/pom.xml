@@ -73,32 +73,24 @@
 			<version>4.10</version>
 		</dependency>
          
+        <dependency>
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+         
+        <dependency>
+		    <groupId>org.codehaus.jackson</groupId>
+		    <artifactId>jackson-xc</artifactId>
+		    <version>1.9.12</version>
+		</dependency>
+         
 		<!-- JSON data exchange -->
 		<dependency>
 			<groupId>org.codehaus.jackson</groupId>
 			<artifactId>jackson-jaxrs</artifactId>
 			<version>1.9.13</version>
 		</dependency>
-
-
-<dependency>
-	<groupId>org.eclipse.persistence</groupId>
-	<artifactId>org.eclipse.persistence.jpa</artifactId>
-	<version>2.5.1</version>
-</dependency>
-            
-            <dependency>
-	<groupId>org.eclipse.persistence</groupId>
-	<artifactId>javax.persistence</artifactId>
-	<version>2.1.0</version>
-</dependency>
-            
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-xc</artifactId>
-    <version>1.9.12</version>
-</dependency>
-               
         
     </dependencies>
   
