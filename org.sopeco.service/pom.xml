@@ -96,7 +96,6 @@
   
 	<!-- ================BUILD OPTIONS================= -->
 	<build>
-    	<finalName>org.sopeco.service</finalName>
     	
     	<plugins>
 	        
