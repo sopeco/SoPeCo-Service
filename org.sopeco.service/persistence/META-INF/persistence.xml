@@ -31,7 +31,8 @@
 		
 		<class>org.sopeco.service.persistence.entities.account.Account</class>
 		<class>org.sopeco.service.persistence.entities.account.AccountDetails</class>
-
+		<class>org.sopeco.service.persistence.entities.account.RememberMeToken</class>
+		
 		<properties>
 			<property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
 			<property name="javax.persistence.jdbc.url" value="jdbc:derby:memory:sopeco-jpa;create=true" />

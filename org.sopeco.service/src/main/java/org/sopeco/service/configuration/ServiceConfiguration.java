@@ -6,9 +6,9 @@ package org.sopeco.service.configuration;
  */
 public abstract class ServiceConfiguration {
 	
-	public static final String USER_TIMEOUT = "sopeco.ui.userTimeout";
+	public static final String USER_TIMEOUT = "sopeco.service.userTimeout";
 	
-	public static final String TIMEOUT_CHECK_INTERVAL = "sopeco.ui.timeoutCheckInterval";
+	public static final String TIMEOUT_CHECK_INTERVAL = "sopeco.service.timeoutCheckInterval";
 	
 	/**
 	 * Database configuration
@@ -18,5 +18,7 @@ public abstract class ServiceConfiguration {
 	public static final String DATABASE_NAME = "org.sopeco.service.name";
 	public static final String DATABASE_USER = "org.sopeco.service.user";
 	public static final String DATABASE_PASSWORD = "org.sopeco.service.password";
+
+	public static final String SESSION_ID = "SESSION_ID";
 	
 }

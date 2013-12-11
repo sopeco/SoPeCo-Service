@@ -62,11 +62,11 @@ public class Account implements Serializable {
 		this.name = name;
 	}
 
-	public String getPaswordHash() {
+	public String getPasswordHash() {
 		return paswordHash;
 	}
 
-	public void setPaswordHash(String paswordHash) {
+	public void setPasswordHash(String paswordHash) {
 		this.paswordHash = paswordHash;
 	}
 
