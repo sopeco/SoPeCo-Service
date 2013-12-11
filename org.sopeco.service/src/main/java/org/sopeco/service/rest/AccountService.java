@@ -33,7 +33,7 @@ public class AccountService {
 			return new Message("Account successfully created", 1);
 		}
 		
-		return new Message("Account with the name " + username + " already exists", 0);
+		return new Message("Account with the name \"" + username + "\" already exists", 0);
 	}
 	
 	private boolean createAccount(String accountName, String password, String dbHost, int dbPort) {

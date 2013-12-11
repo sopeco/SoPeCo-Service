@@ -2,8 +2,6 @@ package org.sopeco.service.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import java.io.IOException;
-
 import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
@@ -53,20 +51,32 @@ public class AccountServiceTest extends JerseyTest {
 	    return config;
 	}
 	
+	/**
+	 * Checks if it is possible to resgister an account twice.
+	 */
 	@Test
 	public void createExistingAccount() {
-		String username = "test";
-		String password = "test";
-	
+		String username = "testuser";
+		String password = "testpassword";
+		
+		// just create the account once to be sure it already exists
+		resource().path("account").path("create").path(username).path(password).get(Message.class);
 		
 		Message m = resource().path("account").path("create").path(username).path(password).get(Message.class);
 
 		assertEquals(true, m.failed());
 	}
 
+	/**
+	 * Checks it the account with the name already exists (after creating it).
+	 */
 	@Test
 	public void checkExistingAccount() {
-		String username = "test";
+		String username = "testuser";
+		
+		// the creation might fail, but we are only interested if afterwards at least one user
+		// with username "testuser" already exists
+		resource().path("account").path("create").path(username).path("rand").get(Message.class);
 
 		Boolean b = resource().path("account").path("user")
 				.path(username).accept(MediaType.APPLICATION_JSON)
