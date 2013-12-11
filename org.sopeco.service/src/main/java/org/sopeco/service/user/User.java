@@ -31,16 +31,16 @@ import java.util.logging.Logger;
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.persistence.entities.definition.MeasurementSpecification;
-import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistence;
+import org.sopeco.service.persistence.entities.account.Account;
+import org.sopeco.service.persistence.entities.account.AccountDetails;
 
 
 /**
  * 
  * @author Marius Oehler
- * 
  */
 public class User {
 
@@ -52,10 +52,10 @@ public class User {
 	 */
 	private String serviceSessionId;
 
-	//private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
+	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
 
 	private String workingSpecification;
-	//private Account currentAccount;
+	private Account currentAccount;
 	private IPersistenceProvider currentPersistenceProvider;
 	//private static final Logger LOGGER = Logger.getLogger(User.class.getName());
 	private long lastRequestTime;
@@ -64,7 +64,7 @@ public class User {
 		sessionId = sId;
 		lastRequestTime = System.currentTimeMillis();
 
-		//currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
+		currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
 	}
 
 	public IPersistenceProvider getCurrentPersistenceProvider() {
@@ -83,13 +83,13 @@ public class User {
 		this.lastRequestTime = pLastRequestTime;
 	}
 
-	/*public void setCurrentAccount(Account currentAccount) {
+	public void setCurrentAccount(Account currentAccount) {
 		this.currentAccount = currentAccount;
 	}
 
 	public Account getCurrentAccount() {
 		return currentAccount;
-	}*/
+	}
 
 	public String getSessionId() {
 		return sessionId;
@@ -103,7 +103,7 @@ public class User {
 		return serviceSessionId;
 	}
 	
-	/*public ScenarioDefinitionBuilder getCurrentScenarioDefinitionBuilder() {
+	public ScenarioDefinitionBuilder getCurrentScenarioDefinitionBuilder() {
 		return currentScenarioDefinitionBuilder;
 	}
 
@@ -112,8 +112,8 @@ public class User {
 	}
 
 	public AccountDetails getAccountDetails() {
-		return UiPersistence.getUiProvider().loadAccountDetails(currentAccount.getId());
-	}*/
+		return ServicePersistence.getServicePersistenceProvider().loadAccountDetails(currentAccount.getId());
+	}
 
 	// *******************************************************************************************************
 
