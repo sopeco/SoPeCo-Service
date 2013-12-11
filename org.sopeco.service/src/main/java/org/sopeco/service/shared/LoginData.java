@@ -9,9 +9,17 @@ package org.sopeco.service.shared;
 public class LoginData {
 
 	private String accessToken;
+
+	private Boolean status;
+
+	public LoginData() {
+		this.accessToken = "";
+		this.status = false;
+	}
 	
-	public LoginData(String accessToken) {
+	public LoginData(String accessToken, Boolean status) {
 		this.accessToken = accessToken;
+		this.status = status;
 	}
 
 	/**
@@ -27,7 +35,19 @@ public class LoginData {
 	public void setAccessToken(String accessToken) {
 		this.accessToken = accessToken;
 	}
-	
-	
+
+	/**
+	 * @return the status
+	 */
+	public Boolean getStatus() {
+		return status;
+	}
+
+	/**
+	 * @param status the status to set
+	 */
+	public void setStatus(Boolean status) {
+		this.status = status;
+	}
 	
 }

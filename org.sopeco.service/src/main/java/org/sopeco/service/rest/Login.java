@@ -1,13 +1,11 @@
 package org.sopeco.service.rest;
 
-import org.sopeco.service.configuration.HTTPStatus;
 import org.sopeco.service.shared.LoginData;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 @Path("login")
 public class Login {
@@ -28,11 +26,11 @@ public class Login {
 	 */
 	@GET
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response loginRequest() {
+	public LoginData loginRequest() {
 		
 		// create the POJO to give the client a LoginData class
-		LoginData loginData = new LoginData(ACCESS_TOKEN);
-		return Response.status(HTTPStatus.Created).entity(loginData).build();
+		LoginData loginData = new LoginData(ACCESS_TOKEN, true);
+		return loginData;
  
 	}
 	
