@@ -7,6 +7,7 @@ import javax.ws.rs.core.MediaType;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
 import org.sopeco.service.configuration.TestConfiguration;
+import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.shared.Message;
 
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -60,9 +61,17 @@ public class AccountServiceTest extends JerseyTest {
 		String password = "testpassword";
 		
 		// just create the account once to be sure it already exists
-		resource().path("account").path("create").path(username).path(password).get(Message.class);
+		resource().path(ServiceConfiguration.SVC_ACCOUNT)
+				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+				  .path(username)
+				  .path(password)
+				  .get(Message.class);
 		
-		Message m = resource().path("account").path("create").path(username).path(password).get(Message.class);
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+						      .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+						      .path(username)
+						      .path(password)
+						      .get(Message.class);
 
 		assertEquals(true, m.failed());
 	}
@@ -76,11 +85,17 @@ public class AccountServiceTest extends JerseyTest {
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
-		resource().path("account").path("create").path(username).path("rand").get(Message.class);
+		resource().path(ServiceConfiguration.SVC_ACCOUNT)
+				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+				  .path(username)
+				  .path("randompassword")
+				  .get(Message.class);
 
-		Boolean b = resource().path("account").path("exists")
-				.path(username).accept(MediaType.APPLICATION_JSON)
-				.get(Boolean.class);
+		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
+							  .path(username)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .get(Boolean.class);
 
 		assertEquals(true, b);
 	}
