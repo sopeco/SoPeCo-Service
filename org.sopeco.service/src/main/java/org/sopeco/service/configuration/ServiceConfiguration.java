@@ -23,4 +23,24 @@ public abstract class ServiceConfiguration {
 	public static final String DATABASE_PASSWORD = "sopeco.service.persistence.password";
 
 	
+	/**
+	 * All the REST services are listed down here
+	 * 
+	 * account
+	 * 		- create (username/pw)
+	 * 		- exists (username)
+	 * 		- login (username/pw)
+	 * 
+	 * user
+	 * 		
+	 * 
+	 */
+	public static final String SVC_ACCOUNT = "account";
+	public static final String SVC_ACCOUNT_CREATE = "create";
+	public static final String SVC_ACCOUNT_EXISTS = "exists";
+	public static final String SVC_ACCOUNT_LOGIN = "login";
+	public static final String SVC_ACCOUNT_INFO = "info";
+	
+	public static final String SVC_USER = "user";
+	
 }

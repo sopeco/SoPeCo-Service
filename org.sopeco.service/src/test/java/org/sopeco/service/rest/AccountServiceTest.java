@@ -78,7 +78,7 @@ public class AccountServiceTest extends JerseyTest {
 		// with username "testuser" already exists
 		resource().path("account").path("create").path(username).path("rand").get(Message.class);
 
-		Boolean b = resource().path("account").path("user")
+		Boolean b = resource().path("account").path("exists")
 				.path(username).accept(MediaType.APPLICATION_JSON)
 				.get(Boolean.class);
 

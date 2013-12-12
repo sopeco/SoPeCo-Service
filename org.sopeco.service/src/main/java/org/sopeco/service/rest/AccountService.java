@@ -23,7 +23,7 @@ import org.sopeco.service.persistence.FlexiblePersistenceProviderFactory;
 import org.sopeco.service.persistence.ServicePersistence;
 import org.sopeco.service.user.UserManager;
 
-@Path("account")
+@Path(ServiceConfiguration.SVC_ACCOUNT)
 public class AccountService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountService.class);
@@ -36,7 +36,7 @@ public class AccountService {
 	 * @return
 	 */
 	@GET
-	@Path("create/{username}/{password}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/{username}/{password}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Message createAccount(@PathParam("username") String username,
 								  @PathParam("password") String password) {
@@ -86,7 +86,7 @@ public class AccountService {
 	}
 	
 	@GET
-	@Path("user/{username}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS + "/{username}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Boolean checkExistence(@PathParam("username") String username) {
 		LOGGER.debug("Trying to check account existence");
@@ -101,7 +101,7 @@ public class AccountService {
 	
 	
 	@GET
-	@Path("login/{username}/{password}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN + "/{username}/{password}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public LoginData login(@PathParam("username") String username,
 							@PathParam("password") String password) {
@@ -171,6 +171,24 @@ public class AccountService {
 		}
 
 		return logindata;
+	}
+	
+	
+	/**
+	 * Access the account information for a given username.
+	 * 
+	 * @param username the username the information is requested to
+	 * @return AccountDetails object with all the account details
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO + "/{username}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public AccountDetails getInfo(@PathParam("username") String username) {
+		
+		Long accountID = ServicePersistence.getServicePersistenceProvider().loadAccount(username).getId();
+		AccountDetails accountDetails = ServicePersistence.getServicePersistenceProvider().loadAccountDetails(accountID);
+
+		return accountDetails;
 	}
 	
 }
