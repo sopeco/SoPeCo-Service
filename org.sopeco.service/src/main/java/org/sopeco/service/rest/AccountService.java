@@ -1,6 +1,5 @@
 package org.sopeco.service.rest;
 
-import javax.servlet.http.HttpServlet;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
