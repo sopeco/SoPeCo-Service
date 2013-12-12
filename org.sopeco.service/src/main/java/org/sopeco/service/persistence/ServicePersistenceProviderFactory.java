@@ -35,6 +35,7 @@ import javax.persistence.Persistence;
 
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
+import org.sopeco.config.exception.ConfigurationException;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
@@ -72,13 +73,19 @@ public final class ServicePersistenceProviderFactory {
 	 * @return ServicePersistenceProvider to access database
 	 */
 	static ServicePersistenceProvider createServicePersistenceProvider() {
+		
 		try {
 			EntityManagerFactory factory = Persistence.createEntityManagerFactory("sopeco-service", getConfigOverrides());
 			return new ServicePersistenceProvider(factory);
+		} catch (ConfigurationException ce) {
+			LOGGER.severe("Could not load the configuration files");
+			LOGGER.severe(ce.getLocalizedMessage());
 		} catch (Exception e) {
 			LOGGER.severe(e.getLocalizedMessage());
 			throw new IllegalArgumentException("Could not create persistence provider!", e);
 		}
+		
+		return null;
 	}
 
 	/**
@@ -87,9 +94,10 @@ public final class ServicePersistenceProviderFactory {
 	 * 
 	 * @return configuration for database
 	 */
-	private static Map<String, Object> getConfigOverrides() {
+	private static Map<String, Object> getConfigOverrides() throws ConfigurationException {
 		Map<String, Object> configOverrides = new HashMap<String, Object>();
 		configOverrides.put(DB_URL, getServerUrl());
+		System.out.println(configOverrides.get(DB_URL));
 		return configOverrides;
 	}
 
@@ -98,9 +106,11 @@ public final class ServicePersistenceProviderFactory {
 	 * 
 	 * @return connection-url to the database
 	 */
-	private static String getServerUrl() {
+	private static String getServerUrl() throws ConfigurationException {
 		
 		PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
+		// load the sopeco-service config file
+		Configuration.getSessionSingleton(Configuration.getGlobalSessionId()).loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
 		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
 		
 		if (config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST) == null) {
