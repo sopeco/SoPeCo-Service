@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.persistence.entities.account.Account;
-import org.sopeco.service.persistence.entities.account.RememberMeToken;
 
 /**
  * Visiblity of methods is worldwide, but contructor can only be accessed
@@ -71,14 +70,6 @@ public final class ServicePersistenceProvider {
 
 	public Account loadAccount(long primaryKey) {
 		return loadSingleById(Account.class, primaryKey);
-	}
-
-	public void storeRememberMeToken(RememberMeToken token) {
-		store(token);
-	}
-
-	public RememberMeToken loadRememberMeToken(String tokenHash) {
-		return loadSingleById(RememberMeToken.class, tokenHash);
 	}
 
 
