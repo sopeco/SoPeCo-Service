@@ -8,6 +8,7 @@ import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.shared.Message;
 
 import com.sun.jersey.api.client.config.ClientConfig;
@@ -57,8 +58,8 @@ public class AccountServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void createExistingAccount() {
-		String username = "testuser";
-		String password = "testpassword";
+		String username = TestConfiguration.TESTUSERNAME;
+		String password = TestConfiguration.TESTPASSWORD;
 		
 		// just create the account once to be sure it already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -81,7 +82,7 @@ public class AccountServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void checkExistingAccount() {
-		String username = "testuser";
+		String username = TestConfiguration.TESTUSERNAME;
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
@@ -98,6 +99,31 @@ public class AccountServiceTest extends JerseyTest {
 							  .get(Boolean.class);
 
 		assertEquals(true, b);
+	}
+	
+
+	/**
+	 * Checks getting AccountInformation for a created account
+	 */
+	
+	public void checkAccountDetails() {
+		String username = TestConfiguration.TESTUSERNAME;
+		
+		// the creation might fail, but we are only interested if afterwards at least one user
+		// with username "testuser" already exists
+		resource().path(ServiceConfiguration.SVC_ACCOUNT)
+				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+				  .path(username)
+				  .path("randompassword")
+				  .get(Message.class);
+
+		AccountDetails ad = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+									  .path(ServiceConfiguration.SVC_ACCOUNT_INFO)
+									  .path(username)
+									  .accept(MediaType.APPLICATION_JSON)
+									  .get(AccountDetails.class);
+
+		assertEquals(username, ad.getAccountName());
 	}
 	
 }
