@@ -35,16 +35,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Stores all the user the service currently is managing in a map, where the
+ * unique UUID is mapped to a definied user.
  * 
- * @author Marius Oehler
- * 
+ * @author Peter Merkert
  */
 public final class UserManager {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserManager.class);
 
 	private static UserManager singleton;
+	private Map<String, User> userMap = new HashMap<String, User>();
 
+	/**
+	 * Private constructor for singleton.
+	 */
+	private UserManager() {
+	}
+	
+	/**
+	 * Singleton instance request.
+	 * 
+	 * @return the usermanager singleton
+	 */
 	public static UserManager instance() {
 		if (singleton == null) {
 			singleton = new UserManager();
@@ -52,32 +65,29 @@ public final class UserManager {
 		return singleton;
 	}
 
-	private Map<String, User> userMap = new HashMap<String, User>();
-
-	private UserManager() {
-	}
 
 	/**
 	 * Returns whether a (not expired) user with the given session id exists in
 	 * the userMap.
 	 * 
-	 * @param sessionId
+	 * @param token the unique token (UUID String)
 	 * @return user with the given session exists
 	 */
-	public boolean existUser(String sessionId) {
+	public boolean existUser(String token) {
 		synchronized (userMap) {
-			return getUser(sessionId) != null;
+			return getUser(token) != null;
 		}
 	}
 
 	/**
 	 * Returns a List with all users which are connected to the given account.
 	 * 
-	 * @param databaseId
-	 * @return
+	 * @param accountId the account id
+	 * @return list with all users connected to account with given accountid.
 	 */
 	public List<User> getAllUserOnAccount(long accountId) {
 		List<User> userList = new ArrayList<User>();
+		
 		for (User u : userMap.values()) {
 			if (u.isExpired()) {
 				destroyUser(u);
@@ -85,16 +95,18 @@ public final class UserManager {
 				userList.add(u);
 			}
 		}
+		
 		return userList;
 	}
 
 	/**
-	 * Returns a list with all valid users.
+	 * Returns a list with all users, which are not expired.
 	 * 
-	 * @return
+	 * @return a list with all not expired users.
 	 */
 	public List<User> getAllUsers() {
 		List<User> userList = new ArrayList<User>();
+		
 		for (User u : userMap.values()) {
 			if (u.isExpired()) {
 				destroyUser(u);
@@ -102,32 +114,41 @@ public final class UserManager {
 				userList.add(u);
 			}
 		}
+		
 		return userList;
 	}
-
+	
 	/**
 	 * Returns the user, which has the given session id. If there is no user
 	 * with the given session key, it returns null.
 	 * 
-	 * @param sessionId
-	 * @return user
+	 * @param token the unique token for the user
+	 * @return user correspondign to given token
 	 */
-	public User getUser(String sessionId) {
+	public User getUser(String token) {
+		
 		synchronized (userMap) {
-			User user = userMap.get(sessionId);
+			
+			User user = userMap.get(token);
 			if (user != null && user.isExpired()) {
 				destroyUser(user);
 				user = null;
 			}
+			
 			return user;
 		}
+		
 	}
 
-	public User registerUser(String sessionId) {
-		LOGGER.debug("Store new user with the session id '{}'", sessionId);
-		User newUser = new User(sessionId);
-		userMap.put(sessionId, newUser);
-		return newUser;
+	/**
+	 * Registers a new user with the given token.
+	 * 
+	 * @param token the unique token, which the users knows, too
+	 */
+	public void registerUser(String token) {
+		LOGGER.debug("Store new user with the token: '{}'", token);
+		User newUser = new User(token);
+		userMap.put(token, newUser);
 	}
 
 	/**
@@ -137,10 +158,11 @@ public final class UserManager {
 	 *            to destroy
 	 */
 	public void destroyUser(User u) {
-		LOGGER.debug("Destroy user with the session id '{}'", u.getSessionId());
+		LOGGER.debug("Destroy user with token: '{}'", u.getToken());
 
-		userMap.remove(u.getSessionId());
+		userMap.remove(u.getToken());
 
+		// remove the persistence provider connected to the user u
 		if (u.getCurrentPersistenceProvider() != null) {
 			u.getCurrentPersistenceProvider().closeProvider();
 			u.setCurrentPersistenceProvider(null);

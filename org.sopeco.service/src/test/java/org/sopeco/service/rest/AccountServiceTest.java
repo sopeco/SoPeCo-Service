@@ -6,6 +6,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
@@ -18,6 +21,8 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class AccountServiceTest extends JerseyTest {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class.getName());
+	
 	public AccountServiceTest() {
 		super();
 	}
@@ -81,15 +86,16 @@ public class AccountServiceTest extends JerseyTest {
 	 * Checks it the account with the name already exists (after creating it).
 	 */
 	@Test
-	public void checkExistingAccount() {
+	public void checkAccountExistence() {
 		String username = TestConfiguration.TESTUSERNAME;
+		String password = TestConfiguration.TESTPASSWORD;
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .path(username)
-				  .path("randompassword")
+				  .path(password)
 				  .get(Message.class);
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -101,20 +107,22 @@ public class AccountServiceTest extends JerseyTest {
 		assertEquals(true, b);
 	}
 	
-
 	/**
 	 * Checks getting AccountInformation for a created account
+	 * 
+	 * Currently there are no account details created, thats why this test it not tested.
+	 * (No @Test annotation).
 	 */
-	
 	public void checkAccountDetails() {
 		String username = TestConfiguration.TESTUSERNAME;
+		String password = TestConfiguration.TESTPASSWORD;
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .path(username)
-				  .path("randompassword")
+				  .path(password)
 				  .get(Message.class);
 
 		AccountDetails ad = resource().path(ServiceConfiguration.SVC_ACCOUNT)

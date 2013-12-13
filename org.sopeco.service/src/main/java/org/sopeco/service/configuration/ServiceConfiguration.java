@@ -9,8 +9,9 @@ public abstract class ServiceConfiguration {
 	public static final String USER_TIMEOUT = "sopeco.service.userTimeout";
 
 	public static final String CONFIGURATION_FILE = "sopeco-service.conf";
+
+	public static final String SESSION_ID = "sessionid";
 	
-	public static final String SESSION_ID = "SESSION_ID";
 	/**
 	 * Database configuration key, can be found in the sopeco-service.conf!
 	 * So the actual values are in the sopeco-service.conf.
@@ -42,5 +43,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_INFO = "info";
 	
 	public static final String SVC_USER = "user";
+
+	public static final String SVC_SCENARIO = "scenario";
+	public static final String SVC_SCENARIO_ADD = "add";
 	
 }

@@ -26,8 +26,8 @@
  */
 package org.sopeco.service.user;
 
-import java.util.logging.Logger;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
@@ -44,26 +44,28 @@ import org.sopeco.service.persistence.entities.account.AccountDetails;
  */
 public class User {
 
-	private String sessionId;
+	private String token;
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(User.class.getName());
 	
 	/**
 	 * Stores the SessionID to the SoPeCo Service. The user get a session id,
 	 * when first time requesting the SoPeCo Service.
 	 */
-	private String serviceSessionId;
 
 	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
 
 	private String workingSpecification;
 	private Account currentAccount;
 	private IPersistenceProvider currentPersistenceProvider;
-	//private static final Logger LOGGER = Logger.getLogger(User.class.getName());
 	private long lastRequestTime;
 
-	public User(String sId) {
-		sessionId = sId;
+	/**
+	 * 
+	 */
+	public User(String token) {
+		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
-
 		currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
 	}
 
@@ -90,17 +92,9 @@ public class User {
 	public Account getCurrentAccount() {
 		return currentAccount;
 	}
-
-	public String getSessionId() {
-		return sessionId;
-	}
-
-	public void setServiceSessionID(String serviceSessionId) {
-		this.serviceSessionId = serviceSessionId;
-	}
-
-	public String getServiceSessionID() {
-		return serviceSessionId;
+	
+	public String getToken() {
+		return token;
 	}
 	
 	public ScenarioDefinitionBuilder getCurrentScenarioDefinitionBuilder() {
@@ -118,6 +112,8 @@ public class User {
 	// *******************************************************************************************************
 
 	public boolean isExpired() {
+		LOGGER.debug("Checking user with token '{}' for being expired.", this.toString());
+		
 		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
 		int userTimeout = config.getPropertyAsInteger(ServiceConfiguration.USER_TIMEOUT, 0);
 		if (userTimeout == 0 || System.currentTimeMillis() < lastRequestTime + userTimeout) {

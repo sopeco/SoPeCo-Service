@@ -38,7 +38,8 @@ import org.sopeco.service.configuration.ServiceConfiguration;
  *
  */
 public class FlexiblePersistenceProviderFactory extends PersistenceProviderFactory {
-	private static Logger logger = LoggerFactory.getLogger(FlexiblePersistenceProviderFactory.class);
+	
+	private static Logger logger = LoggerFactory.getLogger(FlexiblePersistenceProviderFactory.class.getName());
 
 	public static IPersistenceProvider createPersistenceProvider(String host, String port,
 			String dbName) {

@@ -12,7 +12,6 @@ import javax.persistence.NamedQuery;
 /**
  * 
  * @author Marius Oehler
- * @author Peter Merkert
  */
 @Entity
 @NamedQueries({ @NamedQuery(name = "getAllAccounts", query = "SELECT a FROM Account a"),
