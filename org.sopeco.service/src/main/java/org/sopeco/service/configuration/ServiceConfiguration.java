@@ -37,6 +37,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_EXISTS = "exists";
 	public static final String SVC_ACCOUNT_LOGIN = "login";
 	public static final String SVC_ACCOUNT_INFO = "info";
+
+	public static final String SVC_INFO = "info";
 	
 	/**
 	 * QueryParam name for the account name
