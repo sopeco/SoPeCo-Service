@@ -71,13 +71,13 @@ public class AccountServiceTest extends JerseyTest {
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .queryParam("accountname", username)
 				  .queryParam("password", password)
-				  .get(Message.class);
+				  .post(Message.class);
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 						      .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 							  .queryParam("accountname", username)
 							  .queryParam("password", password)
-						      .get(Message.class);
+						      .post(Message.class);
 
 		assertEquals(true, m.failed());
 	}
@@ -96,7 +96,7 @@ public class AccountServiceTest extends JerseyTest {
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .queryParam("accountname", username)
 				  .queryParam("password", password)
-				  .get(Message.class);
+				  .post(Message.class);
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)

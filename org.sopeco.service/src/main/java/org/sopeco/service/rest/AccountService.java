@@ -37,7 +37,7 @@ public class AccountService {
 	 * @param password the password for the account
 	 * @return a {@link Message} with a status and a message string
 	 */
-	@GET
+	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Message createAccount(@QueryParam("accountname") String accountname,
