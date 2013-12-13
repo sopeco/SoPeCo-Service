@@ -6,6 +6,6 @@ public final class TestConfiguration {
 	public static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
 	public static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
 
-	public static final String TESTUSERNAME = "testuser";
+	public static final String TESTACCOUNTNAME = "testuser";
 	public static final String TESTPASSWORD = "testpassword";
 }
