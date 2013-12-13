@@ -32,8 +32,9 @@ public class AccountService {
 	
 	/**
 	 * Creates a new user Account with the given username and password.
+	 * This is a POST request.
 	 * 
-	 * @param username the username
+	 * @param accountname the accountname
 	 * @param password the password for the account
 	 * @return a {@link Message} with a status and a message string
 	 */
@@ -56,7 +57,7 @@ public class AccountService {
 	
 	
 	/**
-	 * Checks if an account with the given name exists
+	 * Checks if an account with the given name exists.
 	 * 
 	 * @param accountname the accountname
 	 * @return true, if the account exists

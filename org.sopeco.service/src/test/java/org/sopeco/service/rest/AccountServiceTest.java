@@ -69,14 +69,14 @@ public class AccountServiceTest extends JerseyTest {
 		// just create the account once to be sure it already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .queryParam("accountname", username)
-				  .queryParam("password", password)
+				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, username)
+				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
 				  .post(Message.class);
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 						      .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-							  .queryParam("accountname", username)
-							  .queryParam("password", password)
+							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, username)
+							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
 						      .post(Message.class);
 
 		assertEquals(true, m.failed());
@@ -94,13 +94,13 @@ public class AccountServiceTest extends JerseyTest {
 		// with username "testuser" already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .queryParam("accountname", username)
-				  .queryParam("password", password)
+				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, username)
+				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
 				  .post(Message.class);
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
-							  .queryParam("accountname", username)
+							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, username)
 							  .accept(MediaType.APPLICATION_JSON)
 							  .get(Boolean.class);
 

@@ -31,16 +31,22 @@ public abstract class ServiceConfiguration {
 	 * 		- create (username/pw)
 	 * 		- exists (username)
 	 * 		- login (username/pw)
-	 * 
-	 * user
-	 * 		
-	 * 
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
 	public static final String SVC_ACCOUNT_EXISTS = "exists";
 	public static final String SVC_ACCOUNT_LOGIN = "login";
 	public static final String SVC_ACCOUNT_INFO = "info";
+	
+	/**
+	 * QueryParam name for the account name
+	 */
+	public static final String SVC_ACCOUNT_ACCOUNTNAME = "accountname";
+	
+	/**
+	 * QueryParam name for the account password
+	 */
+	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	
 	public static final String SVC_USER = "user";
 
