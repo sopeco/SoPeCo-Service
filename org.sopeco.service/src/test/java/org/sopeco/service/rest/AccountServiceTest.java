@@ -100,7 +100,7 @@ public class AccountServiceTest extends JerseyTest {
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
-							  .path(username)
+							  .queryParam("accountname", username)
 							  .accept(MediaType.APPLICATION_JSON)
 							  .get(Boolean.class);
 
@@ -113,6 +113,7 @@ public class AccountServiceTest extends JerseyTest {
 	 * Currently there are no account details created, thats why this test it not tested.
 	 * (No @Test annotation).
 	 */
+	
 	public void checkAccountDetails() {
 		String username = TestConfiguration.TESTUSERNAME;
 		String password = TestConfiguration.TESTPASSWORD;

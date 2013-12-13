@@ -3,9 +3,11 @@ package org.sopeco.service.rest;
 import java.util.UUID;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
@@ -60,9 +62,9 @@ public class AccountService {
 	 * @return true, if the account exists
 	 */
 	@GET
-	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS + "/{accountname}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Boolean checkExistence(@PathParam("accountname") String accountname) {
+	public Boolean checkExistence(@QueryParam("accountname") String accountname) {
 		LOGGER.debug("Trying to check account existence");
 		Boolean exists = accountExist(accountname);
 		
