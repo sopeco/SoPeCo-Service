@@ -69,14 +69,14 @@ public class AccountServiceTest extends JerseyTest {
 		// just create the account once to be sure it already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .path(username)
-				  .path(password)
+				  .queryParam("accountname", username)
+				  .queryParam("password", password)
 				  .get(Message.class);
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 						      .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-						      .path(username)
-						      .path(password)
+							  .queryParam("accountname", username)
+							  .queryParam("password", password)
 						      .get(Message.class);
 
 		assertEquals(true, m.failed());
@@ -94,8 +94,8 @@ public class AccountServiceTest extends JerseyTest {
 		// with username "testuser" already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .path(username)
-				  .path(password)
+				  .queryParam("accountname", username)
+				  .queryParam("password", password)
 				  .get(Message.class);
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)

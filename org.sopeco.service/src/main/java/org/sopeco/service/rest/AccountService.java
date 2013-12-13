@@ -38,10 +38,10 @@ public class AccountService {
 	 * @return a {@link Message} with a status and a message string
 	 */
 	@GET
-	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/{accountname}/{password}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message createAccount(@PathParam("accountname") String accountname,
-								 @PathParam("password") String password) {
+	public Message createAccount(@QueryParam("accountname") String accountname,
+								 @QueryParam("password") String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
 		boolean status = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
