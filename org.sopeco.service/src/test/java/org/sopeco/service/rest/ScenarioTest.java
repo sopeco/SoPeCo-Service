@@ -54,8 +54,8 @@ public class ScenarioTest extends JerseyTest {
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .path(accountname)
-							  .path(password)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 							  .get(Message.class);
 		
 		String token = m.getMessage();

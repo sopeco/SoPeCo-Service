@@ -91,10 +91,10 @@ public class AccountService {
 	
 	
 	@GET
-	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN + "/{accountname}/{password}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message loginWithPassword(@PathParam("accountname") String accountname,
-									 @PathParam("password") String password) {
+	public Message loginWithPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+									 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		Message m = new Message("", 0);
 		
