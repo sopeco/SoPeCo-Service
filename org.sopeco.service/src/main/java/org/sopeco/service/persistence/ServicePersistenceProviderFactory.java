@@ -38,7 +38,6 @@ import org.sopeco.config.IConfiguration;
 import org.sopeco.config.exception.ConfigurationException;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.util.Tools;
 
 /**
  * Factory class to create a {@link ServicePersistenceProvider} object
