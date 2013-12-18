@@ -27,12 +27,19 @@ public abstract class ServiceConfiguration {
 
 	
 	/**
-	 * All the REST services are listed down here
+	 * All the REST services are listed down here.
+	 * All params with prefix SVC points to paths.
+	 * All params with prefix SVCP points to parameter names.
 	 * 
 	 * account
 	 * 		- create (username/pw)
 	 * 		- exists (username)
 	 * 		- login (username/pw)
+	 * 
+	 * info
+	 * 
+	 * scenario
+	 * 		- add
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -41,6 +48,12 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_INFO = "info";
 
 	public static final String SVC_INFO = "info";
+	
+	public static final String SVC_SCENARIO = "scenario";
+	public static final String SVC_SCENARIO_ADD = "add";
+	public static final String SVCP_SCENARIO_NAME = "name";
+	public static final String SVCP_SCENARIO_SPECNAME = "specname";
+	public static final String SVCP_SCENARIO_TOKEN = "token";
 	
 	/**
 	 * QueryParam name for the account name
@@ -53,8 +66,5 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	
 	public static final String SVC_USER = "user";
-
-	public static final String SVC_SCENARIO = "scenario";
-	public static final String SVC_SCENARIO_ADD = "add";
 	
 }

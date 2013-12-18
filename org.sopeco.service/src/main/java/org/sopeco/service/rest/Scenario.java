@@ -1,13 +1,12 @@
 package org.sopeco.service.rest;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
@@ -23,24 +22,14 @@ public class Scenario {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Scenario.class);
 	
-	@GET
+	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Boolean addScenario(@QueryParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
-							   @QueryParam("experiment") String experiment,
-							   @QueryParam("token") String token) {
-		
-		// map the experiment to ExperimentSeriesDefinition with jackson
-		ObjectMapper mapper = new ObjectMapper();
-		ExperimentSeriesDefinition esd;
-		try {
-			esd = mapper.readValue(experiment, ExperimentSeriesDefinition.class);
-		} catch (Exception e) {
-			LOGGER.info("Could not map param experiments into a valid ExperimentSeriesDefinition!");
-			return false;
-		}
+							   @QueryParam("token") String token,
+							   ExperimentSeriesDefinition esd) {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 
@@ -49,7 +38,7 @@ public class Scenario {
 		if (specificationName != null) {
 			emptyScenario.getMeasurementSpecifications().get(0).setName(specificationName);
 			
-			if (experiment != null) {
+			if (esd != null) {
 				emptyScenario.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().add(esd);
 			}
 			
