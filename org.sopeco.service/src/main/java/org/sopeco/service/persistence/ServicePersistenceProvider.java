@@ -175,7 +175,7 @@ public final class ServicePersistenceProvider {
 		return result;
 	}
 
-	private int updateQuery(String queryName, Object... parameterList) {
+	/*private int updateQuery(String queryName, Object... parameterList) {
 		EntityManager em = emf.createEntityManager();
 		Query query = em.createNamedQuery(queryName);
 		for (int i = 0; i <= parameterList.length / 2; i += 2) {
@@ -193,5 +193,5 @@ public final class ServicePersistenceProvider {
 			em.close();
 		}
 		return count;
-	}
+	}*/
 }
