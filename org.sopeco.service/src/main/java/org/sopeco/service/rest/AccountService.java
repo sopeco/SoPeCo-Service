@@ -76,9 +76,9 @@ public class AccountService {
 	 * @return AccountDetails object with all the account details
 	 */
 	@GET
-	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO + "/{accountname}")
+	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
 	@Produces(MediaType.APPLICATION_JSON)
-	public AccountDetails getInfo(@PathParam("accountname") String accountname) {
+	public AccountDetails getInfo(@QueryParam("accountname") String accountname) {
 		
 		Long accountID = ServicePersistence.getServicePersistenceProvider().loadAccount(accountname).getId();
 		AccountDetails accountDetails = ServicePersistence.getServicePersistenceProvider().loadAccountDetails(accountID);
