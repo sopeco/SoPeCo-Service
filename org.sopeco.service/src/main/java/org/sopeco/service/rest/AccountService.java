@@ -45,13 +45,9 @@ public class AccountService {
 								 @QueryParam("password") String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
-		boolean status = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
+		Message m = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
 		
-		if (status) {
-			return new Message("Account successfully created", 1);
-		}
-		
-		return new Message("Account with the name \"" + accountname + "\" already exists", 0);
+		return m;
 	}
 	
 	
@@ -72,6 +68,7 @@ public class AccountService {
 		return exists;
 	}
 	
+	
 	/**
 	 * Access the account information for a given username.
 	 * 
@@ -90,6 +87,14 @@ public class AccountService {
 	}
 	
 	
+	/**
+	 * The login method to authentificate that the current client has the permission to
+	 * change something on this account.
+	 * 
+	 * @param accountname the account name to connect to
+	 * @param password the password for the account
+	 * @return a message, whose status is the token to authentificate afterwards, when it has not failed
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -163,11 +168,21 @@ public class AccountService {
 	
 	/*****************HELPER***********************/
 	
-	private boolean createAccount(String accountName, String password, String dbHost, int dbPort) {
+	/**
+	 * Creates an fresh new account with all the given settings. The account is stored in the database.
+	 * 
+	 * @param accountName the name for this account
+	 * @param password the password to login into this account
+	 * @param dbHost the database for this account
+	 * @param dbPort the database port for this account
+	 * @return message with the status, which indicates if the account could be created
+	 */
+	private Message createAccount(String accountName, String password, String dbHost, int dbPort) {
 		
 		if (accountExist(accountName)) {
 			LOGGER.info("It already exists an account named '{}'", accountName);
-			return false;
+			
+			return new Message("Account with the name \"" + accountName + "\" already exists", 0);
 		}
 
 		Account account = new Account();
@@ -175,7 +190,7 @@ public class AccountService {
 		account.setPasswordHash(Crypto.sha256(password));
 		account.setDbHost(dbHost);
 		account.setDbPort(dbPort);
-		account.setDbName(accountName);
+		account.setDbName(ServiceConfiguration.SVC_DB_PREFIX + " " + accountName);
 		account.setDbPassword(Crypto.encrypt(password, password));
 		account.setLastInteraction(-1);
 
@@ -183,7 +198,7 @@ public class AccountService {
 
 		LOGGER.debug("Account created with id {}", account.getId());
 
-		return true;
+		return new Message("Account successfully created", 1);
 	}
 
 	private boolean accountExist(String accountName) {

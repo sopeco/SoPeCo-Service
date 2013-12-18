@@ -69,5 +69,7 @@ public abstract class ServiceConfiguration {
 	
 	public static final String SVC_USER = "user";
 
+	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 	
 }
