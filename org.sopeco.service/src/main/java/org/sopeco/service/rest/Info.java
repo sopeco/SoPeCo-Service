@@ -12,6 +12,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 @Path(ServiceConfiguration.SVC_INFO)
 public class Info {
 	
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(Info.class);
 
 	/**
