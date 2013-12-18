@@ -38,6 +38,7 @@ import org.sopeco.config.IConfiguration;
 import org.sopeco.config.exception.ConfigurationException;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.util.Tools;
 
 /**
  * Factory class to create a {@link ServicePersistenceProvider} object
@@ -110,8 +111,11 @@ public final class ServicePersistenceProviderFactory {
 		
 		PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
 		// load the sopeco-service config file
-		Configuration.getSessionSingleton(Configuration.getGlobalSessionId()).loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
 		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
+		// sets the root folder where to look for our config files
+		config.setAppRootDirectory(ServiceConfiguration.SERVICE_CONFIG_FOLDER);
+		config.loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
+		
 		
 		if (config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST) == null) {
 			throw new NullPointerException("No MetaDataHost defined.");
