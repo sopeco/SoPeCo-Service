@@ -6,7 +6,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.TestConfiguration;
@@ -20,6 +19,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class AccountServiceTest extends JerseyTest {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class.getName());
 	
 	public AccountServiceTest() {
@@ -61,7 +61,7 @@ public class AccountServiceTest extends JerseyTest {
 	 * Checks if it is possible to resgister an account twice.
 	 */
 	@Test
-	public void createExistingAccount() {
+	public void testCreateExistingAccount() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		
@@ -85,7 +85,7 @@ public class AccountServiceTest extends JerseyTest {
 	 * Checks it the account with the name already exists (after creating it).
 	 */
 	@Test
-	public void checkAccountExistence() {
+	public void testCheckAccountExistence() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		
