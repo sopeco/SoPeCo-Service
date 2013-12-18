@@ -12,6 +12,8 @@ public abstract class ServiceConfiguration {
 
 	public static final String SESSION_ID = "sessionid";
 	
+	public static final String SERVICE_CONFIG_FOLDER = "rsc";
+	
 	/**
 	 * Database configuration key, can be found in the sopeco-service.conf!
 	 * So the actual values are in the sopeco-service.conf.
