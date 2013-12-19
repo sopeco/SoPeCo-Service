@@ -1,32 +1,68 @@
 package org.sopeco.service.persistence;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
+import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.sopeco.config.Configuration;
+import org.sopeco.config.IConfiguration;
+import org.sopeco.config.exception.ConfigurationException;
+import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
+import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.persistence.entities.account.Account;
 
 /**
- * Visiblity of methods is worldwide, but contructor can only be accessed
- * via the {@link ServicePersistence} class.
+ * Visiblity of database modification methods is worldwide. The methods can only be
+ * accessed via the class singleton, which can be requested via {@link getInstance()}.
  * 
  * @author Peter Merkert
  */
 public final class ServicePersistenceProvider {
-
+	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServicePersistenceProvider.class.getName());
 
 	private EntityManagerFactory emf;
+
+	/**
+	 * Singleton instance.
+	 */
+	private static ServicePersistenceProvider singleton;
+	
+	/**
+	 * Database settings for JDBC
+	 */
+	private static final String DB_URL = "javax.persistence.jdbc.url";
+	private static final String SERVER_URL_PREFIX = "jdbc:derby://";
+	private static final String SERVER_URL_SUFFIX = ";create=true";
+
+	/**
+	 * Hidden constructor as a contructor for singleton. Get an instance by calling {@link getInstance()}.
+	 */
+	private ServicePersistenceProvider() {
+		
+		try {
+			emf = Persistence.createEntityManagerFactory("sopeco-service", getConfigOverrides());
+		} catch (ConfigurationException ce) {
+			LOGGER.warn("Could not load the configuration files");
+			LOGGER.warn(ce.getLocalizedMessage());
+		} catch (Exception e) {
+			LOGGER.warn(e.getLocalizedMessage());
+			throw new IllegalArgumentException("Could not create persistence provider!", e);
+		}
+		
+	}
 
 	/**
 	 * The contructor sets the {@link EntityManagerFactory}. It's used
@@ -173,24 +209,66 @@ public final class ServicePersistenceProvider {
 		}
 		return result;
 	}
+	
 
-	/*private int updateQuery(String queryName, Object... parameterList) {
-		EntityManager em = emf.createEntityManager();
-		Query query = em.createNamedQuery(queryName);
-		for (int i = 0; i <= parameterList.length / 2; i += 2) {
-			query.setParameter((String) parameterList[i], parameterList[i + 1]);
+	/*******************************Database configuration*************************************/
+	
+	/**
+	 * Creates a new ServicePersistenceProvider to access the database.
+	 * 
+	 * @return ServicePersistenceProvider to access database
+	 */
+	public static ServicePersistenceProvider getInstance() {
+		
+		if (singleton == null) {
+			singleton = new ServicePersistenceProvider();
 		}
-		int count = 0;
-		try {
-			em.getTransaction().begin();
-			count = query.executeUpdate();
-			em.getTransaction().commit();
-		} finally {
-			if (em.getTransaction().isActive()) {
-				em.getTransaction().rollback();
-			}
-			em.close();
+		
+		return singleton;
+	}
+
+	/**
+	 * Creates a configuration map, which contains the connection url to the
+	 * database.
+	 * 
+	 * @return configuration for database
+	 */
+	private static Map<String, Object> getConfigOverrides() throws ConfigurationException {
+		Map<String, Object> configOverrides = new HashMap<String, Object>();
+		configOverrides.put(DB_URL, getServerUrl());
+		System.out.println(configOverrides.get(DB_URL));
+		return configOverrides;
+	}
+
+	/**
+	 * Builds the connection-url of the SoPeCo service database.
+	 * 
+	 * @return connection-url to the database
+	 */
+	private static String getServerUrl() throws ConfigurationException {
+		
+		PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
+		// load the sopeco-service config file
+		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
+		// sets the root folder where to look for our config files
+		config.setAppRootDirectory(ServiceConfiguration.SERVICE_CONFIG_FOLDER);
+		config.loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
+		
+		
+		if (config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST) == null) {
+			throw new NullPointerException("No MetaDataHost defined.");
 		}
-		return count;
-	}*/
+		
+		String host = config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST);
+		String port = config.getPropertyAsStr(ServiceConfiguration.META_DATA_PORT);
+		String name = config.getPropertyAsStr(ServiceConfiguration.DATABASE_NAME);
+		String user = config.getPropertyAsStr(ServiceConfiguration.DATABASE_USER);
+		String password = config.getPropertyAsStr(ServiceConfiguration.DATABASE_PASSWORD);
+		
+		return SERVER_URL_PREFIX 	+ host + ":" + port
+									+ "/" + name
+									+ ";user=" + user
+									+ ";password=" + password
+									+ SERVER_URL_SUFFIX;
+	}
 }

@@ -33,7 +33,7 @@ import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.persistence.ServicePersistence;
+import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.account.Account;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
 
@@ -106,7 +106,7 @@ public class User {
 	}
 
 	public AccountDetails getAccountDetails() {
-		return ServicePersistence.getServicePersistenceProvider().loadAccountDetails(currentAccount.getId());
+		return ServicePersistenceProvider.getInstance().loadAccountDetails(currentAccount.getId());
 	}
 
 	// *******************************************************************************************************

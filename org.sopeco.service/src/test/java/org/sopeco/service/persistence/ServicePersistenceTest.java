@@ -20,7 +20,7 @@ public class ServicePersistenceTest {
 	 */
 	@Test
 	public void PersistenceTest() {
-		ServicePersistenceProvider spp = ServicePersistence.getServicePersistenceProvider();
+		ServicePersistenceProvider spp = ServicePersistenceProvider.getInstance();
 		assertEquals(null, spp.loadAccount(0));
 	}
 	

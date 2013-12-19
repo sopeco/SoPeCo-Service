@@ -21,8 +21,8 @@ import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.user.UserManager;
-import org.sopeco.service.persistence.ServicePersistence;
 import org.sopeco.service.persistence.FlexiblePersistenceProviderFactory;
+import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 @Path(ServiceConfiguration.SVC_ACCOUNT)
 public class AccountService {
@@ -79,8 +79,8 @@ public class AccountService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public AccountDetails getInfo(@QueryParam("accountname") String accountname) {
 		
-		Long accountID = ServicePersistence.getServicePersistenceProvider().loadAccount(accountname).getId();
-		AccountDetails accountDetails = ServicePersistence.getServicePersistenceProvider().loadAccountDetails(accountID);
+		Long accountID = ServicePersistenceProvider.getInstance().loadAccount(accountname).getId();
+		AccountDetails accountDetails = ServicePersistenceProvider.getInstance().loadAccountDetails(accountID);
 
 		return accountDetails;
 	}
@@ -102,7 +102,7 @@ public class AccountService {
 		
 		Message m = new Message("", 0);
 		
-		Account account = ServicePersistence.getServicePersistenceProvider().loadAccount(accountname);
+		Account account = ServicePersistenceProvider.getInstance().loadAccount(accountname);
 
 		if (account == null) {
 			LOGGER.debug("Account '{}' doesn't exist.", accountname);
@@ -152,12 +152,12 @@ public class AccountService {
 		UserManager.instance().registerUser(uuid);
 		UserManager.instance().getUser(uuid).setCurrentPersistenceProvider(persistence);
 		
-		AccountDetails details = ServicePersistence.getServicePersistenceProvider().loadAccountDetails(account.getId());
+		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
 		if (details == null) {
 			details = new AccountDetails();
 			details.setId(account.getId());
 			details.setAccountName(account.getName());
-			ServicePersistence.getServicePersistenceProvider().storeAccountDetails(details);
+			ServicePersistenceProvider.getInstance().storeAccountDetails(details);
 		}
 
 		return m;
@@ -193,7 +193,7 @@ public class AccountService {
 		account.setDbPassword(Crypto.encrypt(password, password));
 		account.setLastInteraction(-1);
 
-		account = ServicePersistence.getServicePersistenceProvider().storeAccount(account);
+		account = ServicePersistenceProvider.getInstance().storeAccount(account);
 
 		LOGGER.debug("Account created with id {}", account.getId());
 
@@ -201,7 +201,7 @@ public class AccountService {
 	}
 
 	private boolean accountExist(String accountName) {
-		Account testIfExist = ServicePersistence.getServicePersistenceProvider().loadAccount(accountName);
+		Account testIfExist = ServicePersistenceProvider.getInstance().loadAccount(accountName);
 
 		if (testIfExist == null) {
 			return false;
