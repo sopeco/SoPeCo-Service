@@ -33,6 +33,13 @@ public final class ServicePersistenceProvider {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServicePersistenceProvider.class.getName());
 
+	/**
+	 * The entitymanagerfactory is like a thread pol. Entitmanagers to execute database queries
+	 * can be created with this factory.
+	 * This factory handles a connection pool automatically.
+	 * 
+	 * @Todo close the emf down at end of program life
+	 */
 	private EntityManagerFactory emf;
 
 	/**
@@ -236,7 +243,7 @@ public final class ServicePersistenceProvider {
 	private static Map<String, Object> getConfigOverrides() throws ConfigurationException {
 		Map<String, Object> configOverrides = new HashMap<String, Object>();
 		configOverrides.put(DB_URL, getServerUrl());
-		System.out.println(configOverrides.get(DB_URL));
+		LOGGER.debug("Database connection string: {}", configOverrides.get(DB_URL));
 		return configOverrides;
 	}
 
