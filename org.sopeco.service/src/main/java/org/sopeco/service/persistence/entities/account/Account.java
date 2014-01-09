@@ -26,7 +26,7 @@ public class Account implements Serializable {
 
 	@Column(name = "name", unique = true)
 	private String name;
-
+	
 	@Column(name = "paswordHash")
 	private String paswordHash;
 
@@ -43,7 +43,7 @@ public class Account implements Serializable {
 	private String dbName;
 
 	@Column(name = "dbPassword")
-	private byte[][] dbPassword;
+	private String dbPassword;
 
 	public long getId() {
 		return id;
@@ -60,13 +60,13 @@ public class Account implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
+	
 	public String getPasswordHash() {
 		return paswordHash;
 	}
 
-	public void setPasswordHash(String paswordHash) {
-		this.paswordHash = paswordHash;
+	public void setPasswordHash(String passwordHash) {
+		this.paswordHash = passwordHash;
 	}
 
 	public String getDbHost() {
@@ -101,11 +101,11 @@ public class Account implements Serializable {
 		this.dbName = dbName;
 	}
 
-	public byte[][] getDbPassword() {
+	public String getDbPassword() {
 		return dbPassword;
 	}
 
-	public void setDbPassword(byte[][] dbPassword) {
+	public void setDbPassword(String dbPassword) {
 		this.dbPassword = dbPassword;
 	}
 
@@ -114,9 +114,10 @@ public class Account implements Serializable {
 		return "## Account ##" + "\n"
 				+ "Id: " + id + " \n"
 				+ "Name: " + name + " \n"
-				+ "PasswordHash: " + "paswordHash" +" \n"
+				+ "PasswordHash: " + paswordHash +" \n"
 				+ "DatabaseHost: " + dbHost + " \n"
 				+ "DatabasePort: " + dbPort + " \n"
+				+ "DatabasePassword: " + dbPassword + " \n"
 				+ "LastInteraction: " + lastInteraction + " \n"
 				+ "#############";
 	}

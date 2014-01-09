@@ -12,16 +12,13 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
-import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.config.PersistenceConfiguration;
-import org.sopeco.persistence.exceptions.WrongCredentialsException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.account.Account;
 import org.sopeco.service.persistence.entities.account.AccountDetails;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.user.UserManager;
-import org.sopeco.service.persistence.FlexiblePersistenceProviderFactory;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 @Path(ServiceConfiguration.SVC_ACCOUNT)
@@ -114,32 +111,6 @@ public class AccountService {
 			m.setMessage("Wrong password. Password hashes are not equal!");
 			return m;
 		}
-
-		IPersistenceProvider persistence = null;
-		try {
-			String databasePassword = Crypto.decrypt(password, account.getDbPassword());
-			
-			if (databasePassword.isEmpty()) {
-				persistence = FlexiblePersistenceProviderFactory.createPersistenceProvider(account.getDbHost(),
-																						   account.getDbPort() + "",
-																					   	   account.getDbName());
-			} else {
-				persistence = FlexiblePersistenceProviderFactory.createPersistenceProvider(account.getDbHost(), 
-																						   account.getDbPort() + "",
-																						   account.getDbName(),
-																						   databasePassword);
-			}
-		} catch (WrongCredentialsException e) {
-			LOGGER.warn("Wrong password database credentials!");
-			m.setMessage("Wrong password database credentials!");
-			return m;
-		}
-
-		if (persistence == null) {
-			LOGGER.warn("Connection to the database failed.");
-			m.setMessage("Connection to the database failed.");
-			return m;
-		}
 		
 		// create a unique token for the requester
 		String uuid = UUID.randomUUID().toString();
@@ -150,7 +121,7 @@ public class AccountService {
 		
 		// set the user persistence provider
 		UserManager.instance().registerUser(uuid);
-		UserManager.instance().getUser(uuid).setCurrentPersistenceProvider(persistence);
+		UserManager.instance().getUser(uuid).setCurrentAccount(account);
 		
 		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
 		if (details == null) {
@@ -189,8 +160,8 @@ public class AccountService {
 		account.setPasswordHash(Crypto.sha256(password));
 		account.setDbHost(dbHost);
 		account.setDbPort(dbPort);
-		account.setDbName(ServiceConfiguration.SVC_DB_PREFIX + " " + accountName);
-		account.setDbPassword(Crypto.encrypt(password, password));
+		account.setDbName(ServiceConfiguration.SVC_DB_PREFIX + "_" + accountName);
+		account.setDbPassword(password);
 		account.setLastInteraction(-1);
 
 		account = ServicePersistenceProvider.getInstance().storeAccount(account);

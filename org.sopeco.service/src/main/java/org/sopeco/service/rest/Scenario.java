@@ -14,6 +14,7 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.user.UserManager;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
@@ -26,9 +27,9 @@ public class Scenario {
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Boolean addScenario(@QueryParam("name") String scenarioName,
+	public boolean addScenario(@QueryParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
-							   @QueryParam("token") String token,
+							   @QueryParam("token") String usertoken,
 							   ExperimentSeriesDefinition esd) {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
@@ -43,8 +44,9 @@ public class Scenario {
 			}
 			
 		}
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
-		IPersistenceProvider dbCon = UserManager.instance().getUser(token).getCurrentPersistenceProvider();
 
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
@@ -53,9 +55,31 @@ public class Scenario {
 
 		dbCon.store(emptyScenario);
 
-		switchScenario(scenarioName, token);
+		switchScenario(scenarioName, usertoken);
 		return true;
 	}
+	
+	/*@POST
+	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public boolean addScenario(@QueryParam("token") String usertoken,
+							   ScenarioDefinition scenario) {
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+
+		if (dbCon == null) {
+			LOGGER.warn("No database connection found.");
+			return false;
+		}
+
+		dbCon.store(scenario);
+
+		switchScenario(scenario.getScenarioName(), usertoken);
+		return true;
+	}*/
+	
+	
 	
 	
 	/*******************HELPER**************************/
@@ -91,9 +115,7 @@ public class Scenario {
 	 */
 	private ScenarioDefinition loadScenarioDefinition(String scenarioname, String token) {
 		try {
-			ScenarioDefinition definition = UserManager.instance().getUser(token)
-												.getCurrentPersistenceProvider()
-												.loadScenarioDefinition(scenarioname);
+			ScenarioDefinition definition = UserPersistenceProvider.createPersistenceProvider(token).loadScenarioDefinition(scenarioname);
 
 			return definition;
 			
