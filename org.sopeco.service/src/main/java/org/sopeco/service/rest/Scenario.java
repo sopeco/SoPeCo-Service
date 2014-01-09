@@ -1,5 +1,7 @@
 package org.sopeco.service.rest;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,10 +33,12 @@ public class Scenario {
 	public Boolean addScenario(@PathParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
 							   @QueryParam("token") String usertoken,
-							   ExperimentSeriesDefinition esd) {
+							   ExperimentSeriesDefinition esd) throws DataNotFoundException {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 
+		
+		
 		ScenarioDefinition emptyScenario = ScenarioDefinitionBuilder.buildEmptyScenario(scenarioName);
 
 		if (specificationName != null) {
@@ -48,10 +52,16 @@ public class Scenario {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
-
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
 			return false;
+		}
+		
+		for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
+			if (sd.getScenarioName().equals(scenarioName)) {
+				LOGGER.info("Scenario with the given name alaready exists");
+				return false;
+			}
 		}
 
 		dbCon.store(emptyScenario);
@@ -65,13 +75,20 @@ public class Scenario {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Boolean addScenario(@QueryParam("token") String usertoken,
-							   ScenarioDefinition scenario) {
+							   ScenarioDefinition scenario) throws DataNotFoundException {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
-
+		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
 			return false;
+		}
+		
+		for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
+			if (sd.getScenarioName().equals(scenario.getScenarioName())) {
+				LOGGER.info("Scenario with the given name alaready exists");
+				return false;
+			}
 		}
 
 		dbCon.store(scenario);
@@ -80,6 +97,34 @@ public class Scenario {
 		return true;
 	}
 	
+	@POST
+	@Path(ServiceConfiguration.SVC_SCENARIO_LIST)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public String[] getScenarioNames(@QueryParam("token") String usertoken) {
+
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+
+		if (dbCon == null) {
+			LOGGER.warn("No database connection found.");
+			return null;
+		}
+
+		try {
+			List<ScenarioDefinition> scenarioList = dbCon.loadAllScenarioDefinitions();
+
+			String[] retValues = new String[scenarioList.size()];
+
+			for (int i = 0; i < scenarioList.size(); i++) {
+				ScenarioDefinition sd = scenarioList.get(i);
+				retValues[i] = sd.getScenarioName();
+			}
+
+			return retValues;
+		} catch (DataNotFoundException e) {
+			return null;
+		}
+	}
 	
 	
 	

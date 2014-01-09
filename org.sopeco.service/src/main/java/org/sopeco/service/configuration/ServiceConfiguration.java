@@ -40,6 +40,7 @@ public abstract class ServiceConfiguration {
 	 * 
 	 * scenario
 	 * 		- add
+	 * 		- list
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -53,6 +54,7 @@ public abstract class ServiceConfiguration {
 	
 	public static final String SVC_SCENARIO = "scenario";
 	public static final String SVC_SCENARIO_ADD = "add";
+	public static final String SVC_SCENARIO_LIST = "list";
 	public static final String SVCP_SCENARIO_NAME = "name";
 	public static final String SVCP_SCENARIO_SPECNAME = "specname";
 	public static final String SVCP_SCENARIO_TOKEN = "token";

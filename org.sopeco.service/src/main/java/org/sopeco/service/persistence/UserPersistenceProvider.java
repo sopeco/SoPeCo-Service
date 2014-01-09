@@ -37,6 +37,11 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	 */
 	public static IPersistenceProvider createPersistenceProvider(Account account) {
 		
+		if (account == null) {
+			LOGGER.warn("Given account is invalid!");
+			return null;
+		}
+		
 		String dbPassword = account.getDbPassword();
 		String host 	  = account.getDbHost();
 		String port 	  = Integer.toString(account.getDbPort());
@@ -54,7 +59,7 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 		
 		Object[] hpn = { host, port, name };
 		LOGGER.debug("Creating a new persistence provider for {}:{}/{}", hpn);
-
+		
 		UserPersistenceProvider factory = new UserPersistenceProvider();
 		return factory.createJPAPersistenceProvider(ServiceConfiguration.SESSION_ID);
 	}
