@@ -74,4 +74,33 @@ public class ScenarioTest extends JerseyTest {
 		
 	}
 	
+
+	/*@Test
+	public void testScenarioAddScenarioDefintion() {
+		// connect to test users account
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		ScenarioDefinition sd = ScenarioDefinitionBuilder.buildEmptyScenario("test");
+
+		System.out.println("test1");
+		
+		boolean bo = resource().path(ServiceConfiguration.SVC_SCENARIO)
+							   .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							   .accept(MediaType.APPLICATION_JSON)
+							   .type(MediaType.APPLICATION_JSON)
+							   .post(Boolean.class, sd);
+		
+		assertEquals(bo, true);
+		
+	}*/
 }

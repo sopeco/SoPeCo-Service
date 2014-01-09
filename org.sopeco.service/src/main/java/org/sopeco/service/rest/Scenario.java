@@ -28,7 +28,7 @@ public class Scenario {
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addScenario(@PathParam("name") String scenarioName,
+	public Boolean addScenario(@PathParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
 							   @QueryParam("token") String usertoken,
 							   ExperimentSeriesDefinition esd) {
@@ -64,7 +64,7 @@ public class Scenario {
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addScenario(@QueryParam("token") String usertoken,
+	public Boolean addScenario(@QueryParam("token") String usertoken,
 							   ScenarioDefinition scenario) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
