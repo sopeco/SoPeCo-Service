@@ -24,10 +24,7 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	public static IPersistenceProvider createPersistenceProvider(String token) {
 
 		User u = UserManager.instance().getUser(token);
-
 		Account account = u.getCurrentAccount();
-		
-		System.out.println(account.toString());
 		
 		return createPersistenceProvider(account);
 	}
@@ -40,15 +37,10 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	 */
 	public static IPersistenceProvider createPersistenceProvider(Account account) {
 		
-		String dbPassword = "testpassword";//account.getDbPassword();
+		String dbPassword = account.getDbPassword();
 		String host 	  = account.getDbHost();
 		String port 	  = Integer.toString(account.getDbPort());
 		String name 	  = account.getDbName();
-		
-		System.out.println(dbPassword);
-		System.out.println(host);
-		System.out.println(port);
-		System.out.println(name);
 		
 		if (dbPassword.isEmpty()) {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
