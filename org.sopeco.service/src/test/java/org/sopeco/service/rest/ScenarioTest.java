@@ -63,7 +63,7 @@ public class ScenarioTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		boolean bo = resource().path(ServiceConfiguration.SVC_SCENARIO)
 							   .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+							   .path("examplescenario")
 							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 							   .accept(MediaType.APPLICATION_JSON)

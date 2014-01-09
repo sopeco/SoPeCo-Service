@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
@@ -24,10 +25,10 @@ public class Scenario {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Scenario.class);
 	
 	@POST
-	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
+	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addScenario(@QueryParam("name") String scenarioName,
+	public boolean addScenario(@PathParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
 							   @QueryParam("token") String usertoken,
 							   ExperimentSeriesDefinition esd) {
@@ -59,7 +60,7 @@ public class Scenario {
 		return true;
 	}
 	
-	/*@POST
+	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
@@ -77,7 +78,7 @@ public class Scenario {
 
 		switchScenario(scenario.getScenarioName(), usertoken);
 		return true;
-	}*/
+	}
 	
 	
 	
