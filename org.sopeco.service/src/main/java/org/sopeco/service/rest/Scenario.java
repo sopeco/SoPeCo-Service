@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -78,22 +79,24 @@ public class Scenario {
 							   ScenarioDefinition scenario) throws DataNotFoundException {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		String scenarioname = scenario.getScenarioName();
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
 			return false;
 		}
 		
+		
 		for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
-			if (sd.getScenarioName().equals(scenario.getScenarioName())) {
-				LOGGER.info("Scenario with the given name alaready exists");
+			if (sd.getScenarioName().equals(scenarioname)) {
+				LOGGER.info("Scenario with the given name '{}' alaready exists", scenarioname);
 				return false;
 			}
 		}
 
 		dbCon.store(scenario);
 
-		switchScenario(scenario.getScenarioName(), usertoken);
+		switchScenario(scenarioname, usertoken);
 		return true;
 	}
 	
@@ -126,6 +129,31 @@ public class Scenario {
 		}
 	}
 	
+	@DELETE
+	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean removeScenario(@QueryParam("name") String scenarioname,
+								  @QueryParam("token") String usertoken) {
+		
+		if (!scenarioname.matches("[a-zA-Z0-9_]+")) {
+			return false;
+		}
+
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+
+		try {
+			
+			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
+			dbCon.remove(definition);
+			return true;
+			
+		} catch (DataNotFoundException e) {
+			LOGGER.warn("Scenario with name '{}' not found.", scenarioname);
+			return false;
+		}
+		
+	}
+
 	
 	
 	/*******************HELPER**************************/

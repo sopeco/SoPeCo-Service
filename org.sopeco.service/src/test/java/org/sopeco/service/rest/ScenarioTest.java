@@ -189,6 +189,44 @@ public class ScenarioTest extends JerseyTest {
 		assertEquals(list.length > 0, true);
 	}
 
-	
+	/*@Test
+	public void testScenarioDeletion() {
+		// connect to test users account
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		String scenarioname = "examplescenario";
+		
+		// add a default scenario (maybe a scenario with the name already exists, but
+		// we don't care here about it)
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		// now try to delete the scenario
+		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
+							  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .delete(Boolean.class);
+		
+		// the deletion should be successful completed
+		assertEquals(b, true);
+	}*/
 	
 }
