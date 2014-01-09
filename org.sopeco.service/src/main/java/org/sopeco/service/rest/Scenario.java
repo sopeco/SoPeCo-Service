@@ -5,6 +5,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -67,7 +68,7 @@ public class Scenario {
 
 		dbCon.store(emptyScenario);
 
-		switchScenario(scenarioName, usertoken);
+		switchScenarioHelper(scenarioName, usertoken);
 		return true;
 	}
 	
@@ -96,7 +97,7 @@ public class Scenario {
 
 		dbCon.store(scenario);
 
-		switchScenario(scenarioname, usertoken);
+		switchScenarioHelper(scenarioname, usertoken);
 		return true;
 	}
 	
@@ -154,6 +155,23 @@ public class Scenario {
 		
 	}
 
+	@PUT
+	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean switchScenario(@QueryParam("name") String scenarioname,
+	  							  @QueryParam("token") String usertoken) {
+		
+		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
+		if (definition == null) {
+			return false;
+		}
+
+		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
+		UserManager.instance().getUser(usertoken).setCurrentScenarioDefinitionBuilder(builder);
+
+		return true;
+
+	}
 	
 	
 	/*******************HELPER**************************/
@@ -165,7 +183,7 @@ public class Scenario {
 	 * @param token the token to identify the user
 	 * @return true, if the scenario could be switched
 	 */
-	private boolean switchScenario(String scenarioname, String token) {
+	private boolean switchScenarioHelper(String scenarioname, String token) {
 		
 		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, token);
 		if (definition == null) {

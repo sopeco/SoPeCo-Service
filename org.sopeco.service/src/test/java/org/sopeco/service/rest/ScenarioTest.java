@@ -189,7 +189,7 @@ public class ScenarioTest extends JerseyTest {
 		assertEquals(list.length > 0, true);
 	}
 
-	/*@Test
+	@Test
 	public void testScenarioDeletion() {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -227,6 +227,45 @@ public class ScenarioTest extends JerseyTest {
 		
 		// the deletion should be successful completed
 		assertEquals(b, true);
-	}*/
+	}
+	
+	@Test
+	public void testScenarioSwitch() {
+		// connect to test users account
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		String scenarioname = "examplescenario";
+		
+		// add a default scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		// now try to switch the scenario
+		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
+							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .put(Boolean.class);
+		
+		// the switch should be succesful
+		assertEquals(b, true);
+	}
 	
 }
