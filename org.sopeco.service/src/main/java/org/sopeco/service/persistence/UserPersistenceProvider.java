@@ -37,23 +37,16 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	 */
 	public static IPersistenceProvider createPersistenceProvider(Account account) {
 		
-		//Properties p = System.getProperties();
-		//p.setProperty("derby.system.home", "C:\\Apache_Derby_10.10.1.1");
-		//p.setProperty("derby.connection.requireAuthentication", "false");
-		
 		if (account == null) {
 			LOGGER.warn("Given account is invalid!");
 			return null;
 		}
 		
+		@SuppressWarnings("unused")
 		String dbPassword  = account.getDbPassword();
 		String host 	   = account.getDbHost();
 		String port 	   = Integer.toString(account.getDbPort());
 		String name 	   = account.getDbName();
-		
-		System.out.println(dbPassword);
-		System.out.println(host + ":" + port);
-		System.out.println(name);
 		
 		/*if (dbPassword.isEmpty()) {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
