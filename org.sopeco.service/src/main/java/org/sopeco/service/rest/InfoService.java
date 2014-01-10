@@ -8,7 +8,7 @@ import javax.ws.rs.core.MediaType;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 @Path(ServiceConfiguration.SVC_INFO)
-public class Info {
+public class InfoService {
 
 	/**
 	 * Prints information about the SoPeCo Service
