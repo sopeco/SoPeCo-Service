@@ -191,8 +191,6 @@ public class Scenario {
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		u.setCurrentScenarioDefinitionBuilder(builder);
 		ServicePersistenceProvider.getInstance().storeUser(u);
-		
-		//UserManager.instance().getUser(usertoken).setCurrentScenarioDefinitionBuilder(builder);
 
 		return true;
 
@@ -219,7 +217,6 @@ public class Scenario {
 		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
 		u.setCurrentScenarioDefinitionBuilder(builder);
 		ServicePersistenceProvider.getInstance().storeUser(u);
-		//UserManager.instance().getUser(token).setCurrentScenarioDefinitionBuilder(builder);
 
 		return true;
 
