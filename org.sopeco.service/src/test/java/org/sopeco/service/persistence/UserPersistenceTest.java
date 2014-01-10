@@ -23,9 +23,8 @@ public class UserPersistenceTest {
 	@Test
 	public void PersistenceTest() {
 		// test for error checking
-		IPersistenceProvider pp = UserPersistenceProvider.createPersistenceProvider((Account)null);
-		assertEquals(null, pp);
-		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider((Account)null);
+		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed
 	}
 	
 }
