@@ -79,6 +79,8 @@ public class Users {
 	public Users(String token) {
 		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
+		currentAccount = new Account();
+		currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
 	}
 	
 	// ******************************* Setter & Getter ************************************
@@ -148,7 +150,7 @@ public class Users {
 	}
 	
 	public String toString() {
-		return 	"persisted user" + "\n"
+		return 	"_persisted user information_" + "\n"
 				+ "token: " + token + "\n"
 				+ "last action: " + lastRequestTime + "\n"
 				+ "connected to account: " + currentAccount.getName() + "\n";
