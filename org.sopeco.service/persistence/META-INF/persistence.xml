@@ -39,8 +39,7 @@
 			<property name="javax.persistence.jdbc.password" value="test" />
 
 			<property name="eclipselink.target-database" value="Derby" />
-			<!-- <property name="eclipselink.ddl-generation" value="create-tables" /> -->
-			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />
+			<property name="eclipselink.ddl-generation" value="create-tables" />
 			<property name="eclipselink.cache.shared.default" value="false" />
 			<property name="eclipselink.logging.level" value="SEVERE" />
 		</properties>
