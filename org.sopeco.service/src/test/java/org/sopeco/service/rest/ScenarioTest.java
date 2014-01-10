@@ -113,7 +113,7 @@ public class ScenarioTest extends JerseyTest {
 		assertEquals(bo, true);
 		
 	}*/
-	
+
 	@Test
 	public void testScenarioDoubleAdd() {
 		// connect to test users account
@@ -152,7 +152,7 @@ public class ScenarioTest extends JerseyTest {
 		
 		assertEquals(b, false);
 	}
-	
+
 	@Test
 	public void testScenarioListing() {
 		// connect to test users account
@@ -226,7 +226,7 @@ public class ScenarioTest extends JerseyTest {
 							  .delete(Boolean.class);
 		
 		// the deletion should be successful completed
-		assertEquals(b, true);
+		assertEquals(true, b);
 	}
 	
 	@Test
