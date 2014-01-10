@@ -17,9 +17,9 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
-public class ScenarioTest extends JerseyTest {
+public class ScenarioServiceTest extends JerseyTest {
 
-	public ScenarioTest() {
+	public ScenarioServiceTest() {
 		super();
 	}
 	

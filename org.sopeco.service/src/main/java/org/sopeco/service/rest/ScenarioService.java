@@ -25,9 +25,9 @@ import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
 @Path(ServiceConfiguration.SVC_SCENARIO)
-public class Scenario {
+public class ScenarioService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(Scenario.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class);
 	
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
