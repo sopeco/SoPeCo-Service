@@ -39,8 +39,6 @@ public class ScenarioService {
 							   ExperimentSeriesDefinition esd) throws DataNotFoundException {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
-
-		
 		
 		ScenarioDefinition emptyScenario = ScenarioDefinitionBuilder.buildEmptyScenario(scenarioName);
 
@@ -75,7 +73,7 @@ public class ScenarioService {
 		
 		dbCon.store(emptyScenario);
 		dbCon.closeProvider();
-
+		
 		switchScenarioHelper(scenarioName, usertoken);
 		return true;
 	}
@@ -182,18 +180,7 @@ public class ScenarioService {
 	public boolean switchScenario(@QueryParam("name") String scenarioname,
 	  							  @QueryParam("token") String usertoken) {
 		
-		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
-		if (definition == null) {
-			return false;
-		}
-
-		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		u.setCurrentScenarioDefinitionBuilder(builder);
-		ServicePersistenceProvider.getInstance().storeUser(u);
-
-		return true;
-
+		return switchScenarioHelper(scenarioname, usertoken);
 	}
 	
 	
