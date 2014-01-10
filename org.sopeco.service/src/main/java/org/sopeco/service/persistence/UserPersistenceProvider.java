@@ -11,9 +11,9 @@ import org.sopeco.service.user.User;
 import org.sopeco.service.user.UserManager;
 
 public class UserPersistenceProvider extends PersistenceProviderFactory {
-	
-	private static Logger LOGGER = LoggerFactory.getLogger(UserPersistenceProvider.class.getName());
 
+	private static Logger LOGGER = LoggerFactory.getLogger(UserPersistenceProvider.class.getName());
+	
 	/**
 	 * Create the database connection for the given user (via token). The passed token
 	 * identifies a unique user in for the currently conected users.
@@ -37,22 +37,32 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	 */
 	public static IPersistenceProvider createPersistenceProvider(Account account) {
 		
+		//Properties p = System.getProperties();
+		//p.setProperty("derby.system.home", "C:\\Apache_Derby_10.10.1.1");
+		//p.setProperty("derby.connection.requireAuthentication", "false");
+		
 		if (account == null) {
 			LOGGER.warn("Given account is invalid!");
 			return null;
 		}
 		
-		String dbPassword = account.getDbPassword();
-		String host 	  = account.getDbHost();
-		String port 	  = Integer.toString(account.getDbPort());
-		String name 	  = account.getDbName();
+		String dbPassword  = account.getDbPassword();
+		String host 	   = account.getDbHost();
+		String port 	   = Integer.toString(account.getDbPort());
+		String name 	   = account.getDbName();
 		
-		if (dbPassword.isEmpty()) {
+		System.out.println(dbPassword);
+		System.out.println(host + ":" + port);
+		System.out.println(name);
+		
+		/*if (dbPassword.isEmpty()) {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
 		} else {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(true);
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBPassword(dbPassword);
-		}
+		}*/
+		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
+		
 		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBHost(host);
 		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBPort(port);
 		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBName(name);

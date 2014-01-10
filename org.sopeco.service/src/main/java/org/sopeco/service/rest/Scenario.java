@@ -59,14 +59,21 @@ public class Scenario {
 			return false;
 		}
 		
-		for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
-			if (sd.getScenarioName().equals(scenarioName)) {
-				LOGGER.info("Scenario with the given name alaready exists");
-				return false;
+		try {
+			
+			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
+				if (sd.getScenarioName().equals(scenarioName)) {
+					LOGGER.info("Scenario with the given name alaready exists");
+					return false;
+				}
 			}
+	
+		} catch (DataNotFoundException e) {
+			return false;
 		}
-
+		
 		dbCon.store(emptyScenario);
+		dbCon.closeProvider();
 
 		switchScenarioHelper(scenarioName, usertoken);
 		return true;
@@ -77,7 +84,7 @@ public class Scenario {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Boolean addScenario(@QueryParam("token") String usertoken,
-							   ScenarioDefinition scenario) throws DataNotFoundException {
+							   ScenarioDefinition scenario) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		String scenarioname = scenario.getScenarioName();
@@ -87,17 +94,24 @@ public class Scenario {
 			return false;
 		}
 		
-		
-		for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
-			if (sd.getScenarioName().equals(scenarioname)) {
-				LOGGER.info("Scenario with the given name '{}' alaready exists", scenarioname);
-				return false;
+
+		try {
+			
+			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
+				if (sd.getScenarioName().equals(scenarioname)) {
+					LOGGER.info("Scenario with the given name '{}' alaready exists", scenarioname);
+					return false;
+				}
 			}
+			
+		} catch (DataNotFoundException e) {
+			return false;
 		}
 
 		dbCon.store(scenario);
-
+		dbCon.closeProvider();
 		switchScenarioHelper(scenarioname, usertoken);
+		
 		return true;
 	}
 	
@@ -114,20 +128,24 @@ public class Scenario {
 			return null;
 		}
 
+		List<ScenarioDefinition> scenarioList;
+		
 		try {
-			List<ScenarioDefinition> scenarioList = dbCon.loadAllScenarioDefinitions();
-
-			String[] retValues = new String[scenarioList.size()];
-
-			for (int i = 0; i < scenarioList.size(); i++) {
-				ScenarioDefinition sd = scenarioList.get(i);
-				retValues[i] = sd.getScenarioName();
-			}
-
-			return retValues;
+			scenarioList = dbCon.loadAllScenarioDefinitions();
 		} catch (DataNotFoundException e) {
 			return null;
 		}
+		
+		String[] retValues = new String[scenarioList.size()];
+
+		for (int i = 0; i < scenarioList.size(); i++) {
+			ScenarioDefinition sd = scenarioList.get(i);
+			retValues[i] = sd.getScenarioName();
+		}
+		
+		dbCon.closeProvider();
+		
+		return retValues;
 	}
 	
 	@DELETE
@@ -141,7 +159,7 @@ public class Scenario {
 		}
 
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
-
+		
 		try {
 			
 			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
@@ -151,6 +169,8 @@ public class Scenario {
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Scenario with name '{}' not found.", scenarioname);
 			return false;
+		} finally {
+			dbCon.closeProvider();
 		}
 		
 	}
@@ -206,15 +226,21 @@ public class Scenario {
 	 * 			is no scenario with the given name.
 	 */
 	private ScenarioDefinition loadScenarioDefinition(String scenarioname, String token) {
-		try {
-			ScenarioDefinition definition = UserPersistenceProvider.createPersistenceProvider(token).loadScenarioDefinition(scenarioname);
 
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(token);
+		
+		try {
+			
+			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
 			return definition;
 			
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Scenario '{}' not found.", scenarioname);
 			return null;
+		} finally {
+			dbCon.closeProvider();
 		}
+		
 	}
 	
 }
