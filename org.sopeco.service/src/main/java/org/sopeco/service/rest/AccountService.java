@@ -16,9 +16,9 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
+import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.shared.Message;
-import org.sopeco.service.user.UserManager;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 @Path(ServiceConfiguration.SVC_ACCOUNT)
@@ -119,9 +119,12 @@ public class AccountService {
 		m.setStatus(1);
 		m.setMessage(uuid);
 		
-		// set the user persistence provider
-		UserManager.instance().registerUser(uuid);
-		UserManager.instance().getUser(uuid).setCurrentAccount(account);
+		// save the current user
+		Users u = new Users(uuid);
+		u.setCurrentAccount(account);
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		//UserManager.instance().registerUser(uuid);
+		//UserManager.instance().getUser(uuid).setCurrentAccount(account);
 		
 		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
 		if (details == null) {

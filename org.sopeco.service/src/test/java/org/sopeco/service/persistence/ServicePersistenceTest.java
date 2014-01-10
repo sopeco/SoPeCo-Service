@@ -21,6 +21,7 @@ public class ServicePersistenceTest {
 	@Test
 	public void PersistenceTest() {
 		ServicePersistenceProvider spp = ServicePersistenceProvider.getInstance();
+		// account with ID 0 does never exist
 		assertEquals(null, spp.loadAccount(0));
 	}
 	

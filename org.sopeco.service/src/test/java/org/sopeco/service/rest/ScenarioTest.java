@@ -228,7 +228,7 @@ public class ScenarioTest extends JerseyTest {
 		// the deletion should be successful completed
 		assertEquals(true, b);
 	}
-	
+
 	@Test
 	public void testScenarioSwitch() {
 		// connect to test users account

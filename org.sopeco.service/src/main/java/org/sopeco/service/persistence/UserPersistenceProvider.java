@@ -7,8 +7,7 @@ import org.sopeco.persistence.PersistenceProviderFactory;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
-import org.sopeco.service.user.User;
-import org.sopeco.service.user.UserManager;
+import org.sopeco.service.persistence.entities.Users;
 
 public class UserPersistenceProvider extends PersistenceProviderFactory {
 
@@ -23,7 +22,8 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	 */
 	public static IPersistenceProvider createPersistenceProvider(String token) {
 
-		User u = UserManager.instance().getUser(token);
+		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
+		//User u = UserManager.instance().getUser(token);
 		Account account = u.getCurrentAccount();
 		
 		return createPersistenceProvider(account);

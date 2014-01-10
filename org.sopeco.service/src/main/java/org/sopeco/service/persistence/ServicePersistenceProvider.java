@@ -22,6 +22,7 @@ import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
+import org.sopeco.service.persistence.entities.Users;
 
 /**
  * Visiblity of database modification methods is worldwide. The methods can only be
@@ -96,7 +97,18 @@ public final class ServicePersistenceProvider {
 	public void storeAccountDetails(AccountDetails accountDetails) {
 		store(accountDetails);
 	}
+	
+	public Users loadUser(String token) {
+		return loadSingleById(Users.class, token);
+	}
 
+	public Users storeUser(Users user) {
+		return store(user);
+	}
+
+	public void removeUser(Users user) {
+		remove(user);
+	}
 
 	public Account storeAccount(Account account) {
 		return store(account);

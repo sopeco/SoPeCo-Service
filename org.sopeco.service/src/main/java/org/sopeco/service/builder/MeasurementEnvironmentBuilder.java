@@ -26,6 +26,7 @@
  */
 package org.sopeco.service.builder;
 
+import java.io.Serializable;
 import java.util.logging.Logger;
 
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
@@ -39,8 +40,12 @@ import org.sopeco.persistence.entities.definition.ParameterRole;
  * @author Marius Oehler
  * 
  */
-public class MeasurementEnvironmentBuilder {
+public class MeasurementEnvironmentBuilder implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	/**
 	 * name of the root namespace.
 	 */

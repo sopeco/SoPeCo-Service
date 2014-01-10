@@ -24,77 +24,72 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sopeco.service.user;
+package org.sopeco.service.persistence.entities;
+
+import java.util.UUID;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Lob;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
-import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.entities.Account;
-import org.sopeco.service.persistence.entities.AccountDetails;
+
 
 
 /**
+ * The User class stores all important information for one user in the database.
+ * E.g. the current selected scenario of a user is stored here.
  * 
- * @author Marius Oehler
+ * @author Peter Merkert
  */
-public class User {
+@Entity
+public class Users {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(Users.class.getName());
 
+	@Id
+	@Column(name = "token")
 	private String token;
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(User.class.getName());
-	
-	/**
-	 * Stores the SessionID to the SoPeCo Service. The user get a session id,
-	 * when first time requesting the SoPeCo Service.
-	 */
-
-	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
-
-	private String workingSpecification;
+	@Lob
+	@Column(name = "account")
 	private Account currentAccount;
-	private IPersistenceProvider currentPersistenceProvider;
+	
+	@Lob
+	@Column(name = "scenarioDefinition")
+	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
+	
+	@Column(name = "lastRequestTime")
 	private long lastRequestTime;
 
-	/**
-	 * 
-	 */
-	public User(String token) {
+	protected Users() {
+		this(UUID.randomUUID().toString());
+	}
+	
+	public Users(String token) {
 		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
-		currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
 	}
+	
+	// ******************************* Setter & Getter ************************************
 
-	public IPersistenceProvider getCurrentPersistenceProvider() {
-		return currentPersistenceProvider;
+	public String getToken() {
+		return token;
 	}
-
-	public void setCurrentPersistenceProvider(IPersistenceProvider persistenceProvider) {
-		this.currentPersistenceProvider = persistenceProvider;
-	}
-
-	public long getLastRequestTime() {
-		return lastRequestTime;
-	}
-
-	public void setLastRequestTime(long pLastRequestTime) {
-		this.lastRequestTime = pLastRequestTime;
-	}
-
+	
 	public void setCurrentAccount(Account currentAccount) {
 		this.currentAccount = currentAccount;
 	}
 
 	public Account getCurrentAccount() {
 		return currentAccount;
-	}
-	
-	public String getToken() {
-		return token;
 	}
 	
 	public ScenarioDefinitionBuilder getCurrentScenarioDefinitionBuilder() {
@@ -104,13 +99,21 @@ public class User {
 	public void setCurrentScenarioDefinitionBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder) {
 		this.currentScenarioDefinitionBuilder = scenarioDefinitionBuilder;
 	}
+	
+	public long getLastRequestTime() {
+		return lastRequestTime;
+	}
+
+	public void setLastRequestTime(long pLastRequestTime) {
+		this.lastRequestTime = pLastRequestTime;
+	}
+	
+	// ******************************* Custom methods ************************************
 
 	public AccountDetails getAccountDetails() {
 		return ServicePersistenceProvider.getInstance().loadAccountDetails(currentAccount.getId());
 	}
-
-	// *******************************************************************************************************
-
+	
 	public boolean isExpired() {
 		LOGGER.debug("Checking user with token '{}' for being expired.", this.toString());
 		
@@ -122,34 +125,12 @@ public class User {
 			return true;
 		}
 	}
-
-	public String getWorkingSpecification() {
-		return workingSpecification;
+	
+	public String toString() {
+		return 	"persisted user" + "\n"
+				+ "token: " + token + "\n"
+				+ "last action: " + lastRequestTime + "\n"
+				+ "connected to account: " + currentAccount.getName() + "\n";
 	}
-
-	/**
-	 * Set the current specification, which is in the builder as default/working
-	 * spec.
-	 * 
-	 * @param pWorkingSpecification
-	 */
-	/*public void setWorkingSpecification(String pWorkingSpecification) {
-		this.workingSpecification = pWorkingSpecification;
-
-		MeasurementSpecification specification = getCurrentScenarioDefinitionBuilder().getMeasurementSpecification(
-				pWorkingSpecification);
-		MeasurementSpecificationBuilder specificationBuilder = new MeasurementSpecificationBuilder(specification);
-		getCurrentScenarioDefinitionBuilder().setSpecificationBuilder(specificationBuilder);
-	}*/
-
-	/**
-	 * 
-	 */
-	/*public void storeCurrentScenarioDefinition() {
-		LOGGER.info("store current ScenarioDefinition");
-
-		ScenarioDefinition scenarioDef = currentScenarioDefinitionBuilder.getBuiltScenario();
-
-		currentPersistenceProvider.store(scenarioDef);
-	}*/
+	
 }

@@ -19,8 +19,9 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
-import org.sopeco.service.user.UserManager;
+import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
 @Path(ServiceConfiguration.SVC_SCENARIO)
@@ -187,7 +188,11 @@ public class Scenario {
 		}
 
 		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
-		UserManager.instance().getUser(usertoken).setCurrentScenarioDefinitionBuilder(builder);
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		u.setCurrentScenarioDefinitionBuilder(builder);
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		//UserManager.instance().getUser(usertoken).setCurrentScenarioDefinitionBuilder(builder);
 
 		return true;
 
@@ -211,7 +216,10 @@ public class Scenario {
 		}
 
 		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
-		UserManager.instance().getUser(token).setCurrentScenarioDefinitionBuilder(builder);
+		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
+		u.setCurrentScenarioDefinitionBuilder(builder);
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		//UserManager.instance().getUser(token).setCurrentScenarioDefinitionBuilder(builder);
 
 		return true;
 

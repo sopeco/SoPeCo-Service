@@ -26,6 +26,8 @@
  */
 package org.sopeco.service.builder;
 
+import java.io.Serializable;
+
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
@@ -36,8 +38,10 @@ import org.sopeco.persistence.entities.definition.ScenarioDefinition;
  * @author Marius Oehler
  * 
  */
-public class ScenarioDefinitionBuilder {
+public class ScenarioDefinitionBuilder implements Serializable {
 
+	private static final long serialVersionUID = -5845272212303839119L;
+	
 	private ScenarioDefinition currentBuild;
 	private MeasurementEnvironmentBuilder meBuilder;
 	private MeasurementSpecificationBuilder msBuilder;

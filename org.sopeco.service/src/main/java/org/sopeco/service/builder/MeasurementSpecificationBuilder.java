@@ -26,6 +26,7 @@
  */
 package org.sopeco.service.builder;
 
+import java.io.Serializable;
 import java.util.logging.Logger;
 
 import org.sopeco.persistence.entities.definition.ConstantValueAssignment;
@@ -39,8 +40,12 @@ import org.sopeco.persistence.entities.definition.ParameterDefinition;
  * @author Marius Oehler
  * 
  */
-public class MeasurementSpecificationBuilder {
+public class MeasurementSpecificationBuilder implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(MeasurementSpecificationBuilder.class.getName());
 	private MeasurementSpecification specification;
 
