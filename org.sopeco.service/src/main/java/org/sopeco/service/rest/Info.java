@@ -23,7 +23,7 @@ public class Info {
 	@Produces(MediaType.TEXT_HTML)
 	public String createAccount() {
 		return "<h1>Information about SoPeCo Service</h1>"
-				+ "test";
+				+ "Services can be requested.";
 	}
 	
 }
