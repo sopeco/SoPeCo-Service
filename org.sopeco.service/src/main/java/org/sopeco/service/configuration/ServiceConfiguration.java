@@ -63,6 +63,11 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_SCENARIO_SPECNAME = "specname";
 	public static final String SVCP_SCENARIO_TOKEN = "token";
 	
+	public static final String SVC_MEASUREMENT = "measurementspecification";
+	public static final String SVC_MEASUREMENT_LIST = "list";
+	public static final String SVC_MEASUREMENT_LISTSPECS = "listspecification";
+	public static final String SVC_MEASUREMENT_SWITCH = "switch";
+	
 	/**
 	 * QueryParam name for the account name
 	 */
