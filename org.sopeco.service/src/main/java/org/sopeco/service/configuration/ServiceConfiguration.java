@@ -67,6 +67,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT_LIST = "list";
 	public static final String SVC_MEASUREMENT_LISTSPECS = "listspecification";
 	public static final String SVC_MEASUREMENT_SWITCH = "switch";
+	public static final String SVCP_MEASUREMENT_TOKEN = "token";
 	
 	/**
 	 * QueryParam name for the account name
