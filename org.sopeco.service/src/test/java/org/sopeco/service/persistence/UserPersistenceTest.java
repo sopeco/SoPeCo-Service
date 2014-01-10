@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.service.persistence.entities.account.Account;
+import org.sopeco.service.persistence.entities.Account;
 
 /**
  * Tests the service persistence provider.

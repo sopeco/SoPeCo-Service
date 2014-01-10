@@ -6,7 +6,7 @@ import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.PersistenceProviderFactory;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.persistence.entities.account.Account;
+import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.user.User;
 import org.sopeco.service.user.UserManager;
 

@@ -34,8 +34,8 @@ import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.entities.account.Account;
-import org.sopeco.service.persistence.entities.account.AccountDetails;
+import org.sopeco.service.persistence.entities.Account;
+import org.sopeco.service.persistence.entities.AccountDetails;
 
 
 /**

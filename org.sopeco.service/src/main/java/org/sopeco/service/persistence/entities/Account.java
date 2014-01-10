@@ -1,4 +1,4 @@
-package org.sopeco.service.persistence.entities.account;
+package org.sopeco.service.persistence.entities;
 
 import java.io.Serializable;
 

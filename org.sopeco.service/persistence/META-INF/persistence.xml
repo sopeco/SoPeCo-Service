@@ -29,8 +29,8 @@
 		<class>org.sopeco.service.persistence.entities.ScenarioDetails</class>
 		<class>org.sopeco.service.persistence.entities.MECEntity</class>
 		
-		<class>org.sopeco.service.persistence.entities.account.Account</class>
-		<class>org.sopeco.service.persistence.entities.account.AccountDetails</class>
+		<class>org.sopeco.service.persistence.entities.Account</class>
+		<class>org.sopeco.service.persistence.entities.AccountDetails</class>
 		
 		<properties>
 		    <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />

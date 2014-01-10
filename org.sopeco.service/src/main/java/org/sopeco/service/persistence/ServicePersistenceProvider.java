@@ -20,8 +20,8 @@ import org.sopeco.config.exception.ConfigurationException;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.persistence.entities.account.AccountDetails;
-import org.sopeco.service.persistence.entities.account.Account;
+import org.sopeco.service.persistence.entities.Account;
+import org.sopeco.service.persistence.entities.AccountDetails;
 
 /**
  * Visiblity of database modification methods is worldwide. The methods can only be

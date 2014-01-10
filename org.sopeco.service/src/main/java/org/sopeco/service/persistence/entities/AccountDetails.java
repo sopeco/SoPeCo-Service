@@ -24,7 +24,7 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sopeco.service.persistence.entities.account;
+package org.sopeco.service.persistence.entities;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,8 +36,6 @@ import javax.persistence.Id;
 import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-
-import org.sopeco.service.persistence.entities.ScenarioDetails;
 
 /**
  * 
