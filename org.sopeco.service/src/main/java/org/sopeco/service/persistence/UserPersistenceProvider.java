@@ -23,7 +23,6 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	public static IPersistenceProvider createPersistenceProvider(String token) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
-		//User u = UserManager.instance().getUser(token);
 		Account account = u.getCurrentAccount();
 		
 		return createPersistenceProvider(account);
