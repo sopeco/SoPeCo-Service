@@ -67,6 +67,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	public void testMeasurementSpecNameListing() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioname = "examplescenario";
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -81,14 +82,20 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(scenarioname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
 				  .post(Boolean.class, esd);
-		
-		// TODO switch to the scenario just build
+
+		// switch to scenario (if not already in this scenario)
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
 		
 		@SuppressWarnings("unchecked")
 		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
@@ -104,6 +111,8 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	public void testMeasurementSpecNameDoubleAdding() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioname = "examplescenario";
+		String measurementspecname = "measurementspecexample";
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -120,7 +129,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(scenarioname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -130,7 +139,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		// switch to scenario (if not already in this scenario)
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -139,14 +148,14 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, "measurementspecexample")
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
 		          .post(Boolean.class);
 		
 		//create it now a second time, this must fail
 		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 					          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, "measurementspecexample")
+					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
 					          .post(Boolean.class);
 		
 		// the second addition must fail

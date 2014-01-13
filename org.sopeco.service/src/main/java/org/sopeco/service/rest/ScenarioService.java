@@ -80,7 +80,6 @@ public class ScenarioService {
 		dbCon.store(emptyScenario);
 		dbCon.closeProvider();
 		
-		switchScenarioHelper(scenarioName, usertoken);
 		return true;
 	}
 	
@@ -115,7 +114,6 @@ public class ScenarioService {
 
 		dbCon.store(scenario);
 		dbCon.closeProvider();
-		switchScenarioHelper(scenarioname, usertoken);
 		
 		return true;
 	}
