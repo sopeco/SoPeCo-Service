@@ -40,6 +40,12 @@ public class ScenarioService {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
+		// check if a scenario with the given name already exsists
+		if (loadScenarioDefinition(scenarioName, usertoken) != null) {
+			LOGGER.warn("A scenario with the given name '{}' already exsits!", scenarioName);
+			return false;
+		}
+		
 		ScenarioDefinition emptyScenario = ScenarioDefinitionBuilder.buildEmptyScenario(scenarioName);
 
 		if (specificationName != null) {
@@ -204,7 +210,7 @@ public class ScenarioService {
 		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
 		u.setCurrentScenarioDefinitionBuilder(builder);
 		ServicePersistenceProvider.getInstance().storeUser(u);
-
+		
 		return true;
 
 	}
@@ -229,10 +235,7 @@ public class ScenarioService {
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Scenario '{}' not found.", scenarioname);
 			return null;
-		} finally {
-			dbCon.closeProvider();
 		}
-		
 	}
 	
 }

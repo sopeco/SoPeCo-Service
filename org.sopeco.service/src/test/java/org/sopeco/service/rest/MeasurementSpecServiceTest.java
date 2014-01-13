@@ -22,6 +22,7 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 
 public class MeasurementSpecServiceTest extends JerseyTest {
 
+	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementSpecServiceTest.class.getName());
 	
 	public MeasurementSpecServiceTest() {
@@ -87,6 +88,8 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .type(MediaType.APPLICATION_JSON)
 				  .post(Boolean.class, esd);
 		
+		// TODO switch to the scenario just build
+		
 		@SuppressWarnings("unchecked")
 		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 														       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
@@ -96,4 +99,57 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		assertEquals(true, measurementList.size() > 0);
 	}
 	
+
+	@Test
+	public void testMeasurementSpecNameDoubleAdding() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		
+		// just create the account once to be sure it already exists
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		System.out.println("Tokenized: " + token);
+		
+		// add at least the examplescenario for ensurance that there is an measurementSpec available
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path("examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		// switch to scenario (if not already in this scenario)
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// now create the measurement spec for the user once
+		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, "measurementspecexample")
+		          .post(Boolean.class);
+		
+		//create it now a second time, this must fail
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+					          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, "measurementspecexample")
+					          .post(Boolean.class);
+		
+		// the second addition must fail
+		assertEquals(false, b);
+	}
 }
