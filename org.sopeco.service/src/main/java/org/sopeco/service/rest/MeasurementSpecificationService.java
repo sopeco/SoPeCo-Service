@@ -73,7 +73,9 @@ public class MeasurementSpecificationService {
 			return false;
 		}
 		
-		u.setWorkingSpecification(specificationName);
+		u.setMeasurementSpecification(specificationName);
+		
+		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		return true;
 	}
@@ -85,10 +87,6 @@ public class MeasurementSpecificationService {
 									   @QueryParam("specname") String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		System.out.println("3Scenario Name: " + u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getScenarioName());
-		System.out.println("3MeasurementSpec 0th Name: " + u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications().get(0).getName());
-		
 		
 		if (existSpecification(specificationName, u)) {
 			LOGGER.warn("Specification with the name '{}' already exists.", specificationName);
@@ -103,8 +101,7 @@ public class MeasurementSpecificationService {
 		}
 
 		msb.setName(specificationName);
-		
-		System.out.println("Name: " + msb.getBuiltSpecification().getName());
+		u.setMeasurementSpecification(specificationName);
 		
 		// store the scenario definition in the databse of the current user
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -113,8 +110,6 @@ public class MeasurementSpecificationService {
 			LOGGER.warn("No database connection found.");
 			return false;
 		} else {
-			System.out.println("Scenario Name: " + u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getScenarioName());
-			System.out.println("MeasurementSpec 1th Name: " + u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications().get(1).getName());
 			ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
 			dbCon.store(scenarioDef);
 		}
@@ -133,23 +128,38 @@ public class MeasurementSpecificationService {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
+		System.out.println("myspecname: " + specname);
+		for (MeasurementSpecification mss : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
+			System.out.println("myspecname current: " + mss.getName());
+		}
+		
 		if (existSpecification(specname, u)) {
 			LOGGER.warn("Can't rename, because specification with the name '{}' already exists.", specname);
 			return false;
 		}
 
-		u.getCurrentScenarioDefinitionBuilder().getSpecificationBuilder().setName(specname);
-		
+		MeasurementSpecification msss = u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecification(u.getMeasurementSpecification());
 
+		System.out.println("++++++++++++++");
+		System.out.println(msss == null);
+		
+		u.setMeasurementSpecification(specname);
+		
 		// store the scenario definition in the databse of the current user
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
 			return false;
-		} else {
-			ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
-			dbCon.store(scenarioDef);
+		}
+		
+		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+		dbCon.store(scenarioDef);
+		
+		u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
+			System.out.println("2myspecname current: " + ms.getName());
 		}
 
 		// store the new user data in it's database

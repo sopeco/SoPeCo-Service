@@ -68,6 +68,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String scenarioname = "examplescenario";
+		String measurementSpecName = "examplespecname";
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -83,7 +84,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 				  .path(scenarioname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurementSpecName)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -104,8 +105,8 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 														       .get(List.class);
 
 		assertEquals(true, measurementList.size() > 0);
+		assertEquals(true, measurementList.contains(measurementSpecName));
 	}
-	
 
 	@Test
 	public void testMeasurementSpecNameDoubleAdding() {
@@ -122,8 +123,6 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 							  .get(Message.class);
 		
 		String token = m.getMessage();
-		
-		System.out.println("Tokenized: " + token);
 		
 		// add at least the examplescenario for ensurance that there is an measurementSpec available
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
@@ -161,4 +160,68 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		// the second addition must fail
 		assertEquals(false, b);
 	}
+	
+	@Test
+	public void testMeasurementSpecSwitchWorkingSpec() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioname = "examplescenario";
+		String measurementSpecName = "measurementspecexample";
+		String newMeasurementSpecName = "newmeasurementspecexample";
+		
+		// just create the account once to be sure it already exists
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		// add at least the examplescenario for ensurance that there is an measurementSpec available
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		// switch to scenario (if not already in this scenario)
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// now create the measurement spec for the user once
+		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName)
+		          .post(Boolean.class);
+		
+		// rename the current selected measurementspecification
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+					          .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
+					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, newMeasurementSpecName)
+					          .put(Boolean.class);
+		
+		// the renaming should work fine
+		assertEquals(true, b);
+		
+		// now lookup the name we just added
+		@SuppressWarnings("unchecked")
+		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+														       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+															   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+														       .get(List.class);
+		
+		assertEquals(true, measurementList.contains(measurementSpecName));
+	}
+	
 }

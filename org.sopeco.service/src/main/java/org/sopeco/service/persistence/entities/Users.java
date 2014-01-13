@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
-import org.sopeco.service.builder.MeasurementSpecificationBuilder;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -66,8 +65,8 @@ public class Users {
 	@Column(name = "scenarioDefinition")
 	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
 	
-	@Column(name = "workingSpecification")
-	private String workingSpecification;
+	@Column(name = "currentMeasurementSpecification")
+	private String currentMeasurementSpecification;
 	
 	@Column(name = "lastRequestTime")
 	private long lastRequestTime;
@@ -113,22 +112,12 @@ public class Users {
 		this.lastRequestTime = pLastRequestTime;
 	}
 	
-	public String getWorkingSpecification() {
-		return workingSpecification;
+	public String getMeasurementSpecification() {
+		return currentMeasurementSpecification;
 	}
 
-	/**
-	 * Set the current specification, which is in the builder as default/working.
-	 * 
-	 * @param pWorkingSpecification the working specification
-	 */
-	public void setWorkingSpecification(String pWorkingSpecification) {
-		this.workingSpecification = pWorkingSpecification;
-
-		MeasurementSpecification specification = getCurrentScenarioDefinitionBuilder()
-													.getMeasurementSpecification(pWorkingSpecification);
-		MeasurementSpecificationBuilder specificationBuilder = new MeasurementSpecificationBuilder(specification);
-		getCurrentScenarioDefinitionBuilder().setSpecificationBuilder(specificationBuilder);
+	public void setMeasurementSpecification(String measurementSpecification) {
+		this.currentMeasurementSpecification = measurementSpecification;
 	}
 	
 	// ******************************* Custom methods ************************************
