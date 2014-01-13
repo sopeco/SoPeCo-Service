@@ -184,7 +184,7 @@ public class ScenarioServiceTest extends JerseyTest {
 							   .path(ServiceConfiguration.SVC_SCENARIO_LIST)
 							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 							   .accept(MediaType.APPLICATION_JSON)
-							   .post(String[].class);
+							   .get(String[].class);
 		
 		assertEquals(list.length > 0, true);
 	}
