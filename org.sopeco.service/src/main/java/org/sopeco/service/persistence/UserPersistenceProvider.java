@@ -41,19 +41,17 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 			return null;
 		}
 		
-		@SuppressWarnings("unused")
 		String dbPassword  = account.getDbPassword();
 		String host 	   = account.getDbHost();
 		String port 	   = Integer.toString(account.getDbPort());
 		String name 	   = account.getDbName();
 		
-		/*if (dbPassword.isEmpty()) {
+		if (dbPassword.isEmpty()) {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
 		} else {
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(true);
 			PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBPassword(dbPassword);
-		}*/
-		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).setUsePassword(false);
+		}
 		
 		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBHost(host);
 		PersistenceConfiguration.getSessionSingleton(ServiceConfiguration.SESSION_ID).updateDBPort(port);
