@@ -43,6 +43,13 @@ public abstract class ServiceConfiguration {
 	 * 		- list
 	 * 		- delete
 	 * 		- switch
+	 * 
+	 * measurementspecification
+	 * 		- list
+	 * 		- listspecifications (as objects)
+	 * 		- switch
+	 * 		- create
+	 * 		- rename (current measuremtnspecification)
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -67,7 +74,10 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT_LIST = "list";
 	public static final String SVC_MEASUREMENT_LISTSPECS = "listspecification";
 	public static final String SVC_MEASUREMENT_SWITCH = "switch";
+	public static final String SVC_MEASUREMENT_CREATE = "create";
+	public static final String SVC_MEASUREMENT_RENAME = "rename";
 	public static final String SVCP_MEASUREMENT_TOKEN = "token";
+	public static final String SVCP_MEASUREMENT_NAME = "specname";
 	
 	/**
 	 * QueryParam name for the account name
