@@ -84,11 +84,20 @@ public class ScenarioServiceTest extends JerseyTest {
 		assertEquals(bo, true);
 	}
 
+	/**
+	 * Try adding two scenarios with the same name. The second addition must fail.
+	 * 
+	 * 1. log in
+	 * 2. add new scenario with name X
+	 * 3. add new scenario with name X again
+	 */
 	@Test
 	public void testScenarioDoubleAdd() {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -103,8 +112,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -113,8 +122,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// now add scenario WITH THE SAME NAME a second time
 		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
 							  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-							  .path("examplescenario")
-							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+							  .path(scenarioname)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
 							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 							  .accept(MediaType.APPLICATION_JSON)
 							  .type(MediaType.APPLICATION_JSON)
@@ -123,11 +132,20 @@ public class ScenarioServiceTest extends JerseyTest {
 		assertEquals(b, false);
 	}
 
+	/**
+	 * Test the scenario listing. Checks the list for a newly created scenario.
+	 * 
+	 * 1. log in
+	 * 2. add new scenario
+	 * 3. list all scenarios
+	 */
 	@Test
 	public void testScenarioListing() {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -142,8 +160,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -171,6 +189,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -180,15 +200,13 @@ public class ScenarioServiceTest extends JerseyTest {
 		
 		String token = m.getMessage();
 		
-		String scenarioname = "examplescenario";
-		
 		// add a default scenario (maybe a scenario with the name already exists, but
 		// we don't care here about it)
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 				  .path(scenarioname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -218,6 +236,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -227,14 +247,12 @@ public class ScenarioServiceTest extends JerseyTest {
 		
 		String token = m.getMessage();
 		
-		String scenarioname = "examplescenario";
-		
 		// add a default scenario
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 				  .path(scenarioname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
