@@ -30,14 +30,26 @@ public class ScenarioService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class);
 	
+	/**
+	 * Adds a new scenario with the given values. This method DOES NOT switch to the
+	 * newly created scenario. The scenario must be switched manually via the service
+	 * at @Code{switch}.
+	 * 
+	 * @param scenarioName the scenario name
+	 * @param specificationName the measurment specification name
+	 * @param usertoken the user identification
+	 * @param esd the @Code{ExperimentSeriesDefinition}
+	 * @return true, if the scenario was added succesfully. False if a scenario
+	 * 		   with the given already exists.
+	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Boolean addScenario(@PathParam("name") String scenarioName,
+	public boolean addScenario(@PathParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
 							   @QueryParam("token") String usertoken,
-							   ExperimentSeriesDefinition esd) throws DataNotFoundException {
+							   ExperimentSeriesDefinition esd) {
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
@@ -84,11 +96,22 @@ public class ScenarioService {
 		return true;
 	}
 	
+	/**
+	 * Adds a new scenario with a completed scenario object as it. The scenario logic is
+	 * not yet checked in this method.
+	 * This method DOES NOT switch to the newly created scenario. The scenario must be
+	 * switched manually via the service at @Code{switch}.
+	 * 
+	 * @param usertoken the user identification
+	 * @param scenario the scenario as a completed object
+	 * @return true, if the scenario was added succesfully. False, if a scenario with
+	 * 		   the given name already exists.
+	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public Boolean addScenario(@QueryParam("token") String usertoken,
+	public boolean addScenario(@QueryParam("token") String usertoken,
 							   ScenarioDefinition scenario) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -119,6 +142,12 @@ public class ScenarioService {
 		return true;
 	}
 	
+	/**
+	 * Return a list with all the scenario names.
+	 * 
+	 * @param usertoken the user identification
+	 * @return a list with all the scenario names
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -152,6 +181,15 @@ public class ScenarioService {
 		return retValues;
 	}
 	
+	/**
+	 * Deleted the scenario with the given name. Does not delete the scenario, if the
+	 * given user has currenlty selected the scenario.
+	 * 
+	 * @param scenarioname the scenario name
+	 * @param usertoken the user identification
+	 * @return true, if scenario has been deleted. False, if the scenario name is invalid || a scenario
+	 *         with the given name is not found || the user has currently selected the scenario
+	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -159,6 +197,13 @@ public class ScenarioService {
 								  @QueryParam("token") String usertoken) {
 		
 		if (!scenarioname.matches("[a-zA-Z0-9_]+")) {
+			return false;
+		}
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getScenarioName() == scenarioname) {
+			LOGGER.warn("Can't delete current selected scenario. First must switch to another one.");
 			return false;
 		}
 
@@ -179,40 +224,33 @@ public class ScenarioService {
 		
 	}
 
+	/**
+	 * Switch the activ scenario for a given user (via token).
+	 * 
+	 * @param scenarioname the scenario to switch to
+	 * @param usertoken the token to identify the user
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean switchScenario(@QueryParam("name") String scenarioname,
 	  							  @QueryParam("token") String usertoken) {
 		
-		return switchScenarioHelper(scenarioname, usertoken);
-	}
-	
-	
-	/*******************HELPER**************************/
-	
-	/**
-	 * Switch the activ scenario for a given user (via token).
-	 * 
-	 * @param scenarioname the scenario to switch to
-	 * @param token the token to identify the user
-	 * @return true, if the scenario could be switched
-	 */
-	private boolean switchScenarioHelper(String scenarioname, String token) {
-		
-		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, token);
+		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
 		if (definition == null) {
 			return false;
 		}
 
 		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
-		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		u.setCurrentScenarioDefinitionBuilder(builder);
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		return true;
-
 	}
+	
+	
+	/*******************HELPER**************************/
 	
 	/**
 	 * Load a Scenario definition with the given name and user (via token).
