@@ -12,6 +12,9 @@ public class LoginData {
 
 	private Boolean status;
 
+	/**
+	 * Empty param constructor for JSON mapping.
+	 */
 	public LoginData() {
 		this.token = "";
 		this.status = false;

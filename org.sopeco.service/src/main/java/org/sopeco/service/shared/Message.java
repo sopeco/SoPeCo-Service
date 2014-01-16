@@ -18,9 +18,7 @@ public class Message {
 	private String message;
 	
 	/**
-	 * Creates a message.
-	 * 
-	 * @param message the message
+	 * Empty param constructor for JSON mapping.
 	 */
 	public Message() {
 		this.message = "";
