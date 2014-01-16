@@ -202,6 +202,11 @@ public class ScenarioService {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
 		if (u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getScenarioName() == scenarioname) {
 			LOGGER.warn("Can't delete current selected scenario. First must switch to another one.");
 			return false;
@@ -243,6 +248,12 @@ public class ScenarioService {
 
 		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
 		u.setCurrentScenarioDefinitionBuilder(builder);
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		

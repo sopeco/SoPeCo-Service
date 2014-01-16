@@ -47,6 +47,11 @@ public class MeasurementSpecificationService {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
 		List<String> returnList = new ArrayList<String>();
 		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
 			returnList.add(ms.getName());
@@ -68,6 +73,11 @@ public class MeasurementSpecificationService {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
 		List<MeasurementSpecification> returnList = new ArrayList<MeasurementSpecification>();
 		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario()
 				.getMeasurementSpecifications()) {
@@ -91,6 +101,11 @@ public class MeasurementSpecificationService {
 										   @QueryParam("specname") String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
 		
 		LOGGER.debug("Set working specification on: " + specificationName);
 
@@ -122,6 +137,11 @@ public class MeasurementSpecificationService {
 									   @QueryParam("specname") String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
 		
 		if (existSpecification(specificationName, u)) {
 			LOGGER.warn("Specification with the name '{}' already exists.", specificationName);
@@ -169,6 +189,11 @@ public class MeasurementSpecificationService {
 											  @QueryParam("specname") String specname) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
 		
 		if (existSpecification(specname, u)) {
 			LOGGER.warn("Can't rename, because specification with the name '{}' already exists.", specname);
