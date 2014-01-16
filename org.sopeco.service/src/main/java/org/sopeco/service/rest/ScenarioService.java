@@ -166,6 +166,7 @@ public class ScenarioService {
 		try {
 			scenarioList = dbCon.loadAllScenarioDefinitions();
 		} catch (DataNotFoundException e) {
+			LOGGER.info("No scenario definitions in database.");
 			return null;
 		}
 		
