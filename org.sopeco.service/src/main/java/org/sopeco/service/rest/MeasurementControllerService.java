@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -14,9 +15,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.IMeasurementEnvironmentController;
 import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
+import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.service.builder.MeasurementEnvironmentBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
+import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.shared.MECStatus;
 
@@ -75,6 +80,64 @@ public class MeasurementControllerService {
 	
 	}
 	
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_VALIDATE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String[] getValidUrlPattern() {
+		return CONTROLLER_URL_PATTERN;
+	}
+
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_MED + "/"
+	      + ServiceConfiguration.SVC_MEC_MED_SET + "/"
+	      + ServiceConfiguration.SVC_MEC_MED_SET_URL)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MeasurementEnvironmentDefinition getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			  													   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String url) {
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		try {
+			IMeasurementEnvironmentController mec = MEConnectorFactory.connectTo(new URI(url));
+
+			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
+
+			setNewMEDefinition(med, u);
+
+			return med;
+		} catch (URISyntaxException e) {
+			LOGGER.error(e.getMessage());
+			throw new IllegalStateException(e);
+		} catch (RemoteException e) {
+			LOGGER.error(e.getMessage());
+			throw new IllegalStateException(e);
+		}
+	}
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_MED + "/"
+		  + ServiceConfiguration.SVC_MEC_MED_SET + "/"
+		  + ServiceConfiguration.SVC_MEC_MED_SET_BLANK)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MeasurementEnvironmentDefinition getMEDefinitionFromBlank(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken) {
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		MeasurementEnvironmentDefinition med = MeasurementEnvironmentBuilder.createBlankEnvironmentDefinition();
+		setNewMEDefinition(med, u);
+		
+		return med;
+	}
+	
+	
 	/**************************************HELPER****************************************/
 	
 	/**
@@ -91,6 +154,23 @@ public class MeasurementControllerService {
 		}
 
 		return false;
+	}
+	
+	/**
+	 * Sets the measurement environment defitinion for the current {@code ScenarioDefinitionBuilder}.
+	 * 
+	 * @param definition the MED
+	 * @param u the user whose MED is to set
+	 */
+	private void setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
+		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
+		
+		u.getCurrentScenarioDefinitionBuilder().setMEDefinition(definition);
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		dbCon.store(sd);
+		dbCon.closeProvider();
 	}
 	
 }
