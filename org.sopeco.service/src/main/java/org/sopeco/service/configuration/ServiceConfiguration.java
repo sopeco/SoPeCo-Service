@@ -50,6 +50,22 @@ public abstract class ServiceConfiguration {
 	 * 		- switch
 	 * 		- create
 	 * 		- rename (current measuremtnspecification)
+	 * 
+	 * measurementcontroller
+	 * 		- status (of MEC)
+	 * 		- validate
+	 * 		- med (measurment environment definition)
+	 * 			- blank
+	 * 		- current
+	 * 		- namespace
+	 * 			- add
+	 * 			- remove
+	 * 			- rename
+	 * 		- parameter
+	 * 			- add
+	 * 			- remove
+	 * 			- update
+	 * 		- check (if Port is reachable)
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -78,6 +94,24 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT_RENAME = "rename";
 	public static final String SVCP_MEASUREMENT_TOKEN = "token";
 	public static final String SVCP_MEASUREMENT_NAME = "specname";
+	
+	public static final String SVC_MEC = "mec";
+	public static final String SVC_MEC_STATUS = "status";
+	public static final String SVC_MEC_VALIDATE = "validate";
+	public static final String SVC_MEC_MED = "med";
+	public static final String SVC_MEC_MED_BLANK = "blank";
+	public static final String SVC_MEC_CURRENT = "current";
+	public static final String SVC_MEC_NAMESPACE = "namespace";
+	public static final String SVC_MEC_NAMESPACE_ADD = "add";
+	public static final String SVC_MEC_NAMESPACE_REMOVE = "remove";
+	public static final String SVC_MEC_NAMESPACE_RENAME = "rename";
+	public static final String SVC_MEC_PARAM = "parameter";
+	public static final String SVC_MEC_PARAM_ADD = "add";
+	public static final String SVC_MEC_PARAM_REMOVE = "remove";
+	public static final String SVC_MEC_PARAM_UPDATE = "update";
+	public static final String SVC_MEC_CHECK = "check";
+	public static final String SVCP_MEC_TOKEN = "token";
+	public static final String SVCP_MEC_URL = "url";
 	
 	/**
 	 * QueryParam name for the account name
