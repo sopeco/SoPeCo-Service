@@ -99,7 +99,9 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_STATUS = "status";
 	public static final String SVC_MEC_VALIDATE = "validate";
 	public static final String SVC_MEC_MED = "med";
-	public static final String SVC_MEC_MED_BLANK = "blank";
+	public static final String SVC_MEC_MED_SET = "set";
+	public static final String SVC_MEC_MED_SET_URL = "url";
+	public static final String SVC_MEC_MED_SET_BLANK = "blank";
 	public static final String SVC_MEC_CURRENT = "current";
 	public static final String SVC_MEC_NAMESPACE = "namespace";
 	public static final String SVC_MEC_NAMESPACE_ADD = "add";
