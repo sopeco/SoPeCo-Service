@@ -250,7 +250,7 @@ public class ScenarioService {
 	}
 	
 	
-	/*******************HELPER**************************/
+	/**************************************HELPER****************************************/
 	
 	/**
 	 * Load a Scenario definition with the given name and user (via token).
