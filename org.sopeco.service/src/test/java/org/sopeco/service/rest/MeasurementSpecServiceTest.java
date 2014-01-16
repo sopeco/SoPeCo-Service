@@ -61,14 +61,22 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	}
 	
 	/**
-	 * Checks if it is possible to resgister an account twice.
+	 * Checks if it is possible to register an account twice.
+	 * 
+	 * 1. log in
+	 * 2. adds new scenario
+	 * 3. switch to newly created scenario
+	 * 4.
 	 */
+	@SuppressWarnings("unchecked")
 	@Test
 	public void testMeasurementSpecNameListing() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String scenarioname = "examplescenario";
 		String measurementSpecName = "examplespecname";
+		String measurementSpecName2 = "examplespecname2";
+		String measurementSpecName3 = "examplespecname3";
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -98,14 +106,46 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
 		
-		@SuppressWarnings("unchecked")
+		// switch to the newly created measurmentspecification
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .put(Boolean.class);
+		
+		// the switch to the newly created measurmentspecification must go right!
+		assertEquals(true, b);
+		
 		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 														       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
 															   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 														       .get(List.class);
 
-		assertEquals(true, measurementList.size() > 0);
+		assertEquals(true, measurementList.size() >= 1);
 		assertEquals(true, measurementList.contains(measurementSpecName));
+		
+		// nwo create two more specifications
+		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName2)
+		          .post(Boolean.class);
+		
+		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName3)
+		          .post(Boolean.class);
+		
+		measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+			       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+				   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			       .get(List.class);
+
+		assertEquals(true, measurementList.size() >= 3);
+		assertEquals(true, measurementList.contains(measurementSpecName2));
+		assertEquals(true, measurementList.contains(measurementSpecName3));
 	}
 
 	@Test
@@ -143,24 +183,45 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
 		
-		// now create the measurement spec for the user once
+		// now create a new measurement spec for the user once
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
 		          .post(Boolean.class);
 		
-		//create it now a second time, this must fail
+		// switch to the newly created measurmentspecification
 		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-					          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
-					          .post(Boolean.class);
+							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .put(Boolean.class);
+		
+		// the switch to the newly created measurmentspecification must go right!
+		assertEquals(true, b);
+		
+		//create it now a second time, this must fail
+		b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+			          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementspecname)
+			          .post(Boolean.class);
 		
 		// the second addition must fail
 		assertEquals(false, b);
 	}
 	
+	/**
+	 * This test does the following:
+	 * 
+	 * 1. login
+	 * 2. adds scenario
+	 * 3. switch to newly created scenario
+	 * 4. create new measurementspecification
+	 * 5. switch to newly created measurementspecification
+	 * 6. rename current selected measurementspecification
+	 */
 	@Test
 	public void testMeasurementSpecSwitchWorkingSpec() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -204,12 +265,20 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName)
 		          .post(Boolean.class);
 		
-		// rename the current selected measurementspecification
+		// switch to the newly created measurmentspecification
 		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-					          .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
-					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-					          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, newMeasurementSpecName)
-					          .put(Boolean.class);
+							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .put(Boolean.class);
+		
+		// rename the current selected measurementspecification
+		b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+			          .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
+			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, newMeasurementSpecName)
+			          .put(Boolean.class);
 		
 		// the renaming should work fine
 		assertEquals(true, b);

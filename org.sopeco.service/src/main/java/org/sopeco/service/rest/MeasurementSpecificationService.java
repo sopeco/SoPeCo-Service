@@ -22,11 +22,24 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 
+/**
+ * This class handles the meeasurement specifications (MS). 
+ * A ScenarioDefinition does have a list of MeasurementSpecifications and a
+ * MeasurementEnviromentDefinition.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_MEASUREMENT)
 public class MeasurementSpecificationService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementSpecificationService.class);
 	
+	/**
+	 * Lists all the current MS for the user with the given token.
+	 * 
+	 * @param usertoken the user identification
+	 * @return list of all MS (as names)
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -42,6 +55,12 @@ public class MeasurementSpecificationService {
 		return returnList;
 	}
 	
+	/**
+	 * List all the MS as it. So the object returnde is a list of MS objects.
+	 * 
+	 * @param usertoken the user identification
+	 * @return list of all MS (as objects)
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LISTSPECS)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -58,6 +77,13 @@ public class MeasurementSpecificationService {
 		return returnList;
 	}
 	
+	/**
+	 * Switch to a given MS. If the MS does not exist, the switch fails.
+	 * 
+	 * @param usertoken the user identification
+	 * @param specificationName the name of the MS to switch to
+	 * @return true, if MS exist and was switched to
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -80,6 +106,15 @@ public class MeasurementSpecificationService {
 		return true;
 	}
 	
+	/**
+	 * Creates a new MS. However, this request does not switch the MS! The MS must be siwtched manually
+	 * via the service at @Code{SVC_MEASUREMENT_SWITCH} service.
+	 * Return false, if a MS with the given name already exists or the addition failed.
+	 * 
+	 * @param usertoken the user identification
+	 * @param specificationName the name for the new MS
+	 * @return true, if adding was successful and there was no other MS with the given name
+	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -101,7 +136,6 @@ public class MeasurementSpecificationService {
 		}
 
 		msb.setName(specificationName);
-		u.setMeasurementSpecification(specificationName);
 		
 		// store the scenario definition in the databse of the current user
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -120,6 +154,14 @@ public class MeasurementSpecificationService {
 		return true;
 	}
 	
+	/**
+	 * Renames the current selected MS. Fails if the user has not MS currently selected.
+	 * 
+	 * @param usertoken the user identification
+	 * @param specname the new MS name
+	 * @return true, if the current selected MS can be renamed. False, if the user has no
+	 * 		   MS currently selected.
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -128,11 +170,6 @@ public class MeasurementSpecificationService {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
-		System.out.println("myspecname: " + specname);
-		for (MeasurementSpecification mss : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
-			System.out.println("myspecname current: " + mss.getName());
-		}
-		
 		if (existSpecification(specname, u)) {
 			LOGGER.warn("Can't rename, because specification with the name '{}' already exists.", specname);
 			return false;
@@ -140,8 +177,10 @@ public class MeasurementSpecificationService {
 
 		MeasurementSpecification msss = u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecification(u.getMeasurementSpecification());
 
-		System.out.println("++++++++++++++");
-		System.out.println(msss == null);
+		if (msss == null) {
+			LOGGER.warn("User has no MeasurementSpecification selected. Therefore a renaming cannot be completed.");
+			return false;
+		}
 		
 		u.setMeasurementSpecification(specname);
 		
@@ -149,18 +188,12 @@ public class MeasurementSpecificationService {
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
-			LOGGER.warn("No database connection found.");
+			LOGGER.warn("No database connection found for the user with the token '{}'.", usertoken);
 			return false;
 		}
 		
 		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
 		dbCon.store(scenarioDef);
-		
-		u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
-			System.out.println("2myspecname current: " + ms.getName());
-		}
 
 		// store the new user data in it's database
 		ServicePersistenceProvider.getInstance().storeUser(u);
@@ -173,15 +206,16 @@ public class MeasurementSpecificationService {
 	// *************************** (private) HELPER *****************************************
 	
 	/**
-	 * Returns whether a specification with the given name exists.
+	 * Returns whether a MS with the given name exists.
 	 * 
-	 * @param specification specififcation name
-	 * @return true, if specification exists
+	 * @param specification MS name
+	 * @return true, if MS with the given name exists
 	 */
 	private boolean existSpecification(String specification, Users u) {
 
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario()
-				.getMeasurementSpecifications()) {
+		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder()
+										    .getBuiltScenario()
+										    .getMeasurementSpecifications()) {
 			if (specification.equals(ms.getName())) {
 				return true;
 			}
