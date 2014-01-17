@@ -14,6 +14,11 @@ public abstract class ServiceConfiguration {
 	
 	public static final String SERVICE_CONFIG_FOLDER = "rsc";
 	
+	public static final String DEFAULT_MEASUREMENTSPECIFICATION_NAME = "MeasurementSpecification";
+	
+	public static final String MEASUREMENTENVIRONMENT_ROOTNAME = "root";
+	public static final String MEASUREMENTENVIRONMENT_DELIMITER = "/";
+	
 	/**
 	 * Database configuration key, can be found in the sopeco-service.conf!
 	 * So the actual values are in the sopeco-service.conf.
