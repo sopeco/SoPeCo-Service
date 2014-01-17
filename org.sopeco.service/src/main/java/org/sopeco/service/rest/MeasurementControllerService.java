@@ -17,8 +17,9 @@ import org.sopeco.engine.measurementenvironment.IMeasurementEnvironmentControlle
 import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
-import org.sopeco.service.builder.MeasurementEnvironmentBuilder;
+import org.sopeco.service.builder.MeasurementEnvironmentDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
@@ -131,12 +132,18 @@ public class MeasurementControllerService {
 			return null;
 		}
 		
-		MeasurementEnvironmentDefinition med = MeasurementEnvironmentBuilder.createBlankEnvironmentDefinition();
+		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
 		setNewMEDefinition(med, u);
 		
 		return med;
 	}
 	
+	/**
+	 * Returns current selected MED for the given user.
+	 * 
+	 * @param usertoken the user identification
+	 * @return current selected MED for the given user
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -149,6 +156,46 @@ public class MeasurementControllerService {
 		}
 	
 		return u.getCurrentScenarioDefinitionBuilder().getMEDefinition();
+	}
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_NAMESPACE + "/"
+			+ ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean addNamespace(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+								@QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getEnvironmentBuilder()
+							 	 .addNamespaces(path);
+
+		if (ns == null) {
+			return false;
+		}
+		
+		
+		// store the namespace in the database (only possible via storing the whole sd in database)
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		
+		System.out.println("+++++++++++++++++++++");
+		System.out.println(sd.getMeasurementEnvironmentDefinition().getRoot().getName());
+		System.out.println(sd.getMeasurementEnvironmentDefinition().getRoot().getChildren().get(0).getName());
+
+		dbCon.store(sd);
+		dbCon.closeProvider();
+
+		return true;
 	}
 	
 	
