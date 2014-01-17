@@ -114,6 +114,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_CHECK = "check";
 	public static final String SVCP_MEC_TOKEN = "token";
 	public static final String SVCP_MEC_URL = "url";
+	public static final String SVCP_MEC_NAMESPACE = "path"; // namespace path
 	
 	/**
 	 * QueryParam name for the account name
