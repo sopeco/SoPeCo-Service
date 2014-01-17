@@ -99,7 +99,7 @@ public final class ServicePersistenceProvider {
 	}
 	
 	public Users loadUser(String token) {
-		return loadSingleById(Users.class, token);
+		return loadSingleByQuery(Users.class, "getUserByToken", "token", token);
 	}
 
 	public Users storeUser(Users user) {
@@ -176,7 +176,7 @@ public final class ServicePersistenceProvider {
 		T result = null;
 		EntityManager em = emf.createEntityManager();
 		try {
-			
+
 			TypedQuery<T> query = em.createNamedQuery(queryName, returnClazz);
 			for (int i = 0; i <= parameterList.length / 2; i += 2) {
 				query.setParameter((String) parameterList[i], parameterList[i + 1]);

@@ -26,18 +26,17 @@
  */
 package org.sopeco.service.persistence.entities;
 
-import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
+import javax.persistence.NamedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.config.IConfiguration;
-import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -49,6 +48,7 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
  * @author Peter Merkert
  */
 @Entity
+@NamedQuery(name = "getUserByToken", query = "SELECT u FROM Users u WHERE u.token = :token")
 public class Users {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(Users.class.getName());
@@ -62,7 +62,7 @@ public class Users {
 	private Account currentAccount;
 	
 	@Lob
-	@Column(name = "scenarioDefinition")
+	@Column(name = "scenarioDefinitionBuilder")
 	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
 	
 	@Column(name = "currentMeasurementSpecification")
@@ -72,7 +72,6 @@ public class Users {
 	private long lastRequestTime;
 
 	protected Users() {
-		this(UUID.randomUUID().toString());
 	}
 	
 	public Users(String token) {
