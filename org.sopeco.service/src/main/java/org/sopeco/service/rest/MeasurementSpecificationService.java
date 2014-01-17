@@ -53,7 +53,7 @@ public class MeasurementSpecificationService {
 		}
 		
 		List<String> returnList = new ArrayList<String>();
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getMeasurementSpecifications()) {
+		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getMeasurementSpecifications()) {
 			returnList.add(ms.getName());
 		}
 
@@ -79,7 +79,7 @@ public class MeasurementSpecificationService {
 		}
 		
 		List<MeasurementSpecification> returnList = new ArrayList<MeasurementSpecification>();
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getBuiltScenario()
+		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition()
 				.getMeasurementSpecifications()) {
 			returnList.add(ms);
 		}
@@ -149,7 +149,7 @@ public class MeasurementSpecificationService {
 		}
 
 		MeasurementSpecificationBuilder msb = u.getCurrentScenarioDefinitionBuilder()
-													  .addNewMeasurementSpecification();
+													  .getNewMeasurementSpecification();
 		if (msb == null) {
 			LOGGER.warn("Error adding new specification with name '{}'", specificationName);
 			return false;
@@ -164,7 +164,7 @@ public class MeasurementSpecificationService {
 			LOGGER.warn("No database connection found.");
 			return false;
 		} else {
-			ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+			ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 			dbCon.store(scenarioDef);
 		}
 		
@@ -217,7 +217,7 @@ public class MeasurementSpecificationService {
 			return false;
 		}
 		
-		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 		dbCon.store(scenarioDef);
 
 		// store the new user data in it's database
@@ -239,7 +239,7 @@ public class MeasurementSpecificationService {
 	private boolean existSpecification(String specification, Users u) {
 
 		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder()
-										    .getBuiltScenario()
+										    .getScenarioDefinition()
 										    .getMeasurementSpecifications()) {
 			if (specification.equals(ms.getName())) {
 				return true;

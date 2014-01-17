@@ -59,7 +59,8 @@ public class ScenarioService {
 			return false;
 		}
 		
-		ScenarioDefinition emptyScenario = ScenarioDefinitionBuilder.buildEmptyScenario(scenarioName);
+		ScenarioDefinitionBuilder sdb = new ScenarioDefinitionBuilder(scenarioName);
+		ScenarioDefinition emptyScenario = sdb.getScenarioDefinition();
 
 		if (specificationName != null) {
 			emptyScenario.getMeasurementSpecifications().get(0).setName(specificationName);
@@ -208,7 +209,7 @@ public class ScenarioService {
 			return false;
 		}
 		
-		if (u.getCurrentScenarioDefinitionBuilder().getBuiltScenario().getScenarioName() == scenarioname) {
+		if (u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName() == scenarioname) {
 			LOGGER.warn("Can't delete current selected scenario. First must switch to another one.");
 			return false;
 		}
@@ -247,7 +248,7 @@ public class ScenarioService {
 			return false;
 		}
 
-		ScenarioDefinitionBuilder builder = ScenarioDefinitionBuilder.load(definition);
+		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {

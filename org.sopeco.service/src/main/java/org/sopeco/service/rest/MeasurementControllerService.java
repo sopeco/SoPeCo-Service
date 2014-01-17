@@ -155,7 +155,7 @@ public class MeasurementControllerService {
 			return null;
 		}
 	
-		return u.getCurrentScenarioDefinitionBuilder().getMEDefinition();
+		return u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
 	}
 	
 	@PUT
@@ -173,7 +173,7 @@ public class MeasurementControllerService {
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
-								 .getEnvironmentBuilder()
+								 .getMeasurementEnvironmentBuilder()
 							 	 .addNamespaces(path);
 
 		if (ns == null) {
@@ -182,7 +182,7 @@ public class MeasurementControllerService {
 		
 		
 		// store the namespace in the database (only possible via storing the whole sd in database)
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
@@ -226,8 +226,8 @@ public class MeasurementControllerService {
 	private void setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
 		
-		u.getCurrentScenarioDefinitionBuilder().setMEDefinition(definition);
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getBuiltScenario();
+		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
 		dbCon.store(sd);
