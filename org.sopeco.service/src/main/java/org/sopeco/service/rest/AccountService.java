@@ -123,8 +123,6 @@ public class AccountService {
 		Users u = new Users(uuid);
 		u.setCurrentAccount(account);
 		ServicePersistenceProvider.getInstance().storeUser(u);
-		//UserManager.instance().registerUser(uuid);
-		//UserManager.instance().getUser(uuid).setCurrentAccount(account);
 		
 		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
 		if (details == null) {
