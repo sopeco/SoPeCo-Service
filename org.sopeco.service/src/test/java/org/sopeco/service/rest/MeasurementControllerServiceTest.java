@@ -140,4 +140,46 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals("root", med.getRoot().getName());
 	}
 	
+	
+	@Test
+	public void testCurrentMED() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		// create a scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path("examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// return the MED for the current user
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
+														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
+													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+													     .get(MeasurementEnvironmentDefinition.class);
+		
+		// as the namespace is not set yet, it must be null
+		assertEquals("root", med.getRoot().getName());
+	}
 }

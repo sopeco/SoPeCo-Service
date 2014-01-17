@@ -137,6 +137,20 @@ public class MeasurementControllerService {
 		return med;
 	}
 	
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_CURRENT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MeasurementEnvironmentDefinition getCurrentMEDefinition(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken) {
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+	
+		return u.getCurrentScenarioDefinitionBuilder().getMEDefinition();
+	}
+	
 	
 	/**************************************HELPER****************************************/
 	
