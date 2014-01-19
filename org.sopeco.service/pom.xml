@@ -12,6 +12,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
 		<jersey.version>1.17.1</jersey.version>
+		<jackson.version>2.3.0</jackson.version>
 	</properties>
 	
 	<!-- ================REPOSITORIES================= -->
@@ -80,11 +81,10 @@
 		</dependency>
          
 		<!-- JSON data exchange -->
-         
 		<dependency>
-			<groupId>org.codehaus.jackson</groupId>
-			<artifactId>jackson-jaxrs</artifactId>
-			<version>1.9.13</version>
+			<groupId>com.fasterxml.jackson.jaxrs</groupId>
+			<artifactId>jackson-jaxrs-json-provider</artifactId>
+			<version>${jackson.version}</version>
 		</dependency>
 
     </dependencies>

@@ -3,10 +3,10 @@ package org.sopeco.service.rest;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
-import org.codehaus.jackson.annotate.JsonAutoDetect.Visibility;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.codehaus.jackson.map.introspect.VisibilityChecker;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
+
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class is used to customize the used Jackson Json converter. E.g. say that the conversation must
@@ -25,11 +25,13 @@ public class CustomObjectWrapper implements ContextResolver<ObjectMapper> {
 	
 	 public CustomObjectWrapper() {
 		 om = new ObjectMapper();
-		 om.configure(org.codehaus.jackson.map.DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		 om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+		 
+		 //om.addMixInAnnotations(arg0, arg1);
 		 
 		 // mixin for ParameterNamespace
 		 // http://stackoverflow.com/questions/10937924/cant-get-a-basic-jackson-mixin-to-work
-		 om.setVisibilityChecker(VisibilityChecker.Std.defaultInstance().withFieldVisibility(Visibility.PROTECTED_AND_PUBLIC));
+		 //om.setVisibilityChecker(VisibilityChecker.Std.defaultInstance().withFieldVisibility(Visibility.PROTECTED_AND_PUBLIC));
 		 //om.setVisibilityChecker(VisibilityChecker.Std.defaultInstance().withFieldVisibility(Visibility.ANY));
 		 //om.getSerializationConfig().addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 		 //om.getDeserializationConfig().addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);

@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
@@ -12,6 +11,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.shared.Message;
 
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -42,7 +42,7 @@ public class ScenarioServiceTest extends JerseyTest {
 	 */
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
-	    config.getClasses().add(JacksonJsonProvider.class);
+	    config.getClasses().add(JacksonJaxbJsonProvider.class);
 	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
