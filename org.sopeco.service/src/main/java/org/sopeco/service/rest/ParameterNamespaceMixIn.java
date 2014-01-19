@@ -1,16 +1,15 @@
 package org.sopeco.service.rest;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import org.sopeco.persistence.entities.definition.ParameterNamespace;
+/**
+ * This class is only used to inject the class {@link org.sopeco.persistence.entities.definition.ParameterNamespace}
+ * with a Jackson annotation. For more information have a look at {@code CustomObjectWrapper}.
+ * 
+ * @author Peter Merkert
+ */
+@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+public final class ParameterNamespaceMixIn {
 
-/*public class ParameterNamespaceMixIn {
-	
-	@JsonBackReference("role-User")
-	protected List<ParameterNamespace> children = new ArrayList<ParameterNamespace>();
-	
-	@JsonManagedReference("role-User")
-	protected ParameterNamespace parent;
-	
-}*/
+}

@@ -16,6 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * throw an error and shut down. To prevent this behaviour we need to tell Jackson to ingore these "not
  * mappable properties".
  * 
+ * Needed to fix the class {@code ParameterNamespace} to be serialized and deserialized with self
+ * references. To do so, we needed to add a Jackson Annotation for the class {@code ParameterNamespace}.
+ * As we are not allowed to change the class code itself, we use a MixIn via Jackson to inject our
+ * Jackson annotation for correct JSON converting with self-references.
+ * 
  * @author Peter Merkert
  */
 @Provider
@@ -26,15 +31,9 @@ public class CustomObjectWrapper implements ContextResolver<ObjectMapper> {
 	 public CustomObjectWrapper() {
 		 om = new ObjectMapper();
 		 om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-		 
-		 //om.addMixInAnnotations(arg0, arg1);
-		 
-		 // mixin for ParameterNamespace
-		 // http://stackoverflow.com/questions/10937924/cant-get-a-basic-jackson-mixin-to-work
-		 //om.setVisibilityChecker(VisibilityChecker.Std.defaultInstance().withFieldVisibility(Visibility.PROTECTED_AND_PUBLIC));
-		 //om.setVisibilityChecker(VisibilityChecker.Std.defaultInstance().withFieldVisibility(Visibility.ANY));
-		 //om.getSerializationConfig().addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
-		 //om.getDeserializationConfig().addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
+
+		 // mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
+		 om.addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 	 }
 
 	public ObjectMapper getContext(Class<?> objectType) {

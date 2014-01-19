@@ -187,7 +187,8 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	public void testMEDNamespaceAdding() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String mynamespace = "root/mynamespacepath";
+		String mynamespace = "mynamespacepath";
+		String mynamespaceFullPath = "root/" + mynamespace;
 		
 		// log into the account
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -221,19 +222,20 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
 							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
 						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespace)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
 						      .put(Boolean.class);
 		
 		assertEquals(true, b);
 		
 		// return the MED for the current user
-		/*MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
 														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
 													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
 													     .get(MeasurementEnvironmentDefinition.class);
 				
 		
 		// as the namespace is not set yet, it must be null
-		assertEquals("root" + "." + mynamespace, med.getRoot().getFullName());*/
+		assertEquals(mynamespace, med.getRoot().getChildren().get(0).getName());
+		assertEquals("root" + "." + mynamespace, med.getRoot().getChildren().get(0).getFullName());
 	}
 }
