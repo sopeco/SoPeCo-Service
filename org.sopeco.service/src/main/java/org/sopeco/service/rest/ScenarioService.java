@@ -24,6 +24,7 @@ import org.sopeco.persistence.entities.ExperimentSeries;
 import org.sopeco.persistence.entities.ExperimentSeriesRun;
 import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
@@ -36,6 +37,8 @@ import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 public class ScenarioService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class);
+	
+	private static final String TOKEN = ServiceConfiguration.SVCP_SCENARIO_TOKEN;
 	
 	/**
 	 * Adds a new scenario with the given values. This method DOES NOT switch to the
@@ -55,28 +58,45 @@ public class ScenarioService {
 	@Consumes(MediaType.APPLICATION_JSON)
 	public boolean addScenario(@PathParam("name") String scenarioName,
 							   @QueryParam("specname") String specificationName,
-							   @QueryParam("token") String usertoken,
+							   @QueryParam(TOKEN) String usertoken,
 							   ExperimentSeriesDefinition esd) {
-		
+
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		// check if a scenario with the given name already exsists
 		if (loadScenarioDefinition(scenarioName, usertoken) != null) {
-			LOGGER.warn("A scenario with the given name '{}' already exsits!", scenarioName);
+			LOGGER.info("A scenario with the given name '{}' already exsits!", scenarioName);
 			return false;
 		}
 		
 		ScenarioDefinitionBuilder sdb = new ScenarioDefinitionBuilder(scenarioName);
+		//sdb.getMeasurementSpecificationBuilder().addExperimentSeries(esd);
 		ScenarioDefinition emptyScenario = sdb.getScenarioDefinition();
 
-		if (specificationName != null) {
-			emptyScenario.getMeasurementSpecifications().get(0).setName(specificationName);
-			
-			if (esd != null) {
-				emptyScenario.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().add(esd);
-			}
-			
+		if (specificationName == null || specificationName.equals("")) {
+			LOGGER.info("Specification name is invalid.");
+			return false;
 		}
+		
+		if (esd == null) {
+			LOGGER.info("ExperimentSeriesDefinition is invalid.");
+			return false;
+		}
+		
+		// now replace the default created MeasurementSpecification with the custom one
+		int defaultIndexMS = 0;
+		int defaultIndexESD = 0;
+		MeasurementSpecification ms = new MeasurementSpecification();
+		ms.getExperimentSeriesDefinitions().add(esd);
+		ms.setName(specificationName);
+		emptyScenario.getMeasurementSpecifications().set(defaultIndexMS, ms);
+		emptyScenario.getMeasurementSpecifications().get(defaultIndexMS).getExperimentSeriesDefinitions().set(defaultIndexESD, esd);
+		
+		
+		//int index = emptyScenario.getMeasurementSpecifications().indexOf(ms);
+		//System.out.println("Measurementname: " + emptyScenario.getMeasurementSpecifications().get(1).getName());
+		//emptyScenario.getMeasurementSpecifications().get(index).getExperimentSeriesDefinitions().add(esd);
+		//sdb.getMeasurementSpecificationBuilder().addExperimentSeries(esd);
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
@@ -99,7 +119,16 @@ public class ScenarioService {
 		}
 		
 		dbCon.store(emptyScenario);
-		dbCon.closeProvider();
+		
+		try {
+			emptyScenario = dbCon.loadScenarioDefinition(emptyScenario.getScenarioName());
+			System.out.println("t3t3t: " + emptyScenario.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().get(0).getName());
+		} catch (DataNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		dbCon.closeProvider();	
 		
 		return true;
 	}
@@ -119,7 +148,7 @@ public class ScenarioService {
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addScenario(@QueryParam("token") String usertoken,
+	public boolean addScenario(@QueryParam(TOKEN) String usertoken,
 							   ScenarioDefinition scenario) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -159,8 +188,7 @@ public class ScenarioService {
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public String[] getScenarioNames(@QueryParam("token") String usertoken) {
+	public String[] getScenarioNames(@QueryParam(TOKEN) String usertoken) {
 
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
@@ -191,6 +219,27 @@ public class ScenarioService {
 	}
 	
 	/**
+	 * Returns the current selected {@code ScenarioDefinition} for the user.
+	 * 
+	 * @param usertoken the user identification
+	 * @return the current selected {@code ScenarioDefinition} for the user
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ScenarioDefinition getCurrentScenario(@QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		return u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+	}
+	
+	/**
 	 * Deleted the scenario with the given name. Does not delete the scenario, if the
 	 * given user has currenlty selected the scenario.
 	 * 
@@ -203,7 +252,7 @@ public class ScenarioService {
 	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean removeScenario(@QueryParam("name") String scenarioname,
-								  @QueryParam("token") String usertoken) {
+								  @QueryParam(TOKEN) String usertoken) {
 		
 		if (!scenarioname.matches("[a-zA-Z0-9_]+")) {
 			return false;
@@ -250,13 +299,13 @@ public class ScenarioService {
 	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
 			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean switchScenario(@QueryParam("token") String usertoken,
+	public boolean switchScenario(@QueryParam(TOKEN) String usertoken,
 								  @QueryParam("name") String scenarioname) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
-			LOGGER.warn("Invalid token '{}'!", usertoken);
+			LOGGER.info("Invalid token '{}'!", usertoken);
 			return false;
 		}
 		
@@ -265,6 +314,8 @@ public class ScenarioService {
 			return false;
 		}
 
+		System.out.println("tttttt: " + definition.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().get(0).getName());
+		
 		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
 		
 		u.setCurrentScenarioDefinitionBuilder(builder);
@@ -285,13 +336,19 @@ public class ScenarioService {
 		return true;
 	}
 	
-	
+	/**
+	 * Switches a scenario to another one given by the whole {@code ScenarioDefinition}.
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @param scenarioDefinition the new {@code ScenarioDefinition} to set
+	 * @return true, if the scenario could be switched to the given one
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
 			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_DEFINITION)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean switchScenario(@QueryParam("token") String usertoken,
+	public boolean switchScenario(@QueryParam(TOKEN) String usertoken,
 								  ScenarioDefinition scenarioDefinition) {
 		
 		if (scenarioDefinition == null) {
@@ -327,12 +384,18 @@ public class ScenarioService {
 		return true;
 	}
 	
-	
+	/**
+	 * Stores all results of the {@code ScenarioInstance}s of the current connected
+	 * account. The results are archived and stay in the database in an own table. 
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @return true, if all current scenario instances could be stored
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean storeScenario(@QueryParam("token") String usertoken) {
+	public boolean storeScenario(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -377,6 +440,45 @@ public class ScenarioService {
 		
 		return true;
 	}
+	
+	/**
+	 * Returns  the current scenario written down in XML. Not the XML is passed back, but
+	 * a String.
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @return string in XML format of the scenario
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_SCENARIO_XML)
+	@Produces(MediaType.APPLICATION_JSON)
+	public String getScenarioAsXML(@QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return "";
+		}
+		
+		ScenarioDefinition definition = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+
+		if (definition == null) {
+			LOGGER.info("User has not scenario selected!");
+			return "";
+		}
+		
+		ScenarioDefinitionWriter writer = new ScenarioDefinitionWriter(usertoken);
+		System.out.println("++++++++++++++++++++++++");
+		System.out.println(u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName());
+		System.out.println(u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecificationBuilder());
+		System.out.println("write: " + writer);
+		System.out.println("scenariodefinition object: " + definition);
+		String xml = writer.convertToXMLString(definition);
+		System.out.println("+++++++++++++++++++++++++");
+		return xml;
+	}
+	
+	
 	
 	/**************************************HELPER****************************************/
 	

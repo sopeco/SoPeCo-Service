@@ -5,9 +5,14 @@ import static org.junit.Assert.assertEquals;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.Test;
+import org.sopeco.engine.model.ScenarioDefinitionReader;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.ExplorationStrategy;
+import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.configuration.TestConfiguration;
+import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.Message;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -42,6 +47,7 @@ public class ScenarioServiceTest extends JerseyTest {
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
 	    config.getClasses().add(JacksonJaxbJsonProvider.class);
+	    config.getClasses().add(CustomObjectWrapper.class);
 	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
@@ -233,7 +239,6 @@ public class ScenarioServiceTest extends JerseyTest {
 		assertEquals(b, true);
 	}
 	
-	
 	@Test
 	public void testScenarioLoad() {
 		// connect to test users account
@@ -274,4 +279,82 @@ public class ScenarioServiceTest extends JerseyTest {
 		assertEquals(b, true);
 	}
 	
+	@Test
+	public void testScenarioXMLParsing() {
+		// connect to test users account
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
+		
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .type(MediaType.APPLICATION_JSON)
+				  .delete(Boolean.class);
+		
+		// add a default scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		ExplorationStrategy es = new ExplorationStrategy();
+		es.setName("myexplorationstrategy");
+		esd.setExplorationStrategy(es);
+		esd.setName("myname");
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// switch to the newly created measurmentspecification
+		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+				  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurmentspecificationname)
+				  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		String xml = resource().path(ServiceConfiguration.SVC_SCENARIO)
+							   .path(ServiceConfiguration.SVC_SCENARIO_XML)
+							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							   .accept(MediaType.APPLICATION_JSON)
+							   .get(String.class);
+		
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
+														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
+														 .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+														 .accept(MediaType.APPLICATION_JSON)
+														 .get(MeasurementEnvironmentDefinition.class);
+		
+		ScenarioDefinitionReader sdr = new ScenarioDefinitionReader(med, token);
+		ScenarioDefinition scenarioDefinitionXML = sdr.readFromString(xml);
+		
+		ScenarioDefinition scenarioDefinitionCurrent = resource().path(ServiceConfiguration.SVC_SCENARIO)
+															     .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+															     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+															     .accept(MediaType.APPLICATION_JSON)
+															     .get(ScenarioDefinition.class);
+		
+		assertEquals(true, scenarioDefinitionCurrent.equals(scenarioDefinitionXML));
+		
+	}
 }
