@@ -46,43 +46,6 @@ public class ScenarioServiceTest extends JerseyTest {
 	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
-	
-	/**
-	 * The following test is going to be ignored, because the test statement in the end depends
-	 * on the current database state.
-	 * If there was no experiement with the given name in the database before, the return value for the
-	 * addition of the test is going to be true. Otherwise a scenario with the given name has laready existed
-	 * and the result of the REST service is false.
-	 * 
-	 * The test case is left here to look up default scenario addition.
-	 */
-	@Ignore("Depend on database state")
-	@Test
-	public void testScenarioAdd() {
-		// connect to test users account
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
-		
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
-		
-		String token = m.getMessage();
-		
-		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		boolean bo = resource().path(ServiceConfiguration.SVC_SCENARIO)
-							   .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-							   .path("examplescenario")
-							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
-							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-							   .accept(MediaType.APPLICATION_JSON)
-							   .type(MediaType.APPLICATION_JSON)
-							   .post(Boolean.class, esd);
-		
-		assertEquals(bo, true);
-	}
 
 	/**
 	 * Try adding two scenarios with the same name. The second addition must fail.
