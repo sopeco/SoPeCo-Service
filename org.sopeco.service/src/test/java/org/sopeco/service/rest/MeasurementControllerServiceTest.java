@@ -532,5 +532,73 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		assertEquals(true, b);
 	}
+
+	
+	@Test
+	public void testMEDParameterRemoving() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String mynamespace = "mynamespacepath";
+		String mynamespaceFullPath = "root/" + mynamespace;
+		String paramName = "myparam";
+		String paramType = "myparamtype"; // be aware, after setting this is uppercase
+		ParameterRole paramRole = ParameterRole.INPUT;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		// create a scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path("examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// create the namespace, to ensure to have at least this one
+		resource().path(ServiceConfiguration.SVC_MEC)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+			      .put(Boolean.class);
+		
+		resource().path(ServiceConfiguration.SVC_MEC)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM_ADD)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
+							  .type(MediaType.APPLICATION_JSON)
+						      .put(Boolean.class, paramRole);
+
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM_REMOVE)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
+						      .delete(Boolean.class);
+		
+		// deletion must have been succesful
+		assertEquals(true, b);
+	}
 	
 }

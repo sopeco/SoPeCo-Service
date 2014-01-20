@@ -296,12 +296,12 @@ public class MeasurementControllerService {
 			+ ServiceConfiguration.SVC_MEC_PARAM_UPDATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addParameter(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-			      				@QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
-			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME) String paramName,
-			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME_NEW) String paramNameNew,
-			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP) String paramType,
-			      				ParameterRole role) {
+	public boolean updateParameter(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME) String paramName,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME_NEW) String paramNameNew,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP) String paramType,
+			      				   ParameterRole role) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -337,6 +337,41 @@ public class MeasurementControllerService {
 		storeUserAndScenario(u);
 
 		return true;
+	}
+	
+	@DELETE
+	@Path(ServiceConfiguration.SVC_MEC_PARAM + "/"
+			+ ServiceConfiguration.SVC_MEC_PARAM_REMOVE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean removeParameter(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME) String paramName) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getMeasurementEnvironmentBuilder()
+								 .getNamespace(path);
+
+		if (ns == null) {
+			LOGGER.info("Namespace with the path '{}' does not exist!", path);
+			return false;
+		}
+		
+		boolean b = u.getCurrentScenarioDefinitionBuilder()
+					 .getMeasurementEnvironmentBuilder()
+					 .removeNamespace(ns);
+
+		storeUserAndScenario(u);
+
+		return b;
 	}
 	
 	/**************************************HELPER****************************************/
