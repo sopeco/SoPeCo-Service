@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -19,6 +20,7 @@ import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
+import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.builder.MeasurementEnvironmentDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
@@ -223,14 +225,14 @@ public class MeasurementControllerService {
 	@Path(ServiceConfiguration.SVC_MEC_NAMESPACE + "/"
 			+ ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean removeNamespace(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public boolean renameNamespace(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 								   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
 								   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW) String newName) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
-			LOGGER.warn("Invalid token '{}'!", usertoken);
+			LOGGER.info("Invalid token '{}'!", usertoken);
 			return false;
 		}
 
@@ -239,12 +241,50 @@ public class MeasurementControllerService {
 							 	 .getNamespace(path);
 
 		if (ns == null) {
-			LOGGER.warn("Namespace with the path '{}' does not exist!", path);
+			LOGGER.info("Namespace with the path '{}' does not exist!", path);
 			return false;
 		}
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().renameNamespace(ns, newName);
 		
+		storeUserAndScenario(u);
+
+		return true;
+	}
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_PARAM + "/"
+			+ ServiceConfiguration.SVC_MEC_PARAM_ADD)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public boolean addParameter(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME) String paramName,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP) String paramType,
+			      				ParameterRole role) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getMeasurementEnvironmentBuilder()
+								 .getNamespace(path);
+
+		if (ns == null) {
+			LOGGER.info("Namespace with the path '{}' does not exist!", path);
+			return false;
+		}
+
+		u.getCurrentScenarioDefinitionBuilder()
+		 .getMeasurementEnvironmentBuilder()
+		 .addParameter(paramName, paramType, role, ns);
+
 		storeUserAndScenario(u);
 
 		return true;

@@ -121,6 +121,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MEC_URL = "url";
 	public static final String SVCP_MEC_NAMESPACE = "path"; // namespace path
 	public static final String SVCP_MEC_NAMESPACE_NEW = "newName"; // updated namespace name
+	public static final String SVCP_MEC_PARAM_NAME = "paramname";
+	public static final String SVCP_MEC_PARAM_TYP = "paramtype";
 	
 	/**
 	 * QueryParam name for the account name
@@ -135,6 +137,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_USER = "user";
 
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 
 	
 }

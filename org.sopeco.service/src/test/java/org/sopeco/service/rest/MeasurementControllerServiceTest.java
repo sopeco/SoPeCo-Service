@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.shared.MECStatus;
@@ -294,7 +295,19 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 	}
 	
-	
+	/**
+	 * Tests the renaming service.
+	 * 
+	 * 1. login
+	 * 2. add scenario
+	 * 3. switch to newly created scenario
+	 * 4. add new namespace
+	 * 5. rename namespace
+	 * 6. check current namespace name
+	 * 7. check invalid token failure
+	 * 8. remove namespace
+	 * 9. cehck to fail at renaming the removed namespace
+	 */
 	@Test
 	public void testMEDNamespaceRenaming() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -359,6 +372,94 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals(mynamespaceNewName, med.getRoot().getChildren().get(0).getName());
 		assertEquals("root" + "." + mynamespaceNewName, med.getRoot().getChildren().get(0).getFullName());
 		
+		
+		// test not available token
+		b = resource().path(ServiceConfiguration.SVC_MEC)
+					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
+					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
+				      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, "123")
+				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW, mynamespaceNewName)
+				      .put(Boolean.class);
+		
+		assertEquals(false, b);
+		
+		// test not available namespace (delete once for safety)
+		resource().path(ServiceConfiguration.SVC_MEC)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_REMOVE)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+			      .delete(Boolean.class);
+		
+		b = resource().path(ServiceConfiguration.SVC_MEC)
+					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
+					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
+				      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW, mynamespaceNewName)
+				      .put(Boolean.class);
+		
+		assertEquals(false, b);
+	}
+	
+	
+	@Test
+	public void testMEDParameterAdding() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String mynamespace = "mynamespacepath";
+		String mynamespaceFullPath = "root/" + mynamespace;
+		String paramName = "myparam";
+		String paramType = "myparamtype"; // be aware, after setting this is uppercase
+		ParameterRole paramRole = ParameterRole.INPUT;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		// create a scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path("examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// create the namespace, to ensure to have at least this one
+		resource().path(ServiceConfiguration.SVC_MEC)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+			      .put(Boolean.class);
+		
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM)
+							  .path(ServiceConfiguration.SVC_MEC_PARAM_ADD)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
+							  .type(MediaType.APPLICATION_JSON)
+						      .put(Boolean.class, paramRole);
+
+		assertEquals(true, b);
 	}
 	
 }
