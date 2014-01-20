@@ -15,7 +15,14 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.sopeco.config.Configuration;
+import org.sopeco.config.IConfiguration;
+import org.sopeco.engine.model.ScenarioDefinitionWriter;
 import org.sopeco.persistence.IPersistenceProvider;
+import org.sopeco.persistence.entities.ArchiveEntry;
+import org.sopeco.persistence.entities.ExperimentSeries;
+import org.sopeco.persistence.entities.ExperimentSeriesRun;
+import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
@@ -210,7 +217,7 @@ public class ScenarioService {
 		}
 		
 		if (u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName() == scenarioname) {
-			LOGGER.warn("Can't delete current selected scenario. First must switch to another one.");
+			LOGGER.warn("Can't delete the current selected scenario. First must switch to another one.");
 			return false;
 		}
 
@@ -220,7 +227,6 @@ public class ScenarioService {
 			
 			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
 			dbCon.remove(definition);
-			return true;
 			
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Scenario with name '{}' not found.", scenarioname);
@@ -229,6 +235,9 @@ public class ScenarioService {
 			dbCon.closeProvider();
 		}
 		
+		ServicePersistenceProvider.getInstance().storeUser(u);
+
+		return true;
 	}
 
 	/**
@@ -238,17 +247,12 @@ public class ScenarioService {
 	 * @param usertoken the token to identify the user
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
+			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean switchScenario(@QueryParam("name") String scenarioname,
-	  							  @QueryParam("token") String usertoken) {
+	public boolean switchScenario(@QueryParam("token") String usertoken,
+								  @QueryParam("name") String scenarioname) {
 		
-		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
-		if (definition == null) {
-			return false;
-		}
-
-		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -256,12 +260,123 @@ public class ScenarioService {
 			return false;
 		}
 		
+		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
+		if (definition == null) {
+			return false;
+		}
+
+		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
+		
 		u.setCurrentScenarioDefinitionBuilder(builder);
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection for user found.");
+			return false;
+		}
+		
+		dbCon.store(sd);
+		dbCon.closeProvider();
+		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		return true;
 	}
 	
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
+			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_DEFINITION)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean switchScenario(@QueryParam("token") String usertoken,
+								  ScenarioDefinition scenarioDefinition) {
+		
+		if (scenarioDefinition == null) {
+			LOGGER.warn("Invalid scenario definition!");
+			return false;
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection for user found.");
+			return false;
+		}
+		
+		u.setCurrentScenarioDefinitionBuilder(new ScenarioDefinitionBuilder(scenarioDefinition));
+		
+		// store the new scenario defintion in the database
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		
+		dbCon.store(sd);
+		dbCon.closeProvider();
+
+		// store user information in the service database
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		return true;
+	}
+	
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean storeScenario(@QueryParam("token") String usertoken) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection for user found.");
+			return false;
+		}
+		
+		ScenarioDefinition current = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		
+		try {
+			
+			for (ScenarioInstance instance : dbCon.loadScenarioInstances(current.getScenarioName())) {
+					
+				String changeHandlingMode = Configuration.getSessionSingleton(usertoken).getPropertyAsStr(
+						IConfiguration.CONF_DEFINITION_CHANGE_HANDLING_MODE);
+				
+				if (changeHandlingMode.equals(IConfiguration.DCHM_ARCHIVE)) {
+					archiveOldResults(u, instance);
+				}
+
+				dbCon.removeScenarioInstanceKeepResults(instance);
+				
+			}
+			
+		} catch (DataNotFoundException e) {
+			LOGGER.warn("Problem loading available scenario instances!", usertoken);
+			return false;
+		}
+		
+		dbCon.closeProvider();
+		
+		// as the user has not changed, this store is not necessary
+		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		return true;
+	}
 	
 	/**************************************HELPER****************************************/
 	
@@ -286,6 +401,40 @@ public class ScenarioService {
 			LOGGER.warn("Scenario '{}' not found.", scenarioname);
 			return null;
 		}
+	}
+	
+	/**
+	 * Archiving old scenario results from the given {@code ScenarioInstance} into the
+	 * account database.
+	 * 
+	 * @param u the user who wants to archive
+	 * @param scenarioInstance the scenario to save
+	 */
+	private void archiveOldResults(Users u, ScenarioInstance scenarioInstance) {
+		
+		ScenarioDefinitionWriter writer = new ScenarioDefinitionWriter(u.getToken());
+		
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		
+		String scenarioDefinitionXML = writer.convertToXMLString(scenarioInstance.getScenarioDefinition());
+		
+		for (ExperimentSeries es : scenarioInstance.getExperimentSeriesList()) {
+			
+			for (ExperimentSeriesRun run : es.getExperimentSeriesRuns()) {
+				ArchiveEntry entry = new ArchiveEntry(dbCon,
+													  run.getTimestamp(),
+												  	  scenarioInstance.getName(),
+												  	  scenarioInstance.getMeasurementEnvironmentUrl(),
+												  	  es.getName(),
+												  	  run.getLabel(),
+												  	  scenarioDefinitionXML,
+												  	  run.getDatasetId());
+				
+				dbCon.store(entry);
+			}
+			
+		}
+		
 	}
 	
 }
