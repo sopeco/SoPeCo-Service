@@ -52,7 +52,7 @@ public class ScenarioServiceTest extends JerseyTest {
 	 * 
 	 * 1. log in
 	 * 2. add new scenario with name X
-	 * 3. add new scenario with name X again
+	 * 3. add again new scenario with name X
 	 */
 	@Test
 	public void testScenarioDoubleAdd() {
