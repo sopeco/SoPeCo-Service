@@ -46,7 +46,6 @@ public class ScenarioServiceTest extends JerseyTest {
 	 */
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
-	    config.getClasses().add(JacksonJaxbJsonProvider.class);
 	    config.getClasses().add(CustomObjectWrapper.class);
 	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;

@@ -58,7 +58,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
 	    // the class contains the configuration to ignore not mappable properties
-	    config.getClasses().add(JacksonJaxbJsonProvider.class);
 	    config.getClasses().add(CustomObjectWrapper.class);
 	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;

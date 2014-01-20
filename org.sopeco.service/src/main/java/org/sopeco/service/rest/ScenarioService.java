@@ -92,12 +92,6 @@ public class ScenarioService {
 		emptyScenario.getMeasurementSpecifications().set(defaultIndexMS, ms);
 		emptyScenario.getMeasurementSpecifications().get(defaultIndexMS).getExperimentSeriesDefinitions().set(defaultIndexESD, esd);
 		
-		
-		//int index = emptyScenario.getMeasurementSpecifications().indexOf(ms);
-		//System.out.println("Measurementname: " + emptyScenario.getMeasurementSpecifications().get(1).getName());
-		//emptyScenario.getMeasurementSpecifications().get(index).getExperimentSeriesDefinitions().add(esd);
-		//sdb.getMeasurementSpecificationBuilder().addExperimentSeries(esd);
-		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
 		if (dbCon == null) {
@@ -119,14 +113,6 @@ public class ScenarioService {
 		}
 		
 		dbCon.store(emptyScenario);
-		
-		try {
-			emptyScenario = dbCon.loadScenarioDefinition(emptyScenario.getScenarioName());
-			System.out.println("t3t3t: " + emptyScenario.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().get(0).getName());
-		} catch (DataNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		
 		dbCon.closeProvider();	
 		
@@ -313,8 +299,6 @@ public class ScenarioService {
 		if (definition == null) {
 			return false;
 		}
-
-		System.out.println("tttttt: " + definition.getMeasurementSpecifications().get(0).getExperimentSeriesDefinitions().get(0).getName());
 		
 		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
 		
@@ -468,13 +452,8 @@ public class ScenarioService {
 		}
 		
 		ScenarioDefinitionWriter writer = new ScenarioDefinitionWriter(usertoken);
-		System.out.println("++++++++++++++++++++++++");
-		System.out.println(u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName());
-		System.out.println(u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecificationBuilder());
-		System.out.println("write: " + writer);
-		System.out.println("scenariodefinition object: " + definition);
 		String xml = writer.convertToXMLString(definition);
-		System.out.println("+++++++++++++++++++++++++");
+		
 		return xml;
 	}
 	
