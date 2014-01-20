@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
@@ -52,7 +51,7 @@ public class ScenarioServiceTest extends JerseyTest {
 	 * 
 	 * 1. log in
 	 * 2. add new scenario with name X
-	 * 3. add new scenario with name X again
+	 * 3. add again new scenario with name X
 	 */
 	@Test
 	public void testScenarioDoubleAdd() {
