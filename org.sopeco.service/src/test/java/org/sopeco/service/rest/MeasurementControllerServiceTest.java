@@ -40,17 +40,14 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 */
 	@Override
 	public WebAppDescriptor configure() {
-		return new WebAppDescriptor.Builder(new String[] {
-				TestConfiguration.PACKAGE_NAME_JSON,
-				TestConfiguration.PACKAGE_NAME_REST })
-				.initParam(TestConfiguration.PACKAGE_NAME_POJO, "true")
+		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
 				.clientConfig(createClientConfig())
 				.build();
 	}
 
 	/**
-	 * Sets the client config for the client to accept JSON and
-	 * converting JSON Object to POJOs.
+	 * Sets the client config for the client. The method adds a special {@link CustomObjectWrapper}
+	 * to the normal Jackson wrapper for JSON.
 	 * This method is called by {@link configure()}.
 	 * 
 	 * @return ClientConfig to work with JSON
@@ -59,7 +56,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ClientConfig config = new DefaultClientConfig();
 	    // the class contains the configuration to ignore not mappable properties
 	    config.getClasses().add(CustomObjectWrapper.class);
-	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
 	

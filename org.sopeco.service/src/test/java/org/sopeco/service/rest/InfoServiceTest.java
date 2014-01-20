@@ -22,24 +22,21 @@ public class InfoServiceTest extends JerseyTest {
 	
 	@Override
 	public WebAppDescriptor configure() {
-		return new WebAppDescriptor.Builder(new String[] {
-				TestConfiguration.PACKAGE_NAME_JSON,
-				TestConfiguration.PACKAGE_NAME_REST })
-				.initParam(TestConfiguration.PACKAGE_NAME_POJO, "true")
+		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
 				.clientConfig(createClientConfig())
 				.build();
 	}
 
 	/**
-	 * Sets the client config for the client to accept JSON and
-	 * converting JSON Object to POJOs.
+	 * Sets the client config for the client. The method is only used
+	 * to give the possiblity to adjust the ClientConfig.
+	 * 
 	 * This method is called by {@link configure()}.
 	 * 
 	 * @return ClientConfig to work with JSON
 	 */
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
-	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
 	

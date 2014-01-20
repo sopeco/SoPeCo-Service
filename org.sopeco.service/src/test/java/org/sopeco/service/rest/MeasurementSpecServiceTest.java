@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.Message;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
@@ -31,31 +32,27 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 
 	/**
 	 * Configure is called on the object creation of a JerseyTest. It's used to
-	 * configure where the JerseyTest can find JSON, the REST service to test
-	 * and the JSON POJO.
+	 * configure where the JerseyTest can find the REST services.
 	 * 
 	 * @return the configuration
 	 */
 	@Override
 	public WebAppDescriptor configure() {
-		return new WebAppDescriptor.Builder(new String[] {
-				TestConfiguration.PACKAGE_NAME_JSON,
-				TestConfiguration.PACKAGE_NAME_REST })
-				.initParam(TestConfiguration.PACKAGE_NAME_POJO, "true")
-				.clientConfig(createClientConfig())
-				.build();
+		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
+								   .clientConfig(createClientConfig())
+								   .build();
 	}
-
+	
 	/**
-	 * Sets the client config for the client to accept JSON and
-	 * converting JSON Object to POJOs.
+	 * Sets the client config for the client. The method is only used
+	 * to give the possiblity to adjust the ClientConfig.
+	 * 
 	 * This method is called by {@link configure()}.
 	 * 
 	 * @return ClientConfig to work with JSON
 	 */
 	private static ClientConfig createClientConfig() {
 		ClientConfig config = new DefaultClientConfig();
-	    config.getFeatures().put(TestConfiguration.PACKAGE_NAME_POJO, Boolean.TRUE);
 	    return config;
 	}
 	
