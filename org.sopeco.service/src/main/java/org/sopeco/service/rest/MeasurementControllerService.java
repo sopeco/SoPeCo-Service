@@ -19,6 +19,7 @@ import org.sopeco.engine.measurementenvironment.IMeasurementEnvironmentControlle
 import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
@@ -290,6 +291,53 @@ public class MeasurementControllerService {
 		return true;
 	}
 	
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_PARAM + "/"
+			+ ServiceConfiguration.SVC_MEC_PARAM_UPDATE)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public boolean addParameter(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME) String paramName,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME_NEW) String paramNameNew,
+			      				@QueryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP) String paramType,
+			      				ParameterRole role) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getMeasurementEnvironmentBuilder()
+								 .getNamespace(path);
+
+		if (ns == null) {
+			LOGGER.info("Namespace with the path '{}' does not exist!", path);
+			return false;
+		}
+
+		ParameterDefinition parameter = u.getCurrentScenarioDefinitionBuilder()
+										 .getMeasurementEnvironmentBuilder()
+										 .getParameter(paramName, ns);
+		
+		if (parameter == null) {
+			LOGGER.info("Parameter '{}' does not exist in the namespace with path '{}'!", paramName, path);
+			return false;
+		}
+		
+		parameter.setName(paramNameNew);
+		parameter.setRole(role);
+		parameter.setType(paramType);
+
+		storeUserAndScenario(u);
+
+		return true;
+	}
 	
 	/**************************************HELPER****************************************/
 	
