@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.rest.json;
 
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;

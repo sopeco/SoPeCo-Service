@@ -12,6 +12,7 @@ import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefiniti
 import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
 import org.sopeco.service.shared.Message;
 

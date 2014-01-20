@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.rest.json;
 
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
