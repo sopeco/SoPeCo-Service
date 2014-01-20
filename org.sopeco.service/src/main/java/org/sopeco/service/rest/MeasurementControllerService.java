@@ -4,6 +4,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -180,20 +181,71 @@ public class MeasurementControllerService {
 			return false;
 		}
 		
-		
-		// store the namespace in the database (only possible via storing the whole sd in database)
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		storeUserAndScenario(u);
 
-		ServicePersistenceProvider.getInstance().storeUser(u);
+		return true;
+	}
+	
+	
+	@DELETE
+	@Path(ServiceConfiguration.SVC_MEC_NAMESPACE + "/"
+			+ ServiceConfiguration.SVC_MEC_NAMESPACE_REMOVE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean removeNamespace(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+								   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path) {
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
-		
-		System.out.println("+++++++++++++++++++++");
-		System.out.println(sd.getMeasurementEnvironmentDefinition().getRoot().getName());
-		System.out.println(sd.getMeasurementEnvironmentDefinition().getRoot().getChildren().get(0).getName());
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
-		dbCon.store(sd);
-		dbCon.closeProvider();
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getMeasurementEnvironmentBuilder()
+							 	 .getNamespace(path);
+
+		if (ns == null) {
+			LOGGER.warn("Namespace with the path '{}' does not exist!", path);
+			return false;
+		}
+		
+		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().removeNamespace(ns);
+		
+		// store the updated scenario with removed namespace in database
+		storeUserAndScenario(u);
+
+		return true;
+	}
+	
+	
+	@PUT
+	@Path(ServiceConfiguration.SVC_MEC_NAMESPACE + "/"
+			+ ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean removeNamespace(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+								   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE) String path,
+								   @QueryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW) String newName) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return false;
+		}
+
+		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
+								 .getMeasurementEnvironmentBuilder()
+							 	 .getNamespace(path);
+
+		if (ns == null) {
+			LOGGER.warn("Namespace with the path '{}' does not exist!", path);
+			return false;
+		}
+		
+		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().renameNamespace(ns, newName);
+		
+		storeUserAndScenario(u);
 
 		return true;
 	}
@@ -201,6 +253,29 @@ public class MeasurementControllerService {
 	
 	/**************************************HELPER****************************************/
 	
+	/**
+	 * Stores the current user state in the service database. The current scenario state for the given
+	 * user is stored in the connected account database.
+	 * 
+	 * @param u the user whose information should be stored
+	 */
+	private void storeUserAndScenario(Users u) {
+		// store scenario in account database
+		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		
+		if (dbCon == null) {
+			LOGGER.warn("Cannot open the account database. Given token is '{}'", u.getToken());
+			return;
+		}
+		
+		dbCon.store(sd);
+		dbCon.closeProvider();
+
+		// store user information in Service-database
+		ServicePersistenceProvider.getInstance().storeUser(u);
+	}
+
 	/**
 	 * Checks if the given url is like a valid pattern.
 	 * 

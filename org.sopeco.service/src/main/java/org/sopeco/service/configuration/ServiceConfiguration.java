@@ -120,6 +120,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MEC_TOKEN = "token";
 	public static final String SVCP_MEC_URL = "url";
 	public static final String SVCP_MEC_NAMESPACE = "path"; // namespace path
+	public static final String SVCP_MEC_NAMESPACE_NEW = "newName"; // updated namespace name
 	
 	/**
 	 * QueryParam name for the account name
