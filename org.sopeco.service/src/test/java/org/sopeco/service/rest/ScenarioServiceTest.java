@@ -261,6 +261,48 @@ public class ScenarioServiceTest extends JerseyTest {
 		// now try to switch the scenario
 		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
 							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							  .accept(MediaType.APPLICATION_JSON)
+							  .put(Boolean.class);
+		
+		// the switch should be succesful
+		assertEquals(b, true);
+	}
+	
+	
+	@Test
+	public void testScenarioLoad() {
+		// connect to test users account
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String measurmentspecificationname = "examplespecname";
+		String scenarioname = "examplescenario";
+		
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+		
+		// add a default scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		// now try to switch the scenario
+		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
+							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
 							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 							  .accept(MediaType.APPLICATION_JSON)

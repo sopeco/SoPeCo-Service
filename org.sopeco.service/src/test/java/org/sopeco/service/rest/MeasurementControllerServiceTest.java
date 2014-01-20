@@ -124,6 +124,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -169,6 +170,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -213,6 +215,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -269,6 +272,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -338,6 +342,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -436,6 +441,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -496,6 +502,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -565,6 +572,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)

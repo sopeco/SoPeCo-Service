@@ -48,6 +48,9 @@ public abstract class ServiceConfiguration {
 	 * 		- list
 	 * 		- delete
 	 * 		- switch
+	 * 		- current
+	 * 		- store
+	 * 		- xml
 	 * 
 	 * measurementspecification
 	 * 		- list
@@ -88,9 +91,14 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_LIST = "list";
 	public static final String SVC_SCENARIO_DELETE = "delete";
 	public static final String SVC_SCENARIO_SWITCH = "switch";
+	public static final String SVC_SCENARIO_CURRENT = "current";
+	public static final String SVC_SCENARIO_ARCHIVE = "archive";
+	public static final String SVC_SCENARIO_XML = "xml";
 	public static final String SVCP_SCENARIO_NAME = "name";
 	public static final String SVCP_SCENARIO_SPECNAME = "specname";
 	public static final String SVCP_SCENARIO_TOKEN = "token";
+	public static final String SVC_SCENARIO_SWITCH_NAME = "name";
+	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
 	
 	public static final String SVC_MEASUREMENT = "measurementspecification";
 	public static final String SVC_MEASUREMENT_LIST = "list";
@@ -142,6 +150,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_USER = "user";
 
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 
 
 
