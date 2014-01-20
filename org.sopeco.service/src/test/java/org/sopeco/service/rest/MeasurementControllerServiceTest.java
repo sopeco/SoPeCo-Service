@@ -533,7 +533,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals(true, b);
 	}
 
-	
 	@Test
 	public void testMEDParameterRemoving() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -600,5 +599,31 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		// deletion must have been succesful
 		assertEquals(true, b);
 	}
-	
+
+	@Test
+	public void testMEDTestPort() {
+		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
+		String password 	= TestConfiguration.TESTPASSWORD;
+		String host 		= "0.0.0.0";
+		String port 		= "80";
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+
+		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
+							  .path(ServiceConfiguration.SVC_MEC_STATUS)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_HOST, host)
+						      .queryParam(ServiceConfiguration.SVCP_MEC_PORT, port)
+						      .get(Boolean.class);
+		
+		// there can't be a connection to 0.0.0.0:80
+		assertEquals(false, b);
+	}
 }

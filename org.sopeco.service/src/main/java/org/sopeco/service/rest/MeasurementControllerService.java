@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
+import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -28,6 +29,8 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.helper.MEControllerProtocol;
+import org.sopeco.service.rest.helper.ServerCheck;
 import org.sopeco.service.shared.MECStatus;
 
 @Path(ServiceConfiguration.SVC_MEC)
@@ -372,6 +375,48 @@ public class MeasurementControllerService {
 		storeUserAndScenario(u);
 
 		return b;
+	}
+	
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_STATUS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean isPortReachable(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
+			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		LOGGER.debug("Try to reach '{}':'{}'", host, port);
+
+		return ServerCheck.isPortReachable(host, port);
+	}
+	
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_LIST)
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<String> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
+			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port,
+			      				     	  MEControllerProtocol protocol) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return null;
+		}
+
+		if (!ServerCheck.isPortReachable(host, port)) {
+			return null;
+		}
+		
+		return ServerCheck.getController(protocol, host, port);
 	}
 	
 	/**************************************HELPER****************************************/

@@ -61,7 +61,7 @@ public abstract class ServiceConfiguration {
 	 * 		- validate
 	 * 		- med (measurment environment definition)
 	 * 			- blank
-	 * 		- current
+	 * 		- current (MED)
 	 * 		- namespace
 	 * 			- add
 	 * 			- remove
@@ -71,6 +71,7 @@ public abstract class ServiceConfiguration {
 	 * 			- remove
 	 * 			- update
 	 * 		- check (if Port is reachable)
+	 * 		- list
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -117,6 +118,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_PARAM_REMOVE = "remove";
 	public static final String SVC_MEC_PARAM_UPDATE = "update";
 	public static final String SVC_MEC_CHECK = "check";
+	public static final String SVC_MEC_LIST = "list";
 	public static final String SVCP_MEC_TOKEN = "token";
 	public static final String SVCP_MEC_URL = "url";
 	public static final String SVCP_MEC_NAMESPACE = "path"; // namespace path
@@ -124,6 +126,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MEC_PARAM_NAME = "paramname";
 	public static final String SVCP_MEC_PARAM_NAME_NEW = "newparamname";
 	public static final String SVCP_MEC_PARAM_TYP = "paramtype";
+	public static final String SVCP_MEC_HOST = "host";
+	public static final String SVCP_MEC_PORT = "port";
 	
 	/**
 	 * QueryParam name for the account name
@@ -138,6 +142,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_USER = "user";
 
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 
 
 
