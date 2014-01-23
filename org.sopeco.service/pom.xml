@@ -13,6 +13,7 @@
 		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
 		<jersey.version>1.17.1</jersey.version>
 		<jackson.version>2.3.0</jackson.version>
+		<qos-logback.version>1.0.13</qos-logback.version>
 	</properties>
 	
 	<!-- ================REPOSITORIES================= -->
@@ -35,13 +36,20 @@
 	<!-- ================DEPENDENCIES================= -->
 	<dependencies>
 	    
+	    <!-- logging implementation for SLF4J -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${qos-logback.version}</version>
+		</dependency>
+	    
+	    <!-- Dependencies to the SoPeCo package -->
 		<dependency>
 			<groupId>org.sopeco.core</groupId>
 			<artifactId>org.sopeco.persistence</artifactId>
 			<version>${sopeco.version}</version>
 		</dependency>
 		
-	    <!-- org.sopeco.engine denpendency within this package -->
 		<dependency>
 			<groupId>org.sopeco.core</groupId>
 			<artifactId>org.sopeco.core</artifactId>
