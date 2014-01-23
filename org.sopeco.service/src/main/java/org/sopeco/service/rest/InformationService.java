@@ -10,7 +10,7 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 @Path(ServiceConfiguration.SVC_INFO)
-public class InfoService {
+public class InformationService {
 
 	/**
 	 * Prints information about the SoPeCo Service
