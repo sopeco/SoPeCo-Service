@@ -141,9 +141,9 @@ public class ScheduledExperiment implements Serializable {
 	public Map<String, Object> getProperties() {
 		return properties;
 	}
-	
+
 	public void setProperties(IConfiguration configuration) {
-		properties.putAll(configuration.getProperties());
+		properties.putAll(configuration.exportConfiguration());
 	}
 
 	public boolean isActive() {
@@ -258,4 +258,24 @@ public class ScheduledExperiment implements Serializable {
 		this.repeatMinutes = repeatMinutes;
 	}
 
+	
+	public boolean equals(Object obj) {
+		
+		if (obj instanceof ScheduledExperiment) {
+			
+			ScheduledExperiment se = (ScheduledExperiment)obj;	
+			
+			return se.isRepeating == this.isRepeating
+					&& se.account == this.account
+					&& se.active == this.active
+					&& se.addedTime == this.addedTime
+					&& se.controllerUrl == this.controllerUrl
+					&& se.id == this.id
+					&& se.label == this.label
+					&& se.startTime == this.startTime;
+		}
+		
+		return false;
+		
+	}
 }
