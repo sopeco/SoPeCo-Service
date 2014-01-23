@@ -90,6 +90,9 @@ public abstract class ServiceConfiguration {
 	 * 			- update
 	 * 		- check (if Port is reachable)
 	 * 		- list
+	 * 
+	 * execute
+	 * 		- schedule (POST, GET, REMOVE)
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -155,6 +158,10 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MED_PARAM_NAME = "paramname";
 	public static final String SVCP_MED_PARAM_NAME_NEW = "newparamname";
 	public static final String SVCP_MED_PARAM_TYP = "paramtype";
+
+	public static final String SVC_EXECUTE = "execution";
+	public static final String SVC_EXECUTE_SCHEDULE = "schedule";
+	public static final String SVCP_EXECUTE_TOKEN = "token";
 	
 	/**
 	 * QueryParam name for the account name

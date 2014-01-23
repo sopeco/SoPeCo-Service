@@ -22,6 +22,7 @@ import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
+import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 
 /**
@@ -125,7 +126,22 @@ public final class ServicePersistenceProvider {
 	public Account loadAccount(long primaryKey) {
 		return loadSingleById(Account.class, primaryKey);
 	}
+	
+	public void storeScheduledExperiment(ScheduledExperiment scheduledExperiment) {
+		store(scheduledExperiment);
+	}
 
+	public void removeScheduledExperiment(ScheduledExperiment experiment) {
+		remove(experiment);
+	}
+	
+	public List<ScheduledExperiment> loadAllScheduledExperiments() {
+		return loadByQuery(ScheduledExperiment.class, "getAllExperiments");
+	}
+
+	public List<ScheduledExperiment> loadScheduledExperimentsByAccount(long accountId) {
+		return loadByQuery(ScheduledExperiment.class, "getExperimentsByAccount", "account", accountId);
+	}
 
 	/********************************************************************/
 	/**

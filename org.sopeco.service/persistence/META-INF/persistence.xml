@@ -30,6 +30,7 @@
 		<class>org.sopeco.service.persistence.entities.MECEntity</class>
 		<class>org.sopeco.service.persistence.entities.Account</class>
 		<class>org.sopeco.service.persistence.entities.AccountDetails</class>
+		<class>org.sopeco.service.persistence.entities.ScheduledExperiment</class>
 		<class>org.sopeco.service.persistence.entities.Users</class>
 		
 		<properties>
