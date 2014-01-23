@@ -100,6 +100,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_ACCOUNT_PASSWORD = "password";
 
 	public static final String SVC_INFO = "info";
+	public static final String SVC_INFO_RUNNING = "running";
 	
 	public static final String SVC_SCENARIO = "scenario";
 	public static final String SVC_SCENARIO_ADD = "add";
@@ -168,6 +169,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_USER = "user";
 
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 
 
 

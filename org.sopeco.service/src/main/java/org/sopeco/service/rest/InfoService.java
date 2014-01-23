@@ -5,6 +5,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.sopeco.config.Configuration;
+import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 @Path(ServiceConfiguration.SVC_INFO)
@@ -17,9 +19,14 @@ public class InfoService {
 	 */
 	@GET
 	@Produces(MediaType.TEXT_HTML)
-	public String createAccount() {
+	public String getInformation() {
+
+		PersistenceConfiguration conf = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
+		
 		return "<h1>Information about SoPeCo Service</h1>"
-				+ "Services can be requested.";
+				+ "<p>Services can be requested.</p>"
+				+ "<h2>Configuration information</h2>"
+				+ "Metadata database: " + conf.getMetaDataHost() + ":" + conf.getMetaDataPort();
 	}
 	
 	/**
@@ -28,6 +35,7 @@ public class InfoService {
 	 * @return true, if the service is running
 	 */
 	@GET
+	@Path(ServiceConfiguration.SVC_INFO_RUNNING)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Boolean running() {
 		return true;

@@ -42,6 +42,7 @@ public class InfoServiceTest extends JerseyTest {
 	@Test
 	public void testServiceRunning() {
 		Boolean b = resource().path(ServiceConfiguration.SVC_INFO)
+							  .path(ServiceConfiguration.SVC_INFO_RUNNING)
 							  .accept(MediaType.APPLICATION_JSON)
 							  .get(Boolean.class);
 
