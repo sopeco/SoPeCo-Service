@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
+import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +17,6 @@ import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
 import org.sopeco.service.shared.Message;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -26,6 +26,8 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementControllerServiceTest.class.getName());
+	
+	private static final String SCENARIO_NAME = "examplescenario";
 	
 	public MeasurementControllerServiceTest() {
 		super();
@@ -57,6 +59,53 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	    // the class contains the configuration to ignore not mappable properties
 	    config.getClasses().add(CustomObjectWrapper.class);
 	    return config;
+	}
+	
+	/**
+	 * Cleans up the database means: Delete the scenario with name {@code 
+	 * MeasurementControllerServiceTest.SCENARIO_NAME} in the database. This scenario
+	 * is used by every single test and it can cause errors, when the scenario is created,
+	 * but already in the database. Because the database instance is then not updated,
+	 * which can result in unexpected behaviour.
+	 */
+	@After
+	public void cleanUpDatabase() {
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioNameEmpty = "emptyscenario";
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "emptyspecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+			      .delete(Boolean.class);
 	}
 	
 	@Test
@@ -111,7 +160,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -121,7 +170,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -157,7 +206,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -167,7 +216,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -202,7 +251,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -212,7 +261,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -259,7 +308,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -269,7 +318,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -329,7 +378,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -339,7 +388,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -374,7 +423,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals("root" + "." + mynamespaceNewName, med.getRoot().getChildren().get(0).getFullName());
 		
 		
-		// test not available token
+		// test not valid token
 		b = resource().path(ServiceConfiguration.SVC_MEC)
 					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
 					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
@@ -428,7 +477,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -438,7 +487,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -489,7 +538,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -499,7 +548,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -559,7 +608,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path("examplescenario")
+				  .path(SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
@@ -569,7 +618,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "examplescenario")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
