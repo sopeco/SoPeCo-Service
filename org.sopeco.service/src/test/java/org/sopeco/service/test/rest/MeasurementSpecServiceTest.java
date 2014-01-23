@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
@@ -10,9 +10,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
-import org.sopeco.service.configuration.TestConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.shared.Message;
+import org.sopeco.service.test.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;

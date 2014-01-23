@@ -1,17 +1,16 @@
-package org.sopeco.service.persistence;
+package org.sopeco.service.test.persistence;
 
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
-import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.service.persistence.entities.Account;
+import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 /**
  * Tests the service persistence provider.
  * 
  * @author Peter Merkert
  */
-public class UserPersistenceTest {
+public class ServicePersistenceTest {
 
 	/**
 	 * If this test fails, then there might be a dependency to an (too) old package
@@ -22,8 +21,9 @@ public class UserPersistenceTest {
 	 */
 	@Test
 	public void PersistenceTest() {
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider((Account)null);
-		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed
+		ServicePersistenceProvider spp = ServicePersistenceProvider.getInstance();
+		// account with ID 0 does never exist
+		assertEquals(null, spp.loadAccount(0));
 	}
 	
 }
