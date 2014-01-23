@@ -24,6 +24,7 @@ import org.sopeco.persistence.entities.ExperimentSeries;
 import org.sopeco.persistence.entities.ExperimentSeriesRun;
 import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.ExplorationStrategy;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
@@ -45,6 +46,11 @@ public class ScenarioService {
 	 * Adds a new scenario with the given values. This method DOES NOT switch to the
 	 * newly created scenario. The scenario must be switched manually via the service
 	 * at @Code{switch}.
+	 * <br />
+	 * <br />
+	 * To have a correct created scenario, the {@code ExperimentSeriesDefinition} must have
+	 * a non-null {@code ExplorationStrategy} added. If it's still null, when attempting to
+	 * add a scenario, a new empty {@code ExplorationStrategy} is added automatically.
 	 * 
 	 * @param scenarioName the scenario name
 	 * @param specificationName the measurment specification name
@@ -82,6 +88,11 @@ public class ScenarioService {
 		if (esd == null) {
 			LOGGER.info("ExperimentSeriesDefinition is invalid.");
 			return false;
+		}
+		
+		// check if ExperimentSeriesDefinitions has an ExplorationStrategy added
+		if (esd.getExplorationStrategy() == null) {
+			esd.setExplorationStrategy(new ExplorationStrategy());
 		}
 		
 		// now replace the default created MeasurementSpecification with the custom one
@@ -146,7 +157,27 @@ public class ScenarioService {
 			return false;
 		}
 		
-
+		// test the scenario for non-null values (only in first entry)
+		if (scenario.getAllExperimentSeriesDefinitions() == null) {
+			LOGGER.info("ExperimentSeriesDefinition list is invalid.");
+			return false;
+		}
+		
+		for (ExperimentSeriesDefinition esd : scenario.getAllExperimentSeriesDefinitions()) {
+			
+			if (esd == null) {
+				LOGGER.info("An ExperimentSeriesDefinition in list is invalid.");
+				return false;
+			} 
+			
+			if (esd.getExplorationStrategy() == null) {
+				LOGGER.info("ExplorationStrategy is invalid.");
+				return false;
+			}
+			
+		}
+		
+		// now check if there is already a scenario with the given name
 		try {
 			
 			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {

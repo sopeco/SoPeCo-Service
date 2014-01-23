@@ -7,7 +7,6 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Test;
 import org.sopeco.engine.model.ScenarioDefinitionReader;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
-import org.sopeco.persistence.entities.definition.ExplorationStrategy;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
@@ -298,10 +297,6 @@ public class ScenarioServiceTest extends JerseyTest {
 		
 		// add a default scenario
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		ExplorationStrategy es = new ExplorationStrategy();
-		es.setName("myexplorationstrategy");
-		esd.setExplorationStrategy(es);
-		esd.setName("myname");
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 				  .path(scenarioname)
