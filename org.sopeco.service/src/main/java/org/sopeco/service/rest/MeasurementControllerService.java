@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.rmi.RemoteException;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -16,6 +17,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.IMeasurementEnvironmentController;
 import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
+import org.sopeco.engine.measurementenvironment.socket.SocketAppWrapper;
+import org.sopeco.engine.measurementenvironment.socket.SocketManager;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -120,12 +123,29 @@ public class MeasurementControllerService {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return null;
 		}
-
-		if (!ServerCheck.isPortReachable(host, port)) {
-			return null;
-		}
 		
-		return ServerCheck.getController(protocol, host, port);
+		if (protocol == MEControllerProtocol.SOCKET) {
+			
+			SocketAppWrapper app = SocketManager.getSocketApp(host);
+			
+			if (app == null) {
+				LOGGER.info("SocketAppWrapper is in invalid state.");
+				return null;
+			}
+				
+			return Arrays.asList(app.getAvailableController());
+			
+		} else {
+			
+			if (!ServerCheck.isPortReachable(host, port)) {
+				LOGGER.info("Given adress '{}':'{}' not reachable.", host, port);
+				return null;
+			}
+			
+			return ServerCheck.getController(protocol, host, port);
+			
+		}
+
 	}
 	
 	/**************************************HELPER****************************************/
