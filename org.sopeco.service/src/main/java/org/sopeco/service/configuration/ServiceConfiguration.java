@@ -75,6 +75,21 @@ public abstract class ServiceConfiguration {
 	 * 			- update
 	 * 		- check (if Port is reachable)
 	 * 		- list
+	 * 
+	 * measurementenviromentdefintion (MED)
+	 * 		- med
+	 * 			- blank
+	 * 		- current (MED)
+	 * 		- namespace
+	 * 			- add
+	 * 			- remove
+	 * 			- rename
+	 * 		- parameter
+	 * 			- add
+	 * 			- remove
+	 * 			- update
+	 * 		- check (if Port is reachable)
+	 * 		- list
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -112,30 +127,33 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC = "mec";
 	public static final String SVC_MEC_STATUS = "status";
 	public static final String SVC_MEC_VALIDATE = "validate";
-	public static final String SVC_MEC_MED = "med";
-	public static final String SVC_MEC_MED_SET = "set";
-	public static final String SVC_MEC_MED_SET_URL = "url";
-	public static final String SVC_MEC_MED_SET_BLANK = "blank";
-	public static final String SVC_MEC_CURRENT = "current";
-	public static final String SVC_MEC_NAMESPACE = "namespace";
-	public static final String SVC_MEC_NAMESPACE_ADD = "add";
-	public static final String SVC_MEC_NAMESPACE_REMOVE = "remove";
-	public static final String SVC_MEC_NAMESPACE_RENAME = "rename";
-	public static final String SVC_MEC_PARAM = "parameter";
-	public static final String SVC_MEC_PARAM_ADD = "add";
-	public static final String SVC_MEC_PARAM_REMOVE = "remove";
-	public static final String SVC_MEC_PARAM_UPDATE = "update";
 	public static final String SVC_MEC_CHECK = "check";
 	public static final String SVC_MEC_LIST = "list";
 	public static final String SVCP_MEC_TOKEN = "token";
 	public static final String SVCP_MEC_URL = "url";
-	public static final String SVCP_MEC_NAMESPACE = "path"; // namespace path
-	public static final String SVCP_MEC_NAMESPACE_NEW = "newName"; // updated namespace name
-	public static final String SVCP_MEC_PARAM_NAME = "paramname";
-	public static final String SVCP_MEC_PARAM_NAME_NEW = "newparamname";
-	public static final String SVCP_MEC_PARAM_TYP = "paramtype";
 	public static final String SVCP_MEC_HOST = "host";
 	public static final String SVCP_MEC_PORT = "port";
+	
+	public static final String SVC_MED = "med";
+	public static final String SVC_MED_SET = "set";
+	public static final String SVC_MED_SET_MEC = "mec";
+	public static final String SVC_MED_SET_BLANK = "blank";
+	public static final String SVC_MED_CURRENT = "current";
+	public static final String SVC_MED_NAMESPACE = "namespace";
+	public static final String SVC_MED_NAMESPACE_ADD = "add";
+	public static final String SVC_MED_NAMESPACE_REMOVE = "remove";
+	public static final String SVC_MED_NAMESPACE_RENAME = "rename";
+	public static final String SVC_MED_PARAM = "parameter";
+	public static final String SVC_MED_PARAM_ADD = "add";
+	public static final String SVC_MED_PARAM_REMOVE = "remove";
+	public static final String SVC_MED_PARAM_UPDATE = "update";
+	public static final String SVCP_MED_TOKEN = "token";
+	public static final String SVCP_MED_MEC_URL = "url";
+	public static final String SVCP_MED_NAMESPACE = "path"; // namespace path
+	public static final String SVCP_MED_NAMESPACE_NEW = "newName"; // updated namespace name
+	public static final String SVCP_MED_PARAM_NAME = "paramname";
+	public static final String SVCP_MED_PARAM_NAME_NEW = "newparamname";
+	public static final String SVCP_MED_PARAM_TYP = "paramtype";
 	
 	/**
 	 * QueryParam name for the account name

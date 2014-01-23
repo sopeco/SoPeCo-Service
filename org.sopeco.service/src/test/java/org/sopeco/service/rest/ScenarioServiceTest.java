@@ -328,9 +328,9 @@ public class ScenarioServiceTest extends JerseyTest {
 							   .accept(MediaType.APPLICATION_JSON)
 							   .get(String.class);
 		
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
-														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
-														 .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
+														 .path(ServiceConfiguration.SVC_MED_CURRENT)
+														 .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 														 .accept(MediaType.APPLICATION_JSON)
 														 .get(MeasurementEnvironmentDefinition.class);
 		

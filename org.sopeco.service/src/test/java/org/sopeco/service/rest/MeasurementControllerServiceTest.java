@@ -176,11 +176,10 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// blank the MeasurementEnvironmentDefinition
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
-														 .path(ServiceConfiguration.SVC_MEC_MED)
-														 .path(ServiceConfiguration.SVC_MEC_MED_SET)
-														 .path(ServiceConfiguration.SVC_MEC_MED_SET_BLANK)
-													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
+														 .path(ServiceConfiguration.SVC_MED_SET)
+														 .path(ServiceConfiguration.SVC_MED_SET_BLANK)
+													     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 													     .put(MeasurementEnvironmentDefinition.class);
 		
 		// as the namespace is not set yet, it must be null
@@ -222,9 +221,9 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// return the MED for the current user
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
-														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
-													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
+														 .path(ServiceConfiguration.SVC_MED_CURRENT)
+													     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 													     .get(MeasurementEnvironmentDefinition.class);
 		
 		// as the namespace is not set yet, it must be null
@@ -267,19 +266,19 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// return the MED for the current user
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 						      .put(Boolean.class);
 		
 		assertEquals(true, b);
 		
 		// return the MED for the current user
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
-														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
-													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
+														 .path(ServiceConfiguration.SVC_MED_CURRENT)
+													     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 													     .get(MeasurementEnvironmentDefinition.class);
 				
 		
@@ -324,19 +323,19 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// create the namespace
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .put(Boolean.class);
 		
 		// return the MED for the current user
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_REMOVE)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 						      .delete(Boolean.class);
 		
 		// removal must succeed
@@ -394,28 +393,28 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// create the namespace, to ensure to have at least this one
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .put(Boolean.class);
 		
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-							  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW, mynamespaceNewName)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+							  .path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW, mynamespaceNewName)
 						      .put(Boolean.class);
 		
 		// the renaming must succeed
 		assertEquals(true, b);
 		
 		// return the MED for the current user
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MEC)
-														 .path(ServiceConfiguration.SVC_MEC_CURRENT)
-													     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
+														 .path(ServiceConfiguration.SVC_MED_CURRENT)
+													     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 													     .get(MeasurementEnvironmentDefinition.class);
 				
 		// as the namespace is not set yet, it must be null
@@ -424,30 +423,30 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		
 		// test not valid token
-		b = resource().path(ServiceConfiguration.SVC_MEC)
-					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
-				      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, "123")
-				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW, mynamespaceNewName)
+		b = resource().path(ServiceConfiguration.SVC_MED)
+					  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+					  .path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
+				      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, "123")
+				      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+				      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW, mynamespaceNewName)
 				      .put(Boolean.class);
 		
 		assertEquals(false, b);
 		
 		// test not available namespace (delete once for safety)
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_REMOVE)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .delete(Boolean.class);
 		
-		b = resource().path(ServiceConfiguration.SVC_MEC)
-					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-					  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_RENAME)
-				      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-				      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE_NEW, mynamespaceNewName)
+		b = resource().path(ServiceConfiguration.SVC_MED)
+					  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+					  .path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
+				      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+				      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+				      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW, mynamespaceNewName)
 				      .put(Boolean.class);
 		
 		assertEquals(false, b);
@@ -493,20 +492,20 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// create the namespace, to ensure to have at least this one
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .put(Boolean.class);
 		
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM_ADD)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_PARAM)
+							  .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME, paramName)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP, paramType)
 							  .type(MediaType.APPLICATION_JSON)
 						      .put(Boolean.class, paramRole);
 
@@ -554,31 +553,31 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// create the namespace, to ensure to have at least this one
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .put(Boolean.class);
 		
-		resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM_ADD)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
-							  .type(MediaType.APPLICATION_JSON)
-						      .put(Boolean.class, paramRole);
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_PARAM)
+				  .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+			      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME, paramName)
+			      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP, paramType)
+				  .type(MediaType.APPLICATION_JSON)
+			      .put(Boolean.class, paramRole);
 
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM_UPDATE)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME_NEW, paramNameNew)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_PARAM)
+							  .path(ServiceConfiguration.SVC_MED_PARAM_UPDATE)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME, paramName)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME_NEW, paramNameNew)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP, paramType)
 							  .type(MediaType.APPLICATION_JSON)
 						      .put(Boolean.class, paramRole);
 		
@@ -624,29 +623,29 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// create the namespace, to ensure to have at least this one
-		resource().path(ServiceConfiguration.SVC_MEC)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE)
-				  .path(ServiceConfiguration.SVC_MEC_NAMESPACE_ADD)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
+		resource().path(ServiceConfiguration.SVC_MED)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE)
+				  .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+			      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
 			      .put(Boolean.class);
 		
-		resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM_ADD)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_TYP, paramType)
+		resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_PARAM)
+							  .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME, paramName)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP, paramType)
 							  .type(MediaType.APPLICATION_JSON)
 						      .put(Boolean.class, paramRole);
 
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM)
-							  .path(ServiceConfiguration.SVC_MEC_PARAM_REMOVE)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_NAMESPACE, mynamespaceFullPath)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PARAM_NAME, paramName)
+		Boolean b = resource().path(ServiceConfiguration.SVC_MED)
+							  .path(ServiceConfiguration.SVC_MED_PARAM)
+							  .path(ServiceConfiguration.SVC_MED_PARAM_REMOVE)
+						      .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+						      .queryParam(ServiceConfiguration.SVCP_MED_NAMESPACE, mynamespaceFullPath)
+						      .queryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME, paramName)
 						      .delete(Boolean.class);
 		
 		// deletion must have been succesful
