@@ -14,6 +14,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -112,10 +113,10 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		// the switch to the newly created measurmentspecification must go right!
 		assertEquals(true, b);
 		
-		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-														       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-															   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-														       .get(List.class);
+		List<String> measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+										         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+										         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+										         .get(new GenericType<List<String>>(){});
 
 		assertEquals(true, measurementList.size() >= 1);
 		assertEquals(true, measurementList.contains(measurementSpecName));
