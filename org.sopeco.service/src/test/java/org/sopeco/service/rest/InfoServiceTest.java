@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.configuration.TestConfiguration;
 
-import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
