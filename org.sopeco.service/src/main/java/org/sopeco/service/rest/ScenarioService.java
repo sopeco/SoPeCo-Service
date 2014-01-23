@@ -39,6 +39,7 @@ public class ScenarioService {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class);
 	
 	private static final String TOKEN = ServiceConfiguration.SVCP_SCENARIO_TOKEN;
+	private static final String NAME = ServiceConfiguration.SVCP_SCENARIO_NAME;
 	
 	/**
 	 * Adds a new scenario with the given values. This method DOES NOT switch to the
@@ -56,7 +57,7 @@ public class ScenarioService {
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addScenario(@PathParam("name") String scenarioName,
+	public boolean addScenario(@PathParam(NAME) String scenarioName,
 							   @QueryParam("specname") String specificationName,
 							   @QueryParam(TOKEN) String usertoken,
 							   ExperimentSeriesDefinition esd) {
@@ -237,7 +238,7 @@ public class ScenarioService {
 	@DELETE
 	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean removeScenario(@QueryParam("name") String scenarioname,
+	public boolean removeScenario(@QueryParam(NAME) String scenarioname,
 								  @QueryParam(TOKEN) String usertoken) {
 		
 		if (!scenarioname.matches("[a-zA-Z0-9_]+")) {
@@ -286,7 +287,7 @@ public class ScenarioService {
 			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean switchScenario(@QueryParam(TOKEN) String usertoken,
-								  @QueryParam("name") String scenarioname) {
+								  @QueryParam(NAME) String scenarioname) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
