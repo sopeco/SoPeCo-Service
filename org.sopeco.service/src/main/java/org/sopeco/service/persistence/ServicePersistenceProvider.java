@@ -135,6 +135,10 @@ public final class ServicePersistenceProvider {
 		remove(experiment);
 	}
 	
+	public ScheduledExperiment loadScheduledExperiment(long id) {
+		return loadSingleById(ScheduledExperiment.class, id);
+	}
+	
 	public List<ScheduledExperiment> loadAllScheduledExperiments() {
 		return loadByQuery(ScheduledExperiment.class, "getAllExperiments");
 	}
