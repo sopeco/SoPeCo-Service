@@ -37,8 +37,8 @@ public class AccountService {
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message createAccount(@QueryParam("accountname") String accountname,
-								 @QueryParam("password") String password) {
+	public Message createAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+								 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
 		Message m = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
@@ -57,7 +57,7 @@ public class AccountService {
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Boolean checkExistence(@QueryParam("accountname") String accountname) {
+	public Boolean checkExistence(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
 		LOGGER.debug("Trying to check account existence");
 		Boolean exists = accountExist(accountname);
 		
@@ -74,12 +74,34 @@ public class AccountService {
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
 	@Produces(MediaType.APPLICATION_JSON)
-	public AccountDetails getInfo(@QueryParam("accountname") String accountname) {
+	public AccountDetails getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
 		
 		Long accountID = ServicePersistenceProvider.getInstance().loadAccount(accountname).getId();
 		AccountDetails accountDetails = ServicePersistenceProvider.getInstance().loadAccountDetails(accountID);
 
 		return accountDetails;
+	}
+	
+
+	/**
+	 * Access the account as such with the given user token.
+	 * 
+	 * @param usertoken the user identification
+	 * @return the account the current user is related to
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Account getAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		return ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
 	}
 	
 	
