@@ -35,9 +35,9 @@
 		
 		<properties>
 		    <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
-			<property name="javax.persistence.jdbc.url" value="jdbc:derby:sopeco-jpa;create=true" />
-			<property name="javax.persistence.jdbc.user" value="test" />
-			<property name="javax.persistence.jdbc.password" value="test" />
+			<property name="javax.persistence.jdbc.url" value="jdbc:derby:sopeco-service;create=true" />
+			<property name="javax.persistence.jdbc.user" value="sopeco_service" />
+			<property name="javax.persistence.jdbc.password" value="sopeco_service" /> 
 
 			<property name="eclipselink.target-database" value="Derby" />
 			<property name="eclipselink.ddl-generation" value="create-tables" />

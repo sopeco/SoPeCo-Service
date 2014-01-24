@@ -19,13 +19,9 @@ public abstract class ServiceConfiguration {
 	public static final String MEASUREMENTENVIRONMENT_ROOTNAME = "root";
 	public static final String MEASUREMENTENVIRONMENT_DELIMITER = "/";
 	
-	/**
-	 * Database configuration key, can be found in the sopeco-service.conf!
-	 * So the actual values are in the sopeco-service.conf.
-	 */
-	public static final String META_DATA_HOST = "sopeco.config.persistence.metaServer.host";
-	public static final String META_DATA_PORT = "sopeco.config.persistence.metaServer.port";
-	
+	// Database configuration
+	public static final String DATABASE_HOST = "sopeco.service.persistence.host";
+	public static final String DATABASE_PORT = "sopeco.service.persistence.port";
 	public static final String DATABASE_NAME = "sopeco.service.persistence.name";
 	public static final String DATABASE_USER = "sopeco.service.persistence.user";
 	public static final String DATABASE_PASSWORD = "sopeco.service.persistence.password";

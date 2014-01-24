@@ -290,12 +290,12 @@ public final class ServicePersistenceProvider {
 		config.loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
 		
 		
-		if (config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST) == null) {
+		if (config.getPropertyAsStr(ServiceConfiguration.DATABASE_HOST) == null) {
 			throw new NullPointerException("No MetaDataHost defined.");
 		}
 		
-		String host = config.getPropertyAsStr(ServiceConfiguration.META_DATA_HOST);
-		String port = config.getPropertyAsStr(ServiceConfiguration.META_DATA_PORT);
+		String host = config.getPropertyAsStr(ServiceConfiguration.DATABASE_HOST);
+		String port = config.getPropertyAsStr(ServiceConfiguration.DATABASE_PORT);
 		String name = config.getPropertyAsStr(ServiceConfiguration.DATABASE_NAME);
 		String user = config.getPropertyAsStr(ServiceConfiguration.DATABASE_USER);
 		String password = config.getPropertyAsStr(ServiceConfiguration.DATABASE_PASSWORD);
