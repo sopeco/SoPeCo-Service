@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -109,8 +110,20 @@ public class MeasurementControllerService {
 	
 	}
 	
-	@GET
+	/**
+	 * This methods returns the whole list for connected controllers on the given host:port
+	 * with the given protocol.
+	 * 
+	 * @param usertoken authentification of the user
+	 * @param host the host where to snoop on
+	 * @param port the port of the host to snoop on
+	 * @param protocol the protocol to check on given host and port
+	 * @return list of all controller currently connected to given host:port with given protocol, null
+	 *  	   if an error occured
+	 */
+	@PUT
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
