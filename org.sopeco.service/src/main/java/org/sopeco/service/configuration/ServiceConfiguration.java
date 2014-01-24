@@ -159,7 +159,12 @@ public abstract class ServiceConfiguration {
 
 	public static final String SVC_EXECUTE = "execution";
 	public static final String SVC_EXECUTE_SCHEDULE = "schedule";
+	public static final String SVC_EXECUTE_ENABLE = "enable";
+	public static final String SVC_EXECUTE_DISABLE = "disable";
+	public static final String SVC_EXECUTE_ID = "id";
+	public static final String SVC_EXECUTE_DELETE = "delete";
 	public static final String SVCP_EXECUTE_TOKEN = "token";
+	public static final String SVCP_EXECUTE_ID = "id";
 	
 	/**
 	 * QueryParam name for the account name
@@ -174,6 +179,9 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_USER = "user";
 
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
+
+
 
 
 
