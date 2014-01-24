@@ -86,11 +86,16 @@ public class ExecutionService {
 		return ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
 	}
 	
-
+	/**
+	 * Deletes all scheduled experiements for the user with the given token.
+	 * 
+	 * @param usertoken authentification for the user
+	 * @return true, if all scheduled experiements for the user could be deleted
+	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean removeScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_TOKEN) String usertoken) {
+	public boolean removeScheduledExperiments(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
