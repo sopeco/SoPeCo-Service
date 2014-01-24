@@ -258,21 +258,31 @@ public class ScheduledExperiment implements Serializable {
 		this.repeatMinutes = repeatMinutes;
 	}
 
-	
+	/**
+	 * Most of the time, the requester does not have the unique
+	 * id for a ScheduledExperiment. This method is used to
+	 * compare two ScheduledExperiments.
+	 * 
+	 * Compared are:
+	 * - time added (mostly the unique idetification)
+	 * - repeating
+	 * - account id
+	 * - activ status
+	 * - controller url
+	 * - label
+	 */
 	public boolean equals(Object obj) {
 		
 		if (obj instanceof ScheduledExperiment) {
 			
 			ScheduledExperiment se = (ScheduledExperiment)obj;	
 			
-			return se.isRepeating == this.isRepeating
+			return se.addedTime == this.addedTime
+					&& se.isRepeating == this.isRepeating
 					&& se.account == this.account
 					&& se.active == this.active
-					&& se.addedTime == this.addedTime
-					&& se.controllerUrl == this.controllerUrl
-					&& se.id == this.id
-					&& se.label == this.label
-					&& se.startTime == this.startTime;
+					&& se.controllerUrl.equals(this.controllerUrl)
+					&& se.label.equals(this.label);
 		}
 		
 		return false;
