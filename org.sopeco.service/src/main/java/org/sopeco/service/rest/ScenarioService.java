@@ -60,7 +60,7 @@ public class ScenarioService {
 	 * 		   with the given already exists.
 	 */
 	@POST
-	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{name}")
+	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{" + NAME + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public boolean addScenario(@PathParam(NAME) String scenarioName,
