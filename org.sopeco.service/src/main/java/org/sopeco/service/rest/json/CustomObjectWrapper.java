@@ -6,7 +6,6 @@ import javax.ws.rs.ext.Provider;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 
-import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**

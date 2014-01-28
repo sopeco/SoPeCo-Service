@@ -2,7 +2,6 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MediaType;
@@ -463,13 +462,6 @@ public class ExecutionServiceTest extends JerseyTest {
 							  .get(Message.class);
 		
 		String token = m.getMessage();
-
-		// account is needed for account id
-		Account account = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-								    .path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
-								    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
-								    .accept(MediaType.APPLICATION_JSON)
-								    .get(Account.class);
 		
 		// add scenario and switch to
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
