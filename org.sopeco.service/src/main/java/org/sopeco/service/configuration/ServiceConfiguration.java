@@ -89,6 +89,7 @@ public abstract class ServiceConfiguration {
 	 * 
 	 * execute
 	 * 		- schedule (POST, GET, REMOVE)
+	 * 	 	- details
 	 */
 	public static final String SVC_ACCOUNT = "account";
 	public static final String SVC_ACCOUNT_CREATE = "create";
@@ -163,6 +164,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_EXECUTE_DISABLE = "disable";
 	public static final String SVC_EXECUTE_ID = "id";
 	public static final String SVC_EXECUTE_DELETE = "delete";
+	public static final String SVC_EXECUTE_DETAILS = "details";
 	public static final String SVCP_EXECUTE_TOKEN = "token";
 	public static final String SVCP_EXECUTE_ID = "id";
 	
@@ -175,18 +177,8 @@ public abstract class ServiceConfiguration {
 	 * QueryParam name for the account password
 	 */
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
-	
 	public static final String SVC_USER = "user";
-
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
-
-
-
-
-
-
-
-
 
 
 	

@@ -20,6 +20,7 @@ import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.helper.ScheduleExpression;
@@ -279,6 +280,23 @@ public class ExecutionService {
 		return true;
 	}
 	
+	@GET
+	@Path(ServiceConfiguration.SVC_EXECUTE_DETAILS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public List<ExecutedExperimentDetails> getExecutedExperimentDetails(@QueryParam(TOKEN) String usertoken) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		long accountId = u.getCurrentAccount().getId();
+		String scenarioName = u.getAccountDetails().getSelectedScenario();
+		
+		return ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(accountId, scenarioName);
+	}
 	
 	/**************************************HELPER****************************************/
 

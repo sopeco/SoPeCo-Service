@@ -22,6 +22,7 @@ import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
+import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 
@@ -147,6 +148,11 @@ public final class ServicePersistenceProvider {
 		return loadByQuery(ScheduledExperiment.class, "getExperimentsByAccount", "account", accountId);
 	}
 
+	public List<ExecutedExperimentDetails> loadExecutedExperimentDetails(long accountId, String scenarioName) {
+		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName",
+				scenarioName);
+	}
+	
 	/********************************************************************/
 	/**
 	 * The methods are taken out of the WebUI from Marius Oehler.

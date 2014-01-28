@@ -32,6 +32,8 @@
 		<class>org.sopeco.service.persistence.entities.AccountDetails</class>
 		<class>org.sopeco.service.persistence.entities.ScheduledExperiment</class>
 		<class>org.sopeco.service.persistence.entities.Users</class>
+		<class>org.sopeco.service.persistence.entities.MECLog</class>
+		<class>org.sopeco.service.persistence.entities.ExecutedExperimentDetails</class>
 		
 		<properties>
 		    <property name="javax.persistence.jdbc.driver" value="org.apache.derby.jdbc.ClientDriver" />
