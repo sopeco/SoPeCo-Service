@@ -31,7 +31,6 @@ public class CustomObjectWrapper implements ContextResolver<ObjectMapper> {
 	
 	 public CustomObjectWrapper() {
 		 om = new ObjectMapper();
-		 om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
 		 // mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
 		 om.addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
