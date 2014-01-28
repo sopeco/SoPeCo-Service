@@ -18,6 +18,7 @@ import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -416,8 +417,6 @@ public class ExecutionServiceTest extends JerseyTest {
 					     .get(ScheduledExperiment.class);
 
 		assertEquals(scenarioActive, se2.isActive());
-
-		System.out.println("++++++++++++++++++++++++++");
 		
 		// now delete the scheduled experiment
 		b = resource().path(ServiceConfiguration.SVC_EXECUTE)
@@ -430,15 +429,19 @@ public class ExecutionServiceTest extends JerseyTest {
 		
 		assertEquals(true, b);
 		
-		/*se2 =  resource().path(ServiceConfiguration.SVC_EXECUTE)
-					     .path(id)
-					     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-					     .accept(MediaType.APPLICATION_JSON)
-					     .type(MediaType.APPLICATION_JSON)
-					     .get(ScheduledExperiment.class);
-		
-		// the scenario is deleted and must not be found
-		assertEquals(null, se2);*/
+		try {
+			se2 =  resource().path(ServiceConfiguration.SVC_EXECUTE)
+						     .path(id)
+						     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+						     .accept(MediaType.APPLICATION_JSON)
+						     .type(MediaType.APPLICATION_JSON)
+						     .get(ScheduledExperiment.class);
+		} catch (UniformInterfaceException ex) {
+
+            final int status = ex.getResponse().getStatus();
+            assertEquals(204, status);
+            
+        }
 		
 	}
 }

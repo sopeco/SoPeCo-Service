@@ -173,8 +173,6 @@ public class ExecutionService {
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
-		System.out.println("++++++++++++++++++++++++++++++++++++");
-		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
 			return null;
