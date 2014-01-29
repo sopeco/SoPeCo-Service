@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -24,8 +25,6 @@ import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefiniti
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.rest.helper.MEControllerProtocol;
-import org.sopeco.service.rest.helper.ServerCheck;
 import org.sopeco.service.shared.MECStatus;
 
 @Path(ServiceConfiguration.SVC_MEC)
@@ -37,26 +36,6 @@ public class MeasurementControllerService {
 	 * The URL pattern for a controller URL.
 	 */
 	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^rmi://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
-	
-	@GET
-	@Path(ServiceConfiguration.SVC_MEC_CHECK)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public boolean isPortReachable(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port) {
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-
-		if (u == null) {
-			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
-		}
-		
-		LOGGER.debug("Try to reach '{}':'{}'", host, port);
-
-		return ServerCheck.isPortReachable(host, port);
-	}
 	
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_VALIDATE)
@@ -111,13 +90,12 @@ public class MeasurementControllerService {
 	}
 	
 	/**
-	 * This methods returns the whole list for connected controllers on the given host:port
-	 * with the given protocol.
+	 * This methods returns the whole list for connected controllers on the given host:port 
+	 * via socket.
 	 * 
 	 * @param usertoken authentification of the user
 	 * @param host the host where to snoop on
 	 * @param port the port of the host to snoop on
-	 * @param protocol the protocol to check on given host and port
 	 * @return list of all controller currently connected to given host:port with given protocol, null
 	 *  	   if an error occured
 	 */
@@ -127,8 +105,7 @@ public class MeasurementControllerService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
-			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port,
-			      				     	  MEControllerProtocol protocol) {
+			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -137,28 +114,107 @@ public class MeasurementControllerService {
 			return null;
 		}
 		
-		if (protocol == MEControllerProtocol.SOCKET) {
-			
-			SocketAppWrapper app = SocketManager.getSocketApp(host);
-			
-			if (app == null) {
-				LOGGER.info("SocketAppWrapper is in invalid state.");
-				return null;
-			}
-				
-			return Arrays.asList(app.getAvailableController());
-			
-		} else {
-			
-			if (!ServerCheck.isPortReachable(host, port)) {
-				LOGGER.info("Given adress '{}':'{}' not reachable.", host, port);
-				return null;
-			}
-			
-			return ServerCheck.getController(protocol, host, port);
-			
+		SocketAppWrapper app = SocketManager.getSocketApp(host);
+		
+		if (app == null) {
+			LOGGER.info("SocketAppWrapper is in invalid state.");
+			return null;
 		}
+			
+		return Arrays.asList(app.getAvailableController());
 
+	}
+	
+	/**
+	 * Before: The MeasurementEnvironmentController should be connected to the service
+	 * ServerSocket. Otherwise the method is going to fail and return null.
+	 * <br />
+	 * <br />
+	 * The MED is requested from the from the MEC connected to the given URL.
+	 * The MED is returned WITHOUT being stored in the database. This has to be done
+	 * manually via the service at med/set!
+	 * 
+	 * @param usertoken authentification of the user
+	 * @param uri the URI of the MeasurementEnvironmentController already connected to the
+	 * 		  ServerSocket of the service
+	 * @return the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_MED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MeasurementEnvironmentDefinition getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+																   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		try {
+			
+			// connect to the mec via Socket
+			IMeasurementEnvironmentController mec = MEConnectorFactory.connectTo(new URI(uri));
+			
+			if (mec == null) {
+				LOGGER.info("The connected MEC cannot be fetched correctly.");
+				return null;
+			}
+			
+			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
+			
+			if (med == null) {
+				LOGGER.info("The connected med has no valid MeasurementEnvironmentDefinition.");
+				return null;
+			}
+			
+			return med;
+			
+		} catch (URISyntaxException e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		} catch (RemoteException e) {
+			LOGGER.error(e.getMessage());
+			return null;
+		} catch (IllegalStateException x) {
+			LOGGER.error("Controller probably offline.");
+			return null;
+		}
+	}
+	
+	
+	/**
+	 * Before: The MeasurementEnvironmentController (MEC) should be connected to the service
+	 * ServerSocket. Otherwise the method is going to fail and return false.
+	 * <br />
+	 * After getting the {@code MeasurementEnvironmentDefinition} (MED) from the MEC, the MED
+	 * is stored in the account database.
+	 * <br />
+	 * This method only uses the services at {@code getMEDefinitionFromMEC()} and
+	 * {@code MeasurementEnvironmentDefinitionService.setNewMEDefinition()}. See
+	 * their comments for more information.
+	 * 
+	 * @param usertoken authentification of the user
+	 * @param uri the URI of the MeasurementEnvironmentController already connected to the
+	 * 		  ServerSocket of the service
+	 * @return true, if the MED from the MEC was saved successfully in the database
+	 */
+	@POST
+	@Path(ServiceConfiguration.SVC_MEC_MED)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+										  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		MeasurementEnvironmentDefinition med = getMEDefinitionFromMEC(usertoken, uri);
+		return MeasurementEnvironmentDefinitionService.setNewMEDefinition(med, u);
 	}
 	
 	/**************************************HELPER****************************************/
