@@ -1,6 +1,11 @@
 package org.sopeco.service.rest;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -16,11 +21,14 @@ import javax.ws.rs.core.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
+import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
+import org.sopeco.runner.SoPeCoRunner;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
+import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.helper.ScheduleExpression;
@@ -59,7 +67,6 @@ public class ExecutionService {
 		}
 		
 		scheduledExperiment.setNextExecutionTime(nextExecution);
-		
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
@@ -190,6 +197,7 @@ public class ExecutionService {
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_ENABLE)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public boolean setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												 @QueryParam(TOKEN) String usertoken) {
 
@@ -222,6 +230,7 @@ public class ExecutionService {
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DISABLE)
 	@Produces(MediaType.APPLICATION_JSON)
+	@Deprecated
 	public boolean setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												  @QueryParam(TOKEN) String usertoken) {
 
@@ -280,6 +289,78 @@ public class ExecutionService {
 		return true;
 	}
 	
+	@PUT
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_EXECUTE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public boolean executeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+										 	  @QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return false;
+		}
+		
+		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
+		
+		if (exp == null) {
+			LOGGER.info("Invalid scheduling id '{}'.", id);
+			return false;
+		}
+		
+		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
+			return false;
+		}
+		
+		// prepare execution
+		Map<String, Object> executionProperties = exp.getProperties();
+		try {
+			
+			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_URI, new URI(exp.getControllerUrl()));
+			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_CLASS_NAME, null); // only if class name is null, URI is searched
+			executionProperties.put(IConfiguration.CONF_SCENARIO_DESCRIPTION, exp.getScenarioDefinition());
+			
+		} catch (URISyntaxException e) {
+			LOGGER.error("Invalid controller URL '{}'.", exp.getControllerUrl());
+			return false;
+		}
+		
+		// fetch example experiement to execute
+		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));
+		
+		
+		System.out.println("++++++++++++++++++++++++++");
+		System.out.println(exp.getSelectedExperiments());
+		
+		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
+												executionProperties,
+												exp.getSelectedExperiments());
+
+		System.out.println("++++++++++++++++++++++++++");
+		
+		Thread t = new Thread(runner);
+	
+		System.out.println("++++++++++++++++++++++++++");
+		
+		t.start();
+
+		System.out.println("++++++++++++++++++++++++++");
+		
+		try {
+			
+			t.join();
+			System.out.println("++++++++++++++++++++++++++");
+			
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		return true;
+	}
+	
+	
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_DETAILS)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -296,6 +377,22 @@ public class ExecutionService {
 		String scenarioName = u.getAccountDetails().getSelectedScenario();
 		
 		return ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(accountId, scenarioName);
+	}
+	
+	@GET
+	@Path(ServiceConfiguration.SVC_EXECUTE_MECLOG)
+	@Produces(MediaType.APPLICATION_JSON)
+	public MECLog getMECLog(@QueryParam(TOKEN) String usertoken,
+						    @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		return ServicePersistenceProvider.getInstance().loadMECLog(id);
 	}
 	
 	/**************************************HELPER****************************************/

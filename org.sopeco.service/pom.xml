@@ -56,6 +56,12 @@
 			<version>${sopeco.version}</version>
 		</dependency>
 		
+		<dependency>
+			<groupId>org.sopeco.core</groupId>
+			<artifactId>org.sopeco.runner</artifactId>
+			<version>${sopeco.version}</version>
+		</dependency>
+		
 	    <!-- jersey dependencies used for the servlets -->
 		<dependency>
 			<groupId>com.sun.jersey</groupId>
