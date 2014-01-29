@@ -37,7 +37,7 @@ import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 @Path(ServiceConfiguration.SVC_SCENARIO)
 public class ScenarioService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class.getName());
 	
 	private static final String TOKEN = ServiceConfiguration.SVCP_SCENARIO_TOKEN;
 	private static final String NAME = ServiceConfiguration.SVCP_SCENARIO_NAME;
@@ -490,6 +490,27 @@ public class ScenarioService {
 	}
 	
 	
+	@GET
+	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
+	@Produces(MediaType.APPLICATION_JSON)
+	private ScenarioInstance getScenarioInstance(@QueryParam(TOKEN) String usertoken,
+												 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
+												 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
+			
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return null;
+		}
+		
+		try {
+			return UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
+		} catch (DataNotFoundException e) {
+			LOGGER.info("Cannot find a scenario definition with name '{}' and URL '{}'.", name, url);
+			return null;
+		}
+	}
 	
 	/**************************************HELPER****************************************/
 	
