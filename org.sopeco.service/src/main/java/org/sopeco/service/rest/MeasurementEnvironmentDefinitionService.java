@@ -30,9 +30,9 @@ import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 
 @Path(ServiceConfiguration.SVC_MED)
-public class MeasurementDefinitionService {
+public class MeasurementEnvironmentDefinitionService {
 	
-	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementDefinitionService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementEnvironmentDefinitionService.class);
 
 	private static final String TOKEN = ServiceConfiguration.SVCP_MED_TOKEN;
 	
