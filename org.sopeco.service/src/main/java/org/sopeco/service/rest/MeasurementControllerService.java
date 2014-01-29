@@ -39,7 +39,7 @@ public class MeasurementControllerService {
 	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^rmi://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
 	
 	@GET
-	@Path(ServiceConfiguration.SVC_MEC_STATUS)
+	@Path(ServiceConfiguration.SVC_MEC_CHECK)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean isPortReachable(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
@@ -66,7 +66,7 @@ public class MeasurementControllerService {
 	}
 	
 	@GET
-	@Path(ServiceConfiguration.SVC_MEC_CHECK)
+	@Path(ServiceConfiguration.SVC_MEC_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
 	public MECStatus getMECStatus(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 								  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String url) {

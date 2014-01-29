@@ -124,7 +124,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		// connect to a random string
 		MECStatus mecStatus= resource().path(ServiceConfiguration.SVC_MEC)
-									   .path(ServiceConfiguration.SVC_MEC_CHECK)
+									   .path(ServiceConfiguration.SVC_MEC_STATUS)
 									   .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
 									   .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
 									   .get(MECStatus.class);
@@ -133,7 +133,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	
 		// check if a wrong token fails, too
 		mecStatus= resource().path(ServiceConfiguration.SVC_MEC)
-						     .path(ServiceConfiguration.SVC_MEC_CHECK)
+						     .path(ServiceConfiguration.SVC_MEC_STATUS)
 						     .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, "myrandomtoken")
 						     .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
 						     .get(MECStatus.class);
@@ -669,7 +669,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		String token = m.getMessage();
 
 		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_STATUS)
+							  .path(ServiceConfiguration.SVC_MEC_CHECK)
 						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
 						      .queryParam(ServiceConfiguration.SVCP_MEC_HOST, host)
 						      .queryParam(ServiceConfiguration.SVCP_MEC_PORT, port)
