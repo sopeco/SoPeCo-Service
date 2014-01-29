@@ -14,6 +14,12 @@ public abstract class ServiceConfiguration {
 	
 	public static final String SERVICE_CONFIG_FOLDER = "rsc";
 	
+	/**
+	 * Used in class {@code ServerCheck}.
+	 */
+	public static final int SOCKET_TEST_TIMEOUT_MS = 10000;
+
+	
 	public static final String DEFAULT_MEASUREMENTSPECIFICATION_NAME = "MeasurementSpecification";
 	
 	public static final String MEASUREMENTENVIRONMENT_ROOTNAME = "root";
@@ -28,6 +34,8 @@ public abstract class ServiceConfiguration {
 
 	// MEC connection configuration
 	public static final String MEC_PORT = "sopeco.config.mec.listener.port";
+	public static final int MEC_SOCKET_PORT = 8089;
+	public static final String MEC_SOCKET_HOST = "127.0.0.1";
 	
 	/**
 	 * All the REST services are listed down here.
@@ -136,6 +144,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_VALIDATE = "validate";
 	public static final String SVC_MEC_CHECK = "check";
 	public static final String SVC_MEC_LIST = "list";
+	public static final String SVC_MEC_MED = "med";
 	public static final String SVCP_MEC_TOKEN = "token";
 	public static final String SVCP_MEC_URL = "url";
 	public static final String SVCP_MEC_HOST = "host";

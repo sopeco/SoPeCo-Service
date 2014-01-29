@@ -29,11 +29,7 @@ public final class StartUpService implements ServletContextListener {
     public void contextInitialized(ServletContextEvent sce) {
     	
     	// open the ServerSocket on the port set in the configuration
-    	int port = Configuration.getSessionSingleton(Configuration.getGlobalSessionId())
-    						    .getPropertyAsInteger(ServiceConfiguration.MEC_PORT, 11300);
-		if (port > 0) {
-			SocketAcception.open(port);
-		}
+		SocketAcception.open(ServiceConfiguration.MEC_SOCKET_PORT);
 		
     }
 
