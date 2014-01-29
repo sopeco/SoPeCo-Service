@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,6 +59,7 @@ public class ExecutionTest extends JerseyTest {
 	    return config;
 	}
 	
+	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account
