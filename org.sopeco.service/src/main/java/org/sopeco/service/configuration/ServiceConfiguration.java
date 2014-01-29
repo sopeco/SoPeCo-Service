@@ -26,6 +26,8 @@ public abstract class ServiceConfiguration {
 	public static final String DATABASE_USER = "sopeco.service.persistence.user";
 	public static final String DATABASE_PASSWORD = "sopeco.service.persistence.password";
 
+	// MEC connection configuration
+	public static final String MEC_PORT = "sopeco.config.mec.listener.port";
 	
 	/**
 	 * All the REST services are listed down here.
@@ -109,14 +111,16 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_LIST = "list";
 	public static final String SVC_SCENARIO_DELETE = "delete";
 	public static final String SVC_SCENARIO_SWITCH = "switch";
+	public static final String SVC_SCENARIO_SWITCH_NAME = "name";
+	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
 	public static final String SVC_SCENARIO_CURRENT = "current";
 	public static final String SVC_SCENARIO_ARCHIVE = "archive";
 	public static final String SVC_SCENARIO_XML = "xml";
+	public static final String SVC_SCENARIO_INSTANCE = "instance";
 	public static final String SVCP_SCENARIO_NAME = "name";
 	public static final String SVCP_SCENARIO_SPECNAME = "specname";
 	public static final String SVCP_SCENARIO_TOKEN = "token";
-	public static final String SVC_SCENARIO_SWITCH_NAME = "name";
-	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
+	public static final String SVCP_SCENARIO_URL = "url";
 	
 	public static final String SVC_MEASUREMENT = "measurementspecification";
 	public static final String SVC_MEASUREMENT_LIST = "list";
@@ -165,6 +169,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_EXECUTE_ID = "id";
 	public static final String SVC_EXECUTE_DELETE = "delete";
 	public static final String SVC_EXECUTE_DETAILS = "details";
+	public static final String SVC_EXECUTE_MECLOG = "meclog";
+	public static final String SVC_EXECUTE_EXECUTE = "execute";
 	public static final String SVCP_EXECUTE_TOKEN = "token";
 	public static final String SVCP_EXECUTE_ID = "id";
 	
@@ -179,6 +185,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	public static final String SVC_USER = "user";
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
+
 
 
 	
