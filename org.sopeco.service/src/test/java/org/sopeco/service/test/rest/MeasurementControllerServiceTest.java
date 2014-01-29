@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
+import org.sopeco.service.test.rest.fake.MatrixMultiplicationMEC;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -651,13 +653,15 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		// deletion must have been succesful
 		assertEquals(true, b);
 	}
-
+	
+	@Ignore
 	@Test
-	public void testMEDTestPort() {
+	public void testMECStatusValidController() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
-		String host 		= "0.0.0.0";
-		String port 		= "80";
+		String port 		= String.valueOf(ServiceConfiguration.MEC_SOCKET_PORT);
+		String host 		= ServiceConfiguration.MEC_SOCKET_HOST;
+		String socketURI 	= host + ":" + port;
 		
 		// log into the account
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -668,14 +672,15 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		String token = m.getMessage();
 
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEC)
-							  .path(ServiceConfiguration.SVC_MEC_CHECK)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_HOST, host)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_PORT, port)
-						      .get(Boolean.class);
+		MatrixMultiplicationMEC.start();
 		
-		// there can't be a connection to 0.0.0.0:80
-		assertEquals(false, b);
+		MECStatus mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
+								        .path(ServiceConfiguration.SVC_MEC_STATUS)
+								        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+								        .queryParam(ServiceConfiguration.SVCP_MEC_URL, socketURI)
+								        .get(MECStatus.class);
+		
+		assertEquals(MECStatus.STATUS_ONLINE, mecStatus.getStatus());
+		
 	}
 }

@@ -1,12 +1,9 @@
 package org.sopeco.service.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.rmi.RemoteException;
-
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -15,8 +12,6 @@ import javax.ws.rs.core.MediaType;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.engine.measurementenvironment.IMeasurementEnvironmentController;
-import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
@@ -36,34 +31,20 @@ public class MeasurementEnvironmentDefinitionService {
 
 	private static final String TOKEN = ServiceConfiguration.SVCP_MED_TOKEN;
 	
-	@PUT
-	@Path(ServiceConfiguration.SVC_MED_SET + "/"
-	      + ServiceConfiguration.SVC_MED_SET_MEC)
+	@POST
+	@Path(ServiceConfiguration.SVC_MED_SET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MeasurementEnvironmentDefinition setMEDefinitionFromMEC(@QueryParam(TOKEN) String usertoken,
-			  													   @QueryParam(ServiceConfiguration.SVCP_MED_MEC_URL) String url) {
+	public boolean setMEDefinition(@QueryParam(TOKEN) String usertoken,
+								   MeasurementEnvironmentDefinition med) {
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return null;
+			return false;
 		}
 		
-		try {
-			IMeasurementEnvironmentController mec = MEConnectorFactory.connectTo(new URI(url));
-
-			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
-
-			setNewMEDefinition(med, u);
-
-			return med;
-		} catch (URISyntaxException e) {
-			LOGGER.error(e.getMessage());
-			throw new IllegalStateException(e);
-		} catch (RemoteException e) {
-			LOGGER.error(e.getMessage());
-			throw new IllegalStateException(e);
-		}
+		return setNewMEDefinition(med, u);
 	}
 	
 	@PUT
@@ -343,19 +324,31 @@ public class MeasurementEnvironmentDefinitionService {
 	
 	/**
 	 * Sets the measurement environment defitinion for the current {@code ScenarioDefinitionBuilder}.
+	 * <br />
+	 * This method is protected and static as it's called from
+	 * {@code MeasurementControllerService.setMEDefinitionFromMEC()}.
 	 * 
 	 * @param definition the MED
 	 * @param u the user whose MED is to set
+	 * @return true, if the MED could be stored successfully
 	 */
-	private void setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
+	protected static boolean setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
 		
 		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
 		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		
+		if (dbCon == null) {
+			LOGGER.warn("Database connection to account database failed. Cancelling adding MED from MEC to database.");
+			return false;
+		}
+		
 		dbCon.store(sd);
 		dbCon.closeProvider();
+		
+		return true;
 	}
 	
 }
