@@ -23,6 +23,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
+import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 
@@ -151,6 +152,10 @@ public final class ServicePersistenceProvider {
 	public List<ExecutedExperimentDetails> loadExecutedExperimentDetails(long accountId, String scenarioName) {
 		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName",
 				scenarioName);
+	}
+	
+	public MECLog loadMECLog(long id) {
+		return loadSingleById(MECLog.class, id);
 	}
 	
 	/********************************************************************/
