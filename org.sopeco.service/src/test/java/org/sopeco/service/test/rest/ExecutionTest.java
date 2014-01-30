@@ -13,9 +13,11 @@ import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
+import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
+import org.sopeco.service.test.rest.fake.TestMEC;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -41,6 +43,7 @@ public class ExecutionTest extends JerseyTest {
 	@Override
 	public WebAppDescriptor configure() {
 		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
+				.contextListenerClass(StartUpService.class)
 				.clientConfig(createClientConfig())
 				.build();
 	}
@@ -59,7 +62,6 @@ public class ExecutionTest extends JerseyTest {
 	    return config;
 	}
 	
-	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account
@@ -119,9 +121,11 @@ public class ExecutionTest extends JerseyTest {
 							  .accept(MediaType.APPLICATION_JSON)
 							  .put(Boolean.class);
 		
+		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
+		TestMEC.start();
 		
 		boolean repeating = false;
-		String controllerURL = "socket://127.0.0.1";
+		String controllerURL = "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
 		String label = "myScheduledExperiment";
 		long accountId = account.getId();
 		boolean scenarioActive = true;
@@ -148,11 +152,11 @@ public class ExecutionTest extends JerseyTest {
 		
 		// get if for the added scenario
 		long tmpID = resource().path(ServiceConfiguration.SVC_EXECUTE)
-						    .path(ServiceConfiguration.SVC_EXECUTE_ID)
-						    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-						    .accept(MediaType.APPLICATION_JSON)
-						    .type(MediaType.APPLICATION_JSON)
-						    .put(long.class, se);
+						       .path(ServiceConfiguration.SVC_EXECUTE_ID)
+							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							   .accept(MediaType.APPLICATION_JSON)
+							   .type(MediaType.APPLICATION_JSON)
+							   .put(long.class, se);
 		
 		String id = String.valueOf(tmpID);
 		

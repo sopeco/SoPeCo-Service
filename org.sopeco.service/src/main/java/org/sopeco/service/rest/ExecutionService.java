@@ -40,12 +40,19 @@ public class ExecutionService {
 	
 	private static final String TOKEN = ServiceConfiguration.SVCP_EXECUTE_TOKEN;
 	
+	/**
+	 * Adds a {@link ScheduledExperiment} to the 
+	 * 
+	 * @param usertoken
+	 * @param scheduledExperiment
+	 * @return
+	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean addScheduledExperiment(@QueryParam(TOKEN) String usertoken,
-										   ScheduledExperiment scheduledExperiment) {
+										  ScheduledExperiment scheduledExperiment) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -318,6 +325,7 @@ public class ExecutionService {
 		Map<String, Object> executionProperties = exp.getProperties();
 		try {
 			
+			LOGGER.debug("Experiement settings controller URL: '{}'", exp.getControllerUrl());
 			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_URI, new URI(exp.getControllerUrl()));
 			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_CLASS_NAME, null); // only if class name is null, URI is searched
 			executionProperties.put(IConfiguration.CONF_SCENARIO_DESCRIPTION, exp.getScenarioDefinition());
