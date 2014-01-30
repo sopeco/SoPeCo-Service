@@ -673,7 +673,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	public void testMECStatusValidController() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
-		String socketURI 	= "socket://" + TestMEC.MEC_ID + "/" + "ABC";
+		String socketURI 	= "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
 		
 		// log into the account
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
