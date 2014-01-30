@@ -20,6 +20,7 @@ import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
+import org.sopeco.service.persistence.UserPersistenceProvider;
 
 @Path(ServiceConfiguration.SVC_ACCOUNT)
 public class AccountService {
@@ -145,7 +146,8 @@ public class AccountService {
 		Users u = new Users(uuid);
 		u.setCurrentAccount(account);
 		ServicePersistenceProvider.getInstance().storeUser(u);
-		
+
+		// update the account details for a user
 		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
 		if (details == null) {
 			details = new AccountDetails();
@@ -153,6 +155,9 @@ public class AccountService {
 			details.setAccountName(account.getName());
 			ServicePersistenceProvider.getInstance().storeAccountDetails(details);
 		}
+		
+		// update the SoPeCo configuration for the configuration with the usertoken
+		UserPersistenceProvider.updatePersistenceProviderConfiguration(uuid);
 
 		return m;
 	}

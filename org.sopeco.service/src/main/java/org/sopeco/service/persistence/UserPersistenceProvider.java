@@ -8,6 +8,7 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.AccountService;
 
 public class UserPersistenceProvider extends PersistenceProviderFactory {
 
@@ -23,6 +24,12 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 	public static IPersistenceProvider createPersistenceProvider(String token) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", token);
+			return null;
+		}
+		
 		Account account = u.getCurrentAccount();
 		
 		return createPersistenceProvider(account);
@@ -62,6 +69,45 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 		
 		UserPersistenceProvider factory = new UserPersistenceProvider();
 		return factory.createJPAPersistenceProvider(ServiceConfiguration.SESSION_ID);
+	}
+	
+	/**
+	 * Updates the persistence configuration properties for the persistence provider for the
+	 * given token. One configuration is connected to a unique token. The token is here the one
+	 * from the user. The user is connected to an account. The account database connection
+	 * properties are stores in the configuration.<br />
+	 * <br />
+	 * This method is primarily used to once the user logs into an account. The configuration is
+	 * updated with the account database settings. See service <i>LOGIN</i> at {@link AccountService}.
+	 * 
+	 * @param token the token to identify the user
+	 */
+	public static void updatePersistenceProviderConfiguration(String token) {
+		Users u = ServicePersistenceProvider.getInstance().loadUser(token);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", token);
+			return;
+		}
+
+		Account account = u.getCurrentAccount();
+		
+		String dbPassword  = account.getDbPassword();
+		String host 	   = account.getDbHost();
+		String port 	   = Integer.toString(account.getDbPort());
+		String name 	   = account.getDbName();
+		
+		// now set the configuration properties for the user
+		if (dbPassword.isEmpty()) {
+			PersistenceConfiguration.getSessionSingleton(token).setUsePassword(false);
+		} else {
+			PersistenceConfiguration.getSessionSingleton(token).setUsePassword(true);
+			PersistenceConfiguration.getSessionSingleton(token).updateDBPassword(dbPassword);
+		}
+		
+		PersistenceConfiguration.getSessionSingleton(token).updateDBHost(host);
+		PersistenceConfiguration.getSessionSingleton(token).updateDBPort(port);
+		PersistenceConfiguration.getSessionSingleton(token).updateDBName(name);
 	}
 	
 }
