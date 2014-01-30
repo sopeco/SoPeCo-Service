@@ -35,7 +35,7 @@ public class MeasurementControllerService {
 	/**
 	 * The URL pattern for a controller URL.
 	 */
-	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^rmi://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
+	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^socket://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
 	
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_VALIDATE)
@@ -64,9 +64,15 @@ public class MeasurementControllerService {
 		
 	
 		try {
-			IMeasurementEnvironmentController meCotnroller = MEConnectorFactory.connectTo(new URI(url));
+			
+			IMeasurementEnvironmentController mec = MEConnectorFactory.connectTo(new URI(url));
 
-			MeasurementEnvironmentDefinition med = meCotnroller.getMEDefinition();
+			if (mec == null) {
+				LOGGER.debug("Controller not reachable: NO_VALID_MEC_URL");
+				return new MECStatus(MECStatus.NO_VALID_MEC_URL);
+			}
+			
+			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
 
 			if (med == null) {
 				LOGGER.debug("Controller-Status: STATUS_ONLINE_NO_META");
@@ -220,14 +226,15 @@ public class MeasurementControllerService {
 	/**************************************HELPER****************************************/
 
 	/**
-	 * Checks if the given url is like a valid pattern.
+	 * Checks if the given URI is like a valid pattern.
 	 * 
-	 * @param url
-	 * @return
+	 * @param uri the URI to check
+	 * @return true, if the URI has a valid pattern
 	 */
-	private boolean checkUrlIsValid(String url) {
+	private boolean checkUrlIsValid(String uri) {
+		
 		for (String pattern : CONTROLLER_URL_PATTERN) {
-			if (url.matches(pattern)) {
+			if (uri.matches(pattern)) {
 				return true;
 			}
 		}

@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,11 +12,12 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
-import org.sopeco.service.test.rest.fake.MatrixMultiplicationMEC;
+import org.sopeco.service.test.rest.fake.TestMEC;
 
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
@@ -45,6 +45,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	@Override
 	public WebAppDescriptor configure() {
 		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
+				.contextListenerClass(StartUpService.class)
 				.clientConfig(createClientConfig())
 				.build();
 	}
@@ -187,7 +188,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		// as the namespace is not set yet, it must be null
 		assertEquals("root", med.getRoot().getName());
 	}
-	
 	
 	@Test
 	public void testCurrentMED() {
@@ -454,7 +454,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals(false, b);
 	}
 	
-	
 	@Test
 	public void testMEDParameterAdding() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -513,7 +512,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 
 		assertEquals(true, b);
 	}
-	
 	
 	@Test
 	public void testMEDParameterUpdating() {
@@ -654,14 +652,11 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		assertEquals(true, b);
 	}
 	
-	@Ignore
 	@Test
 	public void testMECStatusValidController() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
-		String port 		= String.valueOf(ServiceConfiguration.MEC_SOCKET_PORT);
-		String host 		= ServiceConfiguration.MEC_SOCKET_HOST;
-		String socketURI 	= host + ":" + port;
+		String socketURI 	= "socket://" + TestMEC.MEC_ID + "/" + "ABC";
 		
 		// log into the account
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -672,8 +667,10 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		
 		String token = m.getMessage();
 
-		MatrixMultiplicationMEC.start();
+		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
+		TestMEC.start();
 		
+		// now the controller status is requested
 		MECStatus mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
 								        .path(ServiceConfiguration.SVC_MEC_STATUS)
 								        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
