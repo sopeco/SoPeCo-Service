@@ -493,9 +493,9 @@ public class ScenarioService {
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
 	@Produces(MediaType.APPLICATION_JSON)
-	private ScenarioInstance getScenarioInstance(@QueryParam(TOKEN) String usertoken,
-												 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
-												 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
+	public ScenarioInstance getScenarioInstance(@QueryParam(TOKEN) String usertoken,
+												@QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
+												@QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
 			
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		

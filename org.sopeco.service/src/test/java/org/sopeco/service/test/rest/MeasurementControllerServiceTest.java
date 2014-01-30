@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import javax.servlet.ServletContextListener;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
@@ -14,6 +15,7 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.MeasurementControllerService;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
@@ -27,9 +29,20 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The {@link MeasurementControllerServiceTest} tests the {@link MeasurementControllerService} class.
+ * The {@link ServletContextListener} of class {@link StartUpService} is connected to the test container
+ * and starts the ServerSocket.
+ * <br />
+ * <br />
+ * The ServerSocket is started on each test, because the testcontainer is always shut down. This is not
+ * a bug, but a feature in JerseyTest. A ticket has been opened with the issue
+ * <code>https://java.net/jira/browse/JERSEY-705</code>.
+ * 
+ * @author Peter Merkert
+ */
 public class MeasurementControllerServiceTest extends JerseyTest {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementControllerServiceTest.class.getName());
 	
 	private static final String SCENARIO_NAME = "examplescenario";
@@ -76,6 +89,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 */
 	@After
 	public void cleanUpDatabase() {
+		LOGGER.debug("Cleaning up the database.");
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String scenarioNameEmpty = "emptyscenario";
