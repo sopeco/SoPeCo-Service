@@ -22,7 +22,11 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
               http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
- 
+    
+    <listener>
+		<listener-class>org.sopeco.service.rest.StartUpService</listener-class>
+	</listener>
+    
 	<servlet>
 		<servlet-name>sopeco-service</servlet-name>
 		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -42,6 +46,5 @@
 		<servlet-name>sopeco-service</servlet-name>
 		<url-pattern>/*</url-pattern>
 	</servlet-mapping>
-	
 	
 </web-app>
