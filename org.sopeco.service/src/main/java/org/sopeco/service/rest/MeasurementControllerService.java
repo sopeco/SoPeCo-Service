@@ -9,7 +9,6 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -105,13 +104,12 @@ public class MeasurementControllerService {
 	 * @return list of all controller currently connected to given host:port with given protocol, null
 	 *  	   if an error occured
 	 */
-	@PUT
+	@GET
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public List<String> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
-			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_PORT) Integer port) {
+			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_ID) String id) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -120,7 +118,7 @@ public class MeasurementControllerService {
 			return null;
 		}
 		
-		SocketAppWrapper app = SocketManager.getSocketApp(host);
+		SocketAppWrapper app = SocketManager.getSocketApp(id);
 		
 		if (app == null) {
 			LOGGER.info("SocketAppWrapper is in invalid state.");

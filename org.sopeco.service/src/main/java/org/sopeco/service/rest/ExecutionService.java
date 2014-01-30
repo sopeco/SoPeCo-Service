@@ -330,28 +330,17 @@ public class ExecutionService {
 		// fetch example experiement to execute
 		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));
 		
-		
-		System.out.println("++++++++++++++++++++++++++");
-		System.out.println(exp.getSelectedExperiments());
-		
 		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
 												executionProperties,
 												exp.getSelectedExperiments());
-
-		System.out.println("++++++++++++++++++++++++++");
 		
 		Thread t = new Thread(runner);
-	
-		System.out.println("++++++++++++++++++++++++++");
 		
 		t.start();
-
-		System.out.println("++++++++++++++++++++++++++");
 		
 		try {
 			
 			t.join();
-			System.out.println("++++++++++++++++++++++++++");
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();

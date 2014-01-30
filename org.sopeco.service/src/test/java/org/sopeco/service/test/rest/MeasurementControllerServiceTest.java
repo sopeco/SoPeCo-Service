@@ -2,6 +2,8 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
@@ -19,6 +21,7 @@ import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -678,6 +681,38 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 								        .get(MECStatus.class);
 		
 		assertEquals(MECStatus.STATUS_ONLINE, mecStatus.getStatus());
+		
+	}
+	
+	@Test
+	public void testMECGetControllerList() {
+		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
+		String password 	= TestConfiguration.TESTPASSWORD;
+		String mecID 		= TestMEC.MEC_ID;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+
+		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
+		TestMEC.start();
+		
+		// now the controller status is requested
+		List<String> controllerList = resource().path(ServiceConfiguration.SVC_MEC)
+										        .path(ServiceConfiguration.SVC_MEC_LIST)
+										        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+										        .queryParam(ServiceConfiguration.SVCP_MEC_ID, mecID)
+										        .get(new GenericType<List<String>>(){});
+		
+		// now test for each controller in the MEC
+		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_1));
+		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_2));
+		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_3));
 		
 	}
 }

@@ -26,6 +26,10 @@ public class TestMEC extends AbstractMEController {
 	 */
 	public static final String MEC_ID = TestMEC.class.getName();
 	
+	public static final String MEC_SUB_ID_1 = "ABC";
+	public static final String MEC_SUB_ID_2 = "Helmholtz";
+	public static final String MEC_SUB_ID_3 = "Test";
+	
 	@InputParameter(namespace="test")
 	int abc = 0;
 
@@ -89,9 +93,9 @@ public class TestMEC extends AbstractMEController {
 		LOGGER.debug("Connect the TestMEC controller to the RESTful service ServerSocket.");
 		
 		MECApplication mecapp = MECApplication.get();
-		mecapp.addMeasurementController("ABC", new TestMEC());
-		mecapp.addMeasurementController("Testcontroller", new TestMEC());
-		mecapp.addMeasurementController("DasGleicheNochmal", new TestMEC());
+		mecapp.addMeasurementController(MEC_SUB_ID_1, new TestMEC());
+		mecapp.addMeasurementController(MEC_SUB_ID_2, new TestMEC());
+		mecapp.addMeasurementController(MEC_SUB_ID_3, new TestMEC());
 		mecapp.socketConnect(ServiceConfiguration.MEC_SOCKET_HOST, ServiceConfiguration.MEC_SOCKET_PORT, MEC_ID);
 	}
 

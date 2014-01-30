@@ -149,6 +149,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MEC_URL = "url";
 	public static final String SVCP_MEC_HOST = "host";
 	public static final String SVCP_MEC_PORT = "port";
+	public static final String SVCP_MEC_ID = "id";
 	
 	public static final String SVC_MED = "med";
 	public static final String SVC_MED_SET = "set";
