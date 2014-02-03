@@ -22,8 +22,8 @@ public class UserPersistenceTest {
 	 * For the jersey-test-framework the eclipselink package must the up to date.
 	 */
 	@Test
-	public void PersistenceTest() {
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider((Account)null);
+	public void persistenceTest() {
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider((Account) null);
 		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed
 	}
 	

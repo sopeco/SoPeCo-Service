@@ -20,7 +20,7 @@ public class ServicePersistenceTest {
 	 * For the jersey-test-framework the eclipselink package must the up to date.
 	 */
 	@Test
-	public void PersistenceTest() {
+	public void persistenceTest() {
 		ServicePersistenceProvider spp = ServicePersistenceProvider.getInstance();
 		// account with ID 0 does never exist
 		assertEquals(null, spp.loadAccount(0));
