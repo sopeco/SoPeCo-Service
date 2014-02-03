@@ -30,6 +30,8 @@ public final class StartUpService implements ServletContextListener {
 	 * <br />
 	 * This is a non-blocking method, because the ServerSocket is handled
 	 * via the class <code>SocketAcception</code>.
+	 * 
+	 * @param sce	the {@link ServletContextEvent}
 	 */
 	@Override
     public void contextInitialized(ServletContextEvent sce) {
@@ -45,6 +47,8 @@ public final class StartUpService implements ServletContextListener {
 
 	/**
 	 * Currently this method is empty overwritten.
+	 * 
+	 * @param sce	the {@link ServletContextEvent}
 	 */
 	@Override
     public void contextDestroyed(ServletContextEvent sce) {
