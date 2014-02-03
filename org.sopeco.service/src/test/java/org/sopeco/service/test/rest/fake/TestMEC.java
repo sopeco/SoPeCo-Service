@@ -7,8 +7,6 @@ import org.sopeco.engine.measurementenvironment.InputParameter;
 import org.sopeco.engine.measurementenvironment.app.MECApplication;
 import org.sopeco.persistence.entities.exceptions.ExperimentFailedException;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.rest.MeasurementControllerService;
-import org.sopeco.service.test.rest.MeasurementControllerServiceTest;
 
 /**
  * This class is used in the test environment, when the {@link MeasurementControllerService}
@@ -30,7 +28,7 @@ public class TestMEC extends AbstractMEController {
 	public static final String MEC_SUB_ID_2 = "Helmholtz";
 	public static final String MEC_SUB_ID_3 = "Test";
 	
-	@InputParameter(namespace="test")
+	@InputParameter(namespace = "test")
 	int abc = 0;
 
 	@Override
