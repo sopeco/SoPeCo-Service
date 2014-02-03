@@ -9,6 +9,8 @@ import javax.ws.rs.core.MediaType;
 import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
@@ -34,6 +36,8 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  */
 public class ExecutionServiceTest extends JerseyTest {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionServiceTest.class);
+	
 	/**
 	 * The default constructor calling the JerseyTest constructor.
 	 */
@@ -63,13 +67,24 @@ public class ExecutionServiceTest extends JerseyTest {
 	}
 
 	/**
-	 * Removes all scheduled scenarios for the testaccount.
+	 * Cleans up the database means: Delete the scenario with name {@link 
+	 * MeasurementControllerServiceTest.SCENARIO_NAME} in the database. This scenario
+	 * is used by every single test and it can cause errors, when the scenario is created,
+	 * but already in the database. Because the database instance is then not updated,
+	 * which can result in unexpected behaviour.
+	 * <br />
+	 * In addition all the schedulede scenarios for the test account are deleted.
 	 */
 	@After
 	public void cleanUpDatabase() {
+
+		LOGGER.debug("Cleaning up the database.");
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioNameEmpty = TestConfiguration.TEST_CLEAN_SCENARIO_NAME;
+		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -85,7 +100,35 @@ public class ExecutionServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .type(MediaType.APPLICATION_JSON)
 				  .delete(Boolean.class);
+
+		// now create empty scenario to delete the test scenario
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// delete the example scneario from the db
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
+			      .delete(Boolean.class);
 	}
+	
+	
 	
 	/**
 	 * Tests to delete a scheduled experiment.
