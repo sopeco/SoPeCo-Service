@@ -267,10 +267,11 @@ public class ScenarioService {
 	 * Deleted the scenario with the given name. Does not delete the scenario, if the
 	 * given user has currenlty selected the scenario.
 	 * 
-	 * @param scenarioname the scenario name
-	 * @param usertoken the user identification
-	 * @return true, if scenario has been deleted. False, if the scenario name is invalid || a scenario
-	 *         with the given name is not found || the user has currently selected the scenario
+	 * @param scenarioname 	the scenario name
+	 * @param usertoken 	the user identification
+	 * @return 				true, if scenario has been deleted. False, if the scenario name
+	 * 						is invalid || a scenario with the given name is not found || the
+	 * 						user has currently selected the scenario
 	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
