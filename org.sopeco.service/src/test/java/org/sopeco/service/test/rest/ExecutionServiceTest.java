@@ -6,6 +6,7 @@ import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 
+import org.glassfish.grizzly.http.util.HttpStatus;
 import org.junit.After;
 import org.junit.Test;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
@@ -25,8 +26,17 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>ExecutionServiceTest</code> tests various features of the
+ * <code>ExecutionService</code> RESTful services.
+ * 
+ * @author Peter Merkert
+ */
 public class ExecutionServiceTest extends JerseyTest {
 
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public ExecutionServiceTest() {
 		super();
 	}
@@ -53,7 +63,7 @@ public class ExecutionServiceTest extends JerseyTest {
 	}
 
 	/**
-	 * Removes all scheduled scenarios for the testuser
+	 * Removes all scheduled scenarios for the testaccount.
 	 */
 	@After
 	public void cleanUpDatabase() {
@@ -77,6 +87,17 @@ public class ExecutionServiceTest extends JerseyTest {
 				  .delete(Boolean.class);
 	}
 	
+	/**
+	 * Tests to delete a scheduled experiment.
+	 * 
+	 * 1. login
+	 * 2. add scenario
+	 * 3. switch scenario
+	 * 4. get current scenario definition
+	 * 5. add scheduled experiment
+	 * 6. delete schedulede experiment
+	 * 7. check list of scheduled experiments
+	 */
 	@Test
 	public void testScheduleExperimentDeletion() {
 		// connect to test users account
@@ -156,11 +177,11 @@ public class ExecutionServiceTest extends JerseyTest {
 		assertEquals(true, b);
 		
 		// now try to get the scheduled experiment (which must be empty)
-		List<ScheduledExperiment> list = (List<ScheduledExperiment>)resource().path(ServiceConfiguration.SVC_EXECUTE)
-																		      .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
-																		      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-																		      .accept(MediaType.APPLICATION_JSON)
-																		      .get(new GenericType<List<ScheduledExperiment>>(){});
+		List<ScheduledExperiment> list = (List<ScheduledExperiment>) resource().path(ServiceConfiguration.SVC_EXECUTE)
+																		       .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+																		       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+																		       .accept(MediaType.APPLICATION_JSON)
+																		       .get(new GenericType<List<ScheduledExperiment>>() { });
 		
 		assertEquals(false, list == null);
 		assertEquals(true, list.isEmpty());
@@ -170,6 +191,15 @@ public class ExecutionServiceTest extends JerseyTest {
 	/**
 	 * Adds a {@code ScheduledExperiment} to the scheduler. The list of scheduled experiments
 	 * is then requested and checked for the added one.
+	 * 
+	 * 1. login
+	 * 2. get account related to user
+	 * 3. add scenario
+	 * 4. switch scenario
+	 * 5. get current scenario definition
+	 * 6. add scheduled experiment
+	 * 7. get ID of scheduled experiment
+	 * 8. get list of schedulede experiments
 	 */
 	@Test
 	public void testScheduleExperiment() {
@@ -253,11 +283,11 @@ public class ExecutionServiceTest extends JerseyTest {
 						    .put(long.class, se);
 		
 		// now try to get the scheduled experiment
-		List<ScheduledExperiment> list = (List<ScheduledExperiment>)resource().path(ServiceConfiguration.SVC_EXECUTE)
-																		      .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
-																		      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-																		      .accept(MediaType.APPLICATION_JSON)
-																		      .get(new GenericType<List<ScheduledExperiment>>(){});
+		List<ScheduledExperiment> list = (List<ScheduledExperiment>) resource().path(ServiceConfiguration.SVC_EXECUTE)
+																		       .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+																		       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+																		       .accept(MediaType.APPLICATION_JSON)
+																		       .get(new GenericType<List<ScheduledExperiment>>() { });
 		
 		// check the list for my added scenario to execution list
 		for (int i = 0; i < list.size(); i++) {
@@ -279,7 +309,24 @@ public class ExecutionServiceTest extends JerseyTest {
 		
 	}
 
-	
+	/**
+	 * Test the enabling disabling feature of the schedulede experiment.
+	 * 
+	 * 1. login
+	 * 2. get account related to user
+	 * 3. add scenario
+	 * 4. switch scenario
+	 * 5. get current scenario definition
+	 * 6. add scheduled experiment
+	 * 7. get ID of scheduled experiment
+	 * 8. check if current scheduled experiment is enabled
+	 * 9. disable scheduled experiment
+	 * 10. check if scheduled experiment is disabled
+	 * 11. enable scheduled experiment
+	 * 12. check if scheduled experiment is enabled
+	 * 13. delete scheduled experiment
+	 * 14. check if scheduled experiment is deleted
+	 */
 	@Test
 	public void testScheduleExperimentEnablingDisabling() {
 		// connect to test users account
@@ -440,13 +487,22 @@ public class ExecutionServiceTest extends JerseyTest {
 		} catch (UniformInterfaceException ex) {
 
             final int status = ex.getResponse().getStatus();
-            assertEquals(204, status);
+            assertEquals(HttpStatus.NO_CONTENT_204.getStatusCode(), status);
             
         }
 		
 	}
 	
-	
+	/**
+	 * Requests ExecutionDetails of a not-run scheduled experiment. Therefor the execution
+	 * details must be empty.
+	 * 
+	 * 1. login
+	 * 2. add scenario
+	 * 3. switch scenario
+	 * 4. get scenario definition
+	 * 5. get ExecutedExperimentDetails of the current user
+	 */
 	@Test
 	public void testGetExecutionDetails() {
 		// connect to test users account
@@ -495,7 +551,7 @@ public class ExecutionServiceTest extends JerseyTest {
 													    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 													    .accept(MediaType.APPLICATION_JSON)
 													    .type(MediaType.APPLICATION_JSON)
-													    .get(new GenericType<List<ExecutedExperimentDetails>>(){});
+													    .get(new GenericType<List<ExecutedExperimentDetails>>() { });
 
 		assertEquals(true, eed.isEmpty());
 	}
