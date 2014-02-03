@@ -16,11 +16,20 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>AccountServiceTest</code> tests various features of the
+ * <code>AccountService</code> RESTful services.
+ * 
+ * @author Peter Merkert
+ */
 public class AccountServiceTest extends JerseyTest {
 
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class.getName());
 	
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public AccountServiceTest() {
 		super();
 	}
