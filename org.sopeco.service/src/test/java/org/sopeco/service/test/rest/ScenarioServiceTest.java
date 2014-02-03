@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.engine.model.ScenarioDefinitionReader;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
@@ -19,8 +20,17 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>ScenarioServiceTest</code> tests various features of the
+ * <code>ScenarioService</code> RESTful services.
+ * 
+ * @author Peter Merkert
+ */
 public class ScenarioServiceTest extends JerseyTest {
 
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public ScenarioServiceTest() {
 		super();
 	}
@@ -145,6 +155,7 @@ public class ScenarioServiceTest extends JerseyTest {
 	 * 2. add scenario
 	 * 3. delete scenario
 	 */
+	@Ignore
 	@Test
 	public void testScenarioDeletion() {
 		// connect to test users account
@@ -232,46 +243,19 @@ public class ScenarioServiceTest extends JerseyTest {
 		assertEquals(b, true);
 	}
 	
-	@Test
-	public void testScenarioLoad() {
-		// connect to test users account
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
-		
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
-		
-		String token = m.getMessage();
-		
-		// add a default scenario
-		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(scenarioname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .accept(MediaType.APPLICATION_JSON)
-				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
-		
-		// now try to switch the scenario
-		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
-							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-							  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
-							  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .put(Boolean.class);
-		
-		// the switch should be succesful
-		assertEquals(b, true);
-	}
-	
+	/**
+	 * Try to extract a scenario out of the Service as xml file.
+	 * The xml file is checked afterwards for correctness. When
+	 * this test fails, then the scenario xml parsing might be
+	 * corruput.
+	 * 
+	 * 1. log in
+	 * 2. add scenario
+	 * 3. switch scenario
+	 * 4. get scenario as xml
+	 * 5. get scenario as ScenarioDefinition
+	 * 6. compare XML and ScenarioDefinition
+	 */
 	@Test
 	public void testScenarioXMLParsing() {
 		// connect to test users account
@@ -344,6 +328,5 @@ public class ScenarioServiceTest extends JerseyTest {
 															     .get(ScenarioDefinition.class);
 		
 		assertEquals(true, scenarioDefinitionCurrent.equals(scenarioDefinitionXML));
-		
 	}
 }
