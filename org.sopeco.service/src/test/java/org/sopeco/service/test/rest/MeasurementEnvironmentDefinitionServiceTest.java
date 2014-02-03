@@ -2,8 +2,6 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
@@ -16,12 +14,9 @@ import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
-import org.sopeco.service.shared.MECStatus;
 import org.sopeco.service.shared.Message;
 import org.sopeco.service.test.configuration.TestConfiguration;
-import org.sopeco.service.test.rest.fake.TestMEC;
 
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
