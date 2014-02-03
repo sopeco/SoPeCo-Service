@@ -28,14 +28,20 @@ public class CustomObjectWrapper implements ContextResolver<ObjectMapper> {
 
 	private ObjectMapper om;
 	
-	 public CustomObjectWrapper() {
-		 om = new ObjectMapper();
-
-		 // mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
-		 om.addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
-		 om.addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
+	/**
+	 * The constructor for the CustomObjectWrapper. The default configuration is set up here.
+	 * <br />
+	 * In this case the MixIn classes are injected into the {@link ObjectMapper}.
+	 */
+	public CustomObjectWrapper() {
+		om = new ObjectMapper();
+	
+		// mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
+		om.addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
+		om.addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
 	 }
 
+	@Override
 	public ObjectMapper getContext(Class<?> objectType) {
 		return om;
 	}
