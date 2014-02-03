@@ -33,6 +33,13 @@ import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.helper.ScheduleExpression;
 
+/**
+ * The <code>ExecutionService</code> class provides the service to {@link ScheduledExperiment}s,
+ * manipulate scheduled experiments.<br />
+ * The most important feature is the experiment execution of a <code>ScheduledExperiment</code>.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_EXECUTE)
 public class ExecutionService {
 	
@@ -41,11 +48,17 @@ public class ExecutionService {
 	private static final String TOKEN = ServiceConfiguration.SVCP_EXECUTE_TOKEN;
 	
 	/**
-	 * Adds a {@link ScheduledExperiment} to the 
+	 * Adds a {@link ScheduledExperiment} to the service.
+	 * The last execution time for the schedule is set to <i>-1</i> and the
+	 * properties are referenced from the Configuration with the given token.
+	 * <br />
+	 * <br />
+	 * If the schedule is set reapeated, the next valid execution date is calculated. But even
+	 * if the ScheduledExperiment is not repeated, the execution time is set.
 	 * 
-	 * @param usertoken
-	 * @param scheduledExperiment
-	 * @return
+	 * @param usertoken the user identification
+	 * @param scheduledExperiment the ScheduledExperiment object
+	 * @return true, if the ScheduledExperiement has be added
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -87,11 +100,19 @@ public class ExecutionService {
 		return true;
 	}
 	
-	
+	/**
+	 * Returns the current list of <code>ScheduledExperiment</code>s for the given account.
+	 * <br />
+	 * To get a single ScheduledExperiment, see <code>getScheduledExperiment()</code> in
+	 * this class.
+	 * 
+	 * @param usertoken the user identification
+	 * @return list of <code>ScheduledExperiment</code>, null if there are none
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<ScheduledExperiment> getScheduledExperiment(@QueryParam(TOKEN) String usertoken) {
+	public List<ScheduledExperiment> getScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -161,7 +182,8 @@ public class ExecutionService {
 			return false;
 		}
 		
-		List<ScheduledExperiment> scheduledExperiments = ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
+		List<ScheduledExperiment> scheduledExperiments = ServicePersistenceProvider.getInstance()
+																				   .loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
 		
 		for (ScheduledExperiment exp : scheduledExperiments) {
 			
@@ -171,8 +193,14 @@ public class ExecutionService {
 		
 		return true;
 	}
-	
-	
+
+	/**
+	 * Returns the <code>ScheduledExperiment</code> behind the current URI.
+	 * 
+	 * @param id the ID of the ScheduledExperiment
+	 * @param usertoken the user identification
+	 * @return the <code>ScheduledExperiment</code> behind the current URI
+	 */
 	@GET
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -201,6 +229,15 @@ public class ExecutionService {
 		return exp;
 	}
 	
+	/**
+	 * Enables the given <code>ScheduledExperiment</code> via it's ID.
+	 * 
+	 * @param id the ID of the ScheduledExperiment
+	 * @param usertoken the user identification
+	 * @return true, if the ScheduledExperiment could be enabled
+	 * 
+	 * @deprecated Currently this function is not tested and does not make sense in a RESTful interface
+	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_ENABLE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -233,7 +270,15 @@ public class ExecutionService {
 		return true;
 	}
 	
-	
+	/**
+	 * Disables the given <code>ScheduledExperiment</code> via it's ID.
+	 * 
+	 * @param id the ID of the ScheduledExperiment
+	 * @param usertoken the user identification
+	 * @return true, if the ScheduledExperiment could be disabled
+	 * 
+	 * @deprecated Currently this function is not tested and does not make sense in a RESTful interface
+	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DISABLE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -266,6 +311,13 @@ public class ExecutionService {
 		return true;
 	}
 	
+	/**
+	 * Removes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
+	 * 
+	 * @param id the ID of the ScheduledExperiment
+	 * @param usertoken the user identification
+	 * @return true, if the ScheduledExperiment could be removed
+	 */
 	@DELETE
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DELETE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -296,6 +348,15 @@ public class ExecutionService {
 		return true;
 	}
 	
+	/**
+	 * Executes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
+	 * This is the entrance method to start the real SoPeCo engine with the parameters given
+	 * in the ScheduledExperiment.
+	 * 
+	 * @param id the ID of the ScheduledExperiment
+	 * @param usertoken the user identification
+	 * @return true, if the experiment was successful executed
+	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_EXECUTE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -352,12 +413,18 @@ public class ExecutionService {
 			
 		} catch (InterruptedException e) {
 			e.printStackTrace();
+			return false;
 		}
 		
 		return true;
 	}
 	
-	
+	/**
+	 * Returns the <code>ExecutedExperimentDetails</code> for the user selected scenario.
+	 * 
+	 * @param usertoken the user identification
+	 * @return list of ExecutedExperimentDetails
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_DETAILS)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -376,6 +443,14 @@ public class ExecutionService {
 		return ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(accountId, scenarioName);
 	}
 	
+	/**
+	 * Returns the <code>MECLog</code> for the given user and MECLog ID.
+	 * 
+	 * @param usertoken the user identification
+	 * @param id the MECLog ID
+	 * 
+	 * @return MECLog with the given ID
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_MECLOG)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -392,6 +467,4 @@ public class ExecutionService {
 		return ServicePersistenceProvider.getInstance().loadMECLog(id);
 	}
 	
-	/**************************************HELPER****************************************/
-
 }
