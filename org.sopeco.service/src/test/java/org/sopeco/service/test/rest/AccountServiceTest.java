@@ -24,7 +24,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  */
 public class AccountServiceTest extends JerseyTest {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(AccountServiceTest.class.getName());
 	
 	/**
@@ -66,6 +65,8 @@ public class AccountServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void testAccountDoubleCreation() {
+		LOGGER.debug("Starting test for double account creation.");
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		

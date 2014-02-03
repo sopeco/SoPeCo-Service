@@ -4,15 +4,9 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
-import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
-import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
-import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
@@ -41,7 +35,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  */
 public class MeasurementControllerServiceTest extends JerseyTest {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementControllerServiceTest.class.getName());
 	
 	/**
@@ -90,6 +83,8 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void testMECStatus() {
+		LOGGER.debug("Testing fetch of MEC status.");
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		

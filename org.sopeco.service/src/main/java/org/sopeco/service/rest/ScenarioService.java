@@ -74,6 +74,8 @@ public class ScenarioService {
 							   @QueryParam(TOKEN) String usertoken,
 							   ExperimentSeriesDefinition esd) {
 
+		LOGGER.debug("Adding scenario with name '{}'", scenarioName);
+		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		// check if a scenario with the given name already exsists
@@ -116,12 +118,14 @@ public class ScenarioService {
 			LOGGER.warn("No database connection found.");
 			return false;
 		}
+
+		LOGGER.debug("Adding scenario with name '{}' to database.", scenarioName);
 		
 		try {
 			
 			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
 				if (sd.getScenarioName().equals(scenarioName)) {
-					LOGGER.info("Scenario with the given name alaready exists");
+					LOGGER.info("Scenario with the given name already exists. Aborting database adding.");
 					return false;
 				}
 			}
@@ -133,6 +137,8 @@ public class ScenarioService {
 		dbCon.store(emptyScenario);
 		
 		dbCon.closeProvider();	
+		
+		LOGGER.debug("Scenario with name '{}' stored database.", scenarioName);
 		
 		return true;
 	}
@@ -294,7 +300,7 @@ public class ScenarioService {
 			LOGGER.warn("Can't delete the current selected scenario. First must switch to another one.");
 			return false;
 		}
-
+		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		try {

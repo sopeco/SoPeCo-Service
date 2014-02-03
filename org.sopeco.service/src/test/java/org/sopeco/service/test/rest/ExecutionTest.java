@@ -4,6 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
+import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,6 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  */
 public class ExecutionTest extends JerseyTest {
 
-	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionTest.class.getName());
 	
 	/**
@@ -71,6 +72,56 @@ public class ExecutionTest extends JerseyTest {
 	}
 	
 	/**
+	 * Cleans up the database means: Delete the scenario with name {@code 
+	 * MeasurementControllerServiceTest.SCENARIO_NAME} in the database. This scenario
+	 * is used by every single test and it can cause errors, when the scenario is created,
+	 * but already in the database. Because the database instance is then not updated,
+	 * which can result in unexpected behaviour.
+	 */
+	//@After
+	public void cleanUpDatabase() {
+		LOGGER.debug("Cleaning up the database.");
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioNameEmpty = TestConfiguration.TEST_CLEAN_SCENARIO_NAME;
+		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// delete the example scenario
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
+			      .delete(Boolean.class);
+	}
+	
+	/**
 	 * Tests a whole execution run.
 	 * 
 	 * 1. login
@@ -84,13 +135,12 @@ public class ExecutionTest extends JerseyTest {
 	 * 9. get ID of ScheduledExperiment from step 8
 	 * 10. execute the ScheduledeExperiment with ID from step 9
 	 */
+	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -112,8 +162,8 @@ public class ExecutionTest extends JerseyTest {
 		esd.setName("experimentSeriesDefintion");
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(scenarioname)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurmentspecificationname)
+				  .path(TestConfiguration.TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -122,7 +172,7 @@ public class ExecutionTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioname)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -138,7 +188,7 @@ public class ExecutionTest extends JerseyTest {
 		//switch to created measurement specification
 		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurmentspecificationname)
+							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
 							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 							  .accept(MediaType.APPLICATION_JSON)
 							  .put(Boolean.class);

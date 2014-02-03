@@ -31,8 +31,9 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
 public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementEnvironmentDefinitionServiceTest.class.getName());
-	
-	private static final String SCENARIO_NAME = TestConfiguration.TEST_SCENARIO_NAME;
+
+	private static final String TEST_SCENARIO_NAME = TestConfiguration.TEST_SCENARIO_NAME;
+	private static final String TEST_MEASUREMENT_SPECIFICATION_NAME = TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME;
 	
 	/**
 	 * The default constructor calling the JerseyTest constructor.
@@ -116,7 +117,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 			      .delete(Boolean.class);
 	}
 	
@@ -144,8 +145,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -154,7 +155,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -197,8 +198,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -207,7 +208,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -252,8 +253,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -262,7 +263,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -318,8 +319,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -328,7 +329,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -388,8 +389,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -398,7 +399,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -495,8 +496,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -505,7 +506,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -565,8 +566,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -575,7 +576,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
@@ -645,8 +646,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "examplespecname")
+				  .path(TEST_SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -655,7 +656,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
