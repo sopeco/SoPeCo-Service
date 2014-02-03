@@ -22,6 +22,12 @@ import org.sopeco.service.shared.Message;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 
+/**
+ * Add the RESTful service for account handling. This service class enables e.g. account creation.
+ * However, the login function might be the most frequently used one.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_ACCOUNT)
 public class AccountService {
 	
@@ -202,11 +208,7 @@ public class AccountService {
 	private boolean accountExist(String accountName) {
 		Account testIfExist = ServicePersistenceProvider.getInstance().loadAccount(accountName);
 
-		if (testIfExist == null) {
-			return false;
-		} else {
-			return true;
-		}
+		return testIfExist != null;
 	}
 	
 }
