@@ -20,10 +20,17 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
  * 
  * @author Peter Merkert
  */
-@JsonIdentityInfo(generator=ObjectIdGenerators.IntSequenceGenerator.class, property="@id")
+@JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public interface ParameterNamespaceMixIn {
 
+	/**
+	 * The annotation {@code @JsonIgnore} at the method {@code getFullName()} is used to tell Jackson
+	 * that this method is no getter for a class/interface field. Otherwise Jackson searches for
+	 * a field named {@code fullName}, which is not available.
+	 * 
+	 * @return 	the full namespace string
+	 */
 	@JsonIgnore
-	public String getFullName();
+	String getFullName();
 	
 }
