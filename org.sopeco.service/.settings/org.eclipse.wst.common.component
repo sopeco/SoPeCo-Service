@@ -24,6 +24,27 @@
         <dependent-module archiveName="org.sopeco.engine-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.engine/org.sopeco.engine">
             <dependency-type>uses</dependency-type>
         </dependent-module>
+        <dependent-module archiveName="org.sopeco.runner-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.runner/org.sopeco.runner">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.plugin.std.parametervariation-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.plugin.std.parametervariation/org.sopeco.plugin.std.parametervariation">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.plugin.std.exploration-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.plugin.std.exploration/org.sopeco.plugin.std.exploration">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.analysis.wrapper-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.analysis.wrapper/org.sopeco.analysis.wrapper">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.plugin.std.analysis-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.plugin.std.analysis/org.sopeco.plugin.std.analysis">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.plugin.std.constantassignment-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.plugin.std.constantassignment/org.sopeco.plugin.std.constantassignment">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="org.sopeco.plugin.std.processing-5.0.2-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/org.sopeco.plugin.std.processing/org.sopeco.plugin.std.processing">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <property name="context-root" value="org.sopeco.service"/>
         <property name="java-output-path" value="/org.sopeco.service/target/classes"/>
     </wb-module>
