@@ -26,6 +26,13 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.shared.MECStatus;
 
+/**
+ * The <code>MeasurementControllerService</code> provides services to handle MeasurementEnvironemtControllers (MEC)
+ * of SoPeCo. The service alowes to request information about connected MECs.<br />
+ * Currently only socket connection are allowed and can be used.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_MEC)
 public class MeasurementControllerService {
 	
@@ -36,6 +43,11 @@ public class MeasurementControllerService {
 	 */
 	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^socket://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
 	
+	/**
+	 * Returns the URI pattern for the socket connection URL.
+	 * 
+	 * @return the URI pattern for the socket connection URL
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_VALIDATE)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -43,6 +55,15 @@ public class MeasurementControllerService {
 		return CONTROLLER_URL_PATTERN;
 	}
 	
+	/**
+	 * Returns the status of the MEC on the given URL. The status of the MEC can be fetched via
+	 * the {@link MECStatus}. If the URL is inavlid or something happened to the MEC, null might
+	 * be returned.
+	 * 
+	 * @param usertoken authentification of the user
+	 * @param url 		the URL to the MEC
+	 * @return 			the MEC status of the controller, null if a connection issue happened
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -83,10 +104,10 @@ public class MeasurementControllerService {
 
 		} catch (URISyntaxException e) {
 			LOGGER.error(e.getMessage());
-			throw new IllegalStateException(e);
+			return null;
 		} catch (RemoteException e) {
 			LOGGER.error(e.getMessage());
-			throw new IllegalStateException(e);
+			return null;
 		} catch (IllegalStateException x) {
 			LOGGER.debug("Controller-Status: STATUS_OFFLINE");
 			return new MECStatus(MECStatus.STATUS_OFFLINE);
@@ -95,14 +116,12 @@ public class MeasurementControllerService {
 	}
 	
 	/**
-	 * This methods returns the whole list for connected controllers on the given host:port 
-	 * via socket.
+	 * This methods returns the whole list for connected controllers on the given MEC ID.
 	 * 
 	 * @param usertoken authentification of the user
-	 * @param host the host where to snoop on
-	 * @param port the port of the host to snoop on
-	 * @return list of all controller currently connected to given host:port with given protocol, null
-	 *  	   if an error occured
+	 * @param id 		the MEC ID
+	 * @return 			list of all controllers currently connected to given MEC ID with given, null
+	 *  	   			if an error occured
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
@@ -139,9 +158,9 @@ public class MeasurementControllerService {
 	 * manually via the service at med/set!
 	 * 
 	 * @param usertoken authentification of the user
-	 * @param uri the URI of the MeasurementEnvironmentController already connected to the
-	 * 		  ServerSocket of the service
-	 * @return the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI
+	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
+	 * 		  			ServerSocket of the service
+	 * @return 			the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_MED)
@@ -200,9 +219,9 @@ public class MeasurementControllerService {
 	 * their comments for more information.
 	 * 
 	 * @param usertoken authentification of the user
-	 * @param uri the URI of the MeasurementEnvironmentController already connected to the
-	 * 		  ServerSocket of the service
-	 * @return true, if the MED from the MEC was saved successfully in the database
+	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
+	 * 		  			ServerSocket of the service
+	 * @return 			true, if the MED from the MEC was saved successfully in the database
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_MEC_MED)
@@ -226,8 +245,8 @@ public class MeasurementControllerService {
 	/**
 	 * Checks if the given URI is like a valid pattern.
 	 * 
-	 * @param uri the URI to check
-	 * @return true, if the URI has a valid pattern
+	 * @param uri 	the URI to check
+	 * @return 		true, if the URI has a valid pattern
 	 */
 	private boolean checkUrlIsValid(String uri) {
 		
