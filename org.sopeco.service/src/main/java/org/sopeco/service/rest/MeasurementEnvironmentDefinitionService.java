@@ -24,6 +24,12 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 
+/**
+ * The <code>MeasurementEnvironmentDefinitionService</code> class provides RESTful services
+ * for handling {@link MeasurementEnvironmentDefinition}s (MED) of a {@link ScenarioDefinition}.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_MED)
 public class MeasurementEnvironmentDefinitionService {
 	
@@ -31,6 +37,13 @@ public class MeasurementEnvironmentDefinitionService {
 
 	private static final String TOKEN = ServiceConfiguration.SVCP_MED_TOKEN;
 	
+	/**
+	 * Sets the given {@link MeasurementEnvironmentDefinition}s (MED) for the user.
+	 * 
+	 * @param usertoken the user identification
+	 * @param med		the MED
+	 * @return			true, if the MED could be set
+	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_MED_SET)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -47,11 +60,20 @@ public class MeasurementEnvironmentDefinitionService {
 		return setNewMEDefinition(med, u);
 	}
 	
+	/**
+	 * Sets and returns a blank {@link MeasurementEnvironmentDefinition} (MED). <b>Be aware</b>: This method does
+	 * also set the MED.
+	 * 
+	 * 
+	 * @param usertoken the user identification
+	 * @return			the MED of the given user
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_SET + "/"
 		  + ServiceConfiguration.SVC_MED_SET_BLANK)
 	@Produces(MediaType.APPLICATION_JSON)
 	public MeasurementEnvironmentDefinition getMEDefinitionFromBlank(@QueryParam(TOKEN) String usertoken) {
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -66,15 +88,16 @@ public class MeasurementEnvironmentDefinitionService {
 	}
 	
 	/**
-	 * Returns current selected MED for the given user.
+	 * Returns current selected {@link MeasurementEnvironmentDefinition} (MED) for the given user.
 	 * 
 	 * @param usertoken the user identification
-	 * @return current selected MED for the given user
+	 * @return 			current selected MED for the given user
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MED_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
 	public MeasurementEnvironmentDefinition getCurrentMEDefinition(@QueryParam(TOKEN) String usertoken) {
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -85,9 +108,15 @@ public class MeasurementEnvironmentDefinitionService {
 		return u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
 	}
 	
+	/**
+	 * Adds a namespace to the currently selected {@link MeasurementEnvironmentDefinition} (MED) of the user.
+	 * 
+	 * @param usertoken the user identification
+	 * @param path		the namespace path
+	 * @return			true, if the namespace was added sccessfully
+	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/"
-			+ ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
+	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean addNamespace(@QueryParam(TOKEN) String usertoken,
 								@QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
@@ -112,10 +141,15 @@ public class MeasurementEnvironmentDefinitionService {
 		return true;
 	}
 	
-	
+	/**
+	 * Deletes the namespace with the given path. <b>Be aware</b>:The namespace and all the children are removed here!
+	 * 
+	 * @param usertoken the user identification
+	 * @param path		the namespace path
+	 * @return			true, if the namespace was removed successfuly
+	 */
 	@DELETE
-	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/"
-			+ ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
+	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public boolean removeNamespace(@QueryParam(TOKEN) String usertoken,
 								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
@@ -144,7 +178,14 @@ public class MeasurementEnvironmentDefinitionService {
 		return true;
 	}
 	
-	
+	/**
+	 * Renames a namespace at the given path to the new path.
+	 * 
+	 * @param usertoken the user identification
+	 * @param path		the path to the namespace
+	 * @param newName	the new path to the namespace
+	 * @return			true, if the renaming was successful
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/"
 			+ ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
@@ -176,6 +217,17 @@ public class MeasurementEnvironmentDefinitionService {
 		return true;
 	}
 	
+	/**
+	 * Adds a parameter to the namespace with the given path.
+	 * <b>Attention</b>: The parameter type is stored uppercase!
+	 * 
+	 * @param usertoken the user identification
+	 * @param path		the path to the namespace
+	 * @param paramName	the parameter name
+	 * @param paramType	the parameter type
+	 * @param role		the {@link ParameterRole}
+	 * @return			true, if the adding was successful
+	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
 			+ ServiceConfiguration.SVC_MED_PARAM_ADD)
@@ -214,9 +266,19 @@ public class MeasurementEnvironmentDefinitionService {
 		return true;
 	}
 	
+	/**
+	 * Updates a parameter in the given path with the new information.
+	 * 
+	 * @param usertoken 	the user identification
+	 * @param path			the path to the parameter
+	 * @param paramName		the name of the parameter
+	 * @param paramNameNew	the new name of the parameter
+	 * @param paramType		the (new) parameter type
+	 * @param role			the (new) parameter role
+	 * @return				true, if the update was successful
+	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
-			+ ServiceConfiguration.SVC_MED_PARAM_UPDATE)
+	@Path(ServiceConfiguration.SVC_MED_PARAM + "/" + ServiceConfiguration.SVC_MED_PARAM_UPDATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public boolean updateParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
@@ -262,6 +324,14 @@ public class MeasurementEnvironmentDefinitionService {
 		return true;
 	}
 	
+	/**
+	 * Removes the parameter with the given name in the given path.
+	 * 
+	 * @param usertoken the user identification
+	 * @param path		the path to the parameter
+	 * @param paramName	the name of the parameter
+	 * @return			true, if the parameter could be removed
+	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
 			+ ServiceConfiguration.SVC_MED_PARAM_REMOVE)
@@ -328,9 +398,9 @@ public class MeasurementEnvironmentDefinitionService {
 	 * This method is protected and static as it's called from
 	 * {@code MeasurementControllerService.setMEDefinitionFromMEC()}.
 	 * 
-	 * @param definition the MED
-	 * @param u the user whose MED is to set
-	 * @return true, if the MED could be stored successfully
+	 * @param definition 	the MED
+	 * @param u 			the user whose MED is to set
+	 * @return 				true, if the MED could be stored successfully
 	 */
 	protected static boolean setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
