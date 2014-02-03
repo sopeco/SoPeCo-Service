@@ -5,7 +5,6 @@ import static org.junit.Assert.assertEquals;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +77,7 @@ public class ExecutionTest extends JerseyTest {
 	 * but already in the database. Because the database instance is then not updated,
 	 * which can result in unexpected behaviour.
 	 */
-	//@After
+	@After
 	public void cleanUpDatabase() {
 		LOGGER.debug("Cleaning up the database.");
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -135,7 +134,6 @@ public class ExecutionTest extends JerseyTest {
 	 * 9. get ID of ScheduledExperiment from step 8
 	 * 10. execute the ScheduledeExperiment with ID from step 9
 	 */
-	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account

@@ -272,6 +272,7 @@ public class ScenarioService {
 	/**
 	 * Deleted the scenario with the given name. Does not delete the scenario, if the
 	 * given user has currenlty selected the scenario.
+	 * <b>Attention:</b> All the scenario instances related to the scenario will be deleted, too!
 	 * 
 	 * @param scenarioname 	the scenario name
 	 * @param usertoken 	the user identification
@@ -306,6 +307,24 @@ public class ScenarioService {
 		try {
 			
 			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
+			
+			// check for scenario Instances and remove these
+			if (definition == null) {
+				LOGGER.warn("ScenarioDefinition is invalid.");
+				return false;
+			}
+			
+			List<ScenarioInstance> scenarioInstances = dbCon.loadScenarioInstances(scenarioname);
+			
+			if (scenarioInstances == null) {
+				LOGGER.warn("ScenarioInstances cannot be fetched.");
+				return false;
+			}
+			
+			for (ScenarioInstance si : scenarioInstances) {
+				dbCon.remove(si);
+			}
+			
 			dbCon.remove(definition);
 			
 		} catch (DataNotFoundException e) {
