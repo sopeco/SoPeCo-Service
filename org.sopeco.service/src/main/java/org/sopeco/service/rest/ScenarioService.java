@@ -34,12 +34,18 @@ import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
+/**
+ * The <code>ScenarioService</code> class provides RESTful services to handle scenarios in SoPeCo.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_SCENARIO)
 public class ScenarioService {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioService.class.getName());
 	
 	private static final String TOKEN = ServiceConfiguration.SVCP_SCENARIO_TOKEN;
+	
 	private static final String NAME = ServiceConfiguration.SVCP_SCENARIO_NAME;
 	
 	/**
@@ -310,8 +316,9 @@ public class ScenarioService {
 	/**
 	 * Switch the activ scenario for a given user (via token).
 	 * 
-	 * @param scenarioname the scenario to switch to
-	 * @param usertoken the token to identify the user
+	 * @param scenarioname 	the scenario to switch to
+	 * @param usertoken 	the token to identify the user
+	 * @return				true, if the switch could be executed
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
@@ -355,9 +362,9 @@ public class ScenarioService {
 	/**
 	 * Switches a scenario to another one given by the whole {@code ScenarioDefinition}.
 	 * 
-	 * @param usertoken the token to identify the user
-	 * @param scenarioDefinition the new {@code ScenarioDefinition} to set
-	 * @return true, if the scenario could be switched to the given one
+	 * @param usertoken 			the token to identify the user
+	 * @param scenarioDefinition 	the new {@code ScenarioDefinition} to set
+	 * @return 						true, if the scenario could be switched to the given one
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
@@ -489,7 +496,14 @@ public class ScenarioService {
 		return xml;
 	}
 	
-	
+	/**
+	 * Returns the {@link ScenarioInstance} identified with the given name and url.
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @param name		the name of the <code>ScenarioInstance</code>
+	 * @param url		the URL of the <code>ScenarioInstance</code>
+	 * @return			the <code>ScenarioInstance</code>
+	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
 	@Produces(MediaType.APPLICATION_JSON)
