@@ -1,6 +1,8 @@
 package org.sopeco.service.configuration;
 
 /**
+ * The default service configuration. Here you can find all the URI for the RESTful service and
+ * a lot of configuration lookup properties of the SoPeCo Configuration.
  * 
  * @author Peter Merkert
  */
@@ -185,19 +187,14 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_ID = "id";
 	
 	/**
-	 * QueryParam name for the account name
+	 * QueryParam name for the account name.
 	 */
 	public static final String SVC_ACCOUNT_ACCOUNTNAME = "accountname";
 	
 	/**
-	 * QueryParam name for the account password
+	 * QueryParam name for the account password.
 	 */
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	public static final String SVC_USER = "user";
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
-
-
-
-
-	
 }
