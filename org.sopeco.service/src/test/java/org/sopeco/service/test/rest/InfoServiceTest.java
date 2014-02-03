@@ -13,8 +13,17 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>InfoServiceTest</code> tests various features of the
+ * <code>InfoService</code> RESTful services.
+ * 
+ * @author Peter Merkert
+ */
 public class InfoServiceTest extends JerseyTest {
 
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public InfoServiceTest() {
 		super();
 	}
@@ -39,6 +48,10 @@ public class InfoServiceTest extends JerseyTest {
 	    return config;
 	}
 	
+	/**
+	 * Tests the default service request interface, if the service
+	 * is running.
+	 */
 	@Test
 	public void testServiceRunning() {
 		Boolean b = resource().path(ServiceConfiguration.SVC_INFO)
