@@ -88,8 +88,8 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	/**
 	 * Adds a new namespace to the root namespace.
 	 * 
-	 * @param name name of the new namespace
-	 * @return The new namespace
+	 * @param namespaceName name of the new namespace
+	 * @return 				the new namespace
 	 */
 	public ParameterNamespace addNamespace(String namespaceName) {
 		return addNamespace(namespaceName, scenarioDefinitionBuilder.getMeasurementEnvironmentDefinition().getRoot());
@@ -98,9 +98,9 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	/**
 	 * Adds a new namespace to the target namespace.
 	 * 
-	 * @param name name of the new namespace
-	 * @param targetNamespace namespace which gets the new namespace
-	 * @return The new namespace
+	 * @param namespaceName 	name of the new namespace
+	 * @param targetNamespace 	namespace which gets the new namespace
+	 * @return 					the new namespace
 	 */
 	public ParameterNamespace addNamespace(String namespaceName, ParameterNamespace targetNamespace) {
 		LOGGER.info("Adding new namespace '" + namespaceName + "' to parent '" + targetNamespace.getFullName() + "'.");
@@ -162,10 +162,11 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	/**
 	 * Adding a new parameter to the given namespace.
 	 * 
-	 * @param name name of the new parameter
-	 * @param type type of the new parameter
-	 * @param role role of the new parameter
+	 * @param name 		name of the new parameter
+	 * @param type 		type of the new parameter
+	 * @param role 		role of the new parameter
 	 * @param namespace namespace where the parameter will be added
+	 * @return 			the ParameterDefinition created with the given parameter
 	 */
 	public ParameterDefinition addParameter(String name, String type, ParameterRole role, ParameterNamespace namespace) {
 		if (namespace == null) {
@@ -184,6 +185,8 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @return a MeasurementEnvironmentDefinition
+	 * 
 	 * @Deprecated Use getMeasurementEnvironmentDefinition().
 	 */
 	@Deprecated

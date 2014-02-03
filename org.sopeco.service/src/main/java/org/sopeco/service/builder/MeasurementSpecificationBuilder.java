@@ -68,11 +68,11 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
-	 * Creates a new MeasurementSpecificationBuilder with the given {@code ScenarioDefinitionBuilder}
-	 * and the name for the {@code MeasurementSpecification}.
+	 * Creates a new MeasurementSpecificationBuilder with the given {@link ScenarioDefinitionBuilder}
+	 * and the name for the {@link MeasurementSpecification}.
 	 * 
-	 * @param sBuilder
-	 * @param specName
+	 * @param scenarioDefinitionBuilder		a ScenarioDefinitionBuilder
+	 * @param measurementSpecificationName	the name of the measurementSpecificationName
 	 */
 	public MeasurementSpecificationBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder,
 										   String measurementSpecificationName) {
@@ -85,9 +85,9 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
-	 * Creates a new MeasurementSpecificationBuilder with the given {@code MeasurementSpecification}.
+	 * Creates a new MeasurementSpecificationBuilder with the given {@link MeasurementSpecification}.
 	 * 
-	 * @param measurementSpecification the {@code MeasurementSpecification}
+	 * @param measurementSpecification the <code>MeasurementSpecification</code>
 	 */
 	public MeasurementSpecificationBuilder(MeasurementSpecification measurementSpecification) {
 		LOGGER.info("Creating MeasurementSpecificationBuilder for the "
@@ -101,11 +101,9 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Adding a parameter as initial assignment.
 	 * 
-	 * @param parameter
-	 *            definition of the parameter
-	 * @param value
-	 *            value of the given parameter
-	 * @return was the adding successful
+	 * @param parameter	definition of the parameter
+	 * @param value		value of the given parameter
+	 * @return 			true, if the adding was successful
 	 */
 	public boolean addInitAssignment(ParameterDefinition parameter, String value) {
 		ConstantValueAssignment cva = SimpleEntityFactory.createConstantValueAssignment(parameter, value);
@@ -116,9 +114,8 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Adding a const value assignment as initial assignment.
 	 * 
-	 * @param cva
-	 *            const value assignment being added
-	 * @return was the adding successful
+	 * @param cva 	const value assignment being added
+	 * @return		true, if the adding was successful
 	 */
 	public boolean addInitAssignment(ConstantValueAssignment cva) {
 		LOGGER.info("adding parameter '" + cva.getParameter().getFullName() + "' as init assignment");
@@ -134,10 +131,10 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
-	 * Returns whetherr an assignment with the given fullname (namespace + name)
-	 * exists.
+	 * Returns true, if an assignment with the given fullname (namespace + name) exists.
 	 * 
-	 * @return
+	 * @param parameter	the {@link ParameterDefinition}
+	 * @return 			true, if an assignment with the given fullname (namespace + name) exists
 	 */
 	public boolean containsInitialAssignment(ParameterDefinition parameter) {
 		for (ConstantValueAssignment assignment : measurementSpecification.getInitializationAssignemts()) {
@@ -151,9 +148,8 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Removes the given assignment.
 	 * 
-	 * @param cva
-	 *            ConstantValueAssignment being removed
-	 * @return was the removal successful
+	 * @param cva	ConstantValueAssignment being removed
+	 * @return 		true, if the removal was successful
 	 */
 	public boolean removeInitialAssignment(ConstantValueAssignment cva) {
 		LOGGER.info("Removing ConstantValueAssignment '" + cva.getParameter().getFullName()
@@ -165,9 +161,8 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Removes the given assignment.
 	 * 
-	 * @param parameter
-	 *            parameter of cva being removed
-	 * @return was the removal successful
+	 * @param parameter	parameter of cva being removed
+	 * @return 			true, if the removal was successful
 	 */
 	public boolean removeInitialAssignment(ParameterDefinition parameter) {
 		LOGGER.info("Removing parameter '" + parameter.getFullName() + "' from init assignment list");
@@ -188,22 +183,12 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Adds a new experiment series definition to the specification.
 	 * 
-	 * @param name
-	 *            experiment name
-	 * @param termination
-	 *            terminition condition
-	 * @return if adding was successful: the created experimentSeriesDefinition
-	 *         object else null
+	 * @param name	experiment name
+	 * @return 		if adding was successful: the created experimentSeriesDefinition
+	 *         		object else null
 	 */
-	public ExperimentSeriesDefinition addExperimentSeries(String name/*
-																	 * ,
-																	 * ExperimentTerminationCondition
-																	 * termination
-																	 */) {
-		ExperimentSeriesDefinition experiment = SimpleEntityFactory.createExperimentSeriesDefinition(name/*
-																										 * ,
-																										 * termination
-																										 */);
+	public ExperimentSeriesDefinition addExperimentSeries(String name) {
+		ExperimentSeriesDefinition experiment = SimpleEntityFactory.createExperimentSeriesDefinition(name);
 
 		if (addExperimentSeries(experiment)) {
 			return experiment;
@@ -215,10 +200,9 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Adds the given exp. series def. object to the specification.
 	 * 
-	 * @param experiment
-	 *            esd object which will be added
-	 * @return true if the adding was successful; false if a experiment with the
-	 *         given name already exists
+	 * @param experiment	esd object which will be added
+	 * @return 				true if the adding was successful; false if a experiment with the
+	 *         				given name already exists
 	 */
 	public boolean addExperimentSeries(ExperimentSeriesDefinition experiment) {
 		LOGGER.info("adding new experiementSeriesDefinition '" + experiment.getName() + "' to specification '"
@@ -239,10 +223,9 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Return the ExpSeriesDef with the given name.
 	 * 
-	 * @param name
-	 *            name of the ExpSeries
-	 * @return the found experimentSeries. if no expSeries with the given name
-	 *         was found, it returns null
+	 * @param name	name of the ExpSeries
+	 * @return 		the found experimentSeries. if no expSeries with the given name
+	 *         		was found, it returns null
 	 */
 	public ExperimentSeriesDefinition getExperimentSeries(String name) {
 		for (ExperimentSeriesDefinition expDefinition : measurementSpecification.getExperimentSeriesDefinitions()) {
@@ -262,9 +245,8 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Removes the given experiment from the specification.
 	 * 
-	 * @param expDefinition
-	 *            experimentSeries which will be removed
-	 * @return true if the removal was successful
+	 * @param expDefinition	experimentSeries which will be removed
+	 * @return 				true if the removal was successful
 	 */
 	public boolean removeExperimentSeries(ExperimentSeriesDefinition expDefinition) {
 		return removeExperimentSeries(expDefinition.getName());
@@ -273,9 +255,8 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Removes the experiment, which has the given name, from the specification.
 	 * 
-	 * @param name
-	 *            name of the experimentSeries which will be removed
-	 * @return true if the removal was successful
+	 * @param name	name of the experimentSeries which will be removed
+	 * @return 		true if the removal was successful
 	 */
 	public boolean removeExperimentSeries(String name) {
 		LOGGER.info("removing the experiment '" + name + "' from the specification '" + measurementSpecification.getName() + "'");
@@ -295,8 +276,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	/**
 	 * Set a new specification name.
 	 * 
-	 * @param name
-	 *            the new spec. name
+	 * @param name	the new spec. name
 	 */
 	public void setName(String name) {
 		LOGGER.info("Setting new specification name: '" + measurementSpecification.getName() + "' -> '" + name + "'");

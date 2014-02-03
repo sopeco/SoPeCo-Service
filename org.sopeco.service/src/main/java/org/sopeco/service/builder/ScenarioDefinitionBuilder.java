@@ -107,6 +107,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @return a MeasurementEnvironmentDefinitionBuilder
+	 * 
 	 * @Deprecated Use the method getMeasurementEnvironmentBuilder().
 	 */
 	@Deprecated
@@ -124,7 +126,9 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
-	 * Use setMeasurementEnvironmentDefinition().
+	 * @param meDefinition the MeasurementEnvironmentDefinition
+	 * 
+	 * @deprecated Use setMeasurementEnvironmentDefinition().
 	 */
 	@Deprecated
 	public void setMEDefinition(MeasurementEnvironmentDefinition meDefinition) {
@@ -141,6 +145,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @return a MeasurementEnvironmentDefinition 
+	 * 
 	 * @Deprecated Use getMeasurementEnvironmentDefinition()
 	 */
 	@Deprecated
@@ -158,6 +164,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
+	 * @return a MeasurementSpecificationBuilder
+	 * 
 	 * @Deprecated Use getNewMeasurementSpecification()
 	 */
 	@Deprecated
@@ -196,6 +204,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @param builder the MeasurementSpecificationBuilder
+	 * 
 	 * @Deprecated Use setMeasurementSpecificationBuilder().
 	 */
 	@Deprecated
@@ -214,6 +224,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @return a MeasurementSpecificationBuilder 
+	 * 
 	 * @Deprecated Use getMeasurementSpecificationBuilder().
 	 */
 	@Deprecated
@@ -231,6 +243,8 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
+	 * @return a ScenarioDefinition
+	 * 
 	 * @Deprecated Use getScenarioDefinition().
 	 */
 	@Deprecated
@@ -249,6 +263,9 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @param name the name
+	 * @return a ScenarioDefinition
+	 * 
 	 * @Deprecated Use constructor and getScenarioDefinition().
 	 */
 	@Deprecated
@@ -261,6 +278,9 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
+	 * @param definition a ScenarioDefinition
+	 * @return a ScenarioDefinitionBuilder
+	 * 
 	 * @Deprecated Use constructor.
 	 */
 	@Deprecated
