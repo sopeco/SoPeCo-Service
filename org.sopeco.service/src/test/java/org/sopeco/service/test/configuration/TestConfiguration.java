@@ -1,6 +1,11 @@
 package org.sopeco.service.test.configuration;
 
-public final class TestConfiguration {
+/**
+ * Utility class with the configuration properties for the test environement.
+ * 
+ * @author Peter Merkert
+ */
+public abstract class TestConfiguration {
 
 	public static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
 	public static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
