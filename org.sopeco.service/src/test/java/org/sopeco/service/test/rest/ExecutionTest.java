@@ -23,11 +23,20 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>ExecutionTest</code> tests a whole execution run. From login via scenario creation
+ * to MEC registration and test execution.
+ * 
+ * @author Peter Merkert
+ */
 public class ExecutionTest extends JerseyTest {
 
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionTest.class.getName());
 	
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public ExecutionTest() {
 		super();
 	}
@@ -61,6 +70,20 @@ public class ExecutionTest extends JerseyTest {
 	    return config;
 	}
 	
+	/**
+	 * Tests a whole execution run.
+	 * 
+	 * 1. login
+	 * 2. get the account related to the current user
+	 * 3. add scenario
+	 * 4. switch scenario
+	 * 5. get current scenario definition
+	 * 6. switch measurement specification
+	 * 7. start the TestMEC
+	 * 8. add a ScheduledExperiment with controller information to service
+	 * 9. get ID of ScheduledExperiment from step 8
+	 * 10. execute the ScheduledeExperiment with ID from step 9
+	 */
 	@Test
 	public void testExecution() {
 		// connect to test users account
