@@ -36,6 +36,8 @@ public final class StartUpService implements ServletContextListener {
 	@Override
     public void contextInitialized(ServletContextEvent sce) {
     	
+		LOGGER.debug("RESTful SoPeCo Service Layer starting up.");	
+		
 		try {
 	    	// open the ServerSocket on the port set in the configuration
 			SocketAcception.open(ServiceConfiguration.MEC_SOCKET_PORT);
@@ -52,6 +54,7 @@ public final class StartUpService implements ServletContextListener {
 	 */
 	@Override
     public void contextDestroyed(ServletContextEvent sce) {
+		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");	
     }
     
 }
