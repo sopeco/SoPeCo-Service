@@ -36,22 +36,22 @@ public abstract class TestConfiguration {
 	/**
 	 * The default test scenario name. It's used when creating scenarios in test cases.
 	 */
-	public static final String TEST_SCENARIO_NAME = "testScenarioName";
+	public static final String TEST_SCENARIO_NAME = "testscenarioname";
 	
 	/**
 	 * The default test measurement specification name. It's used when creating the default scenario.
 	 */
-	public static final String TEST_MEASUREMENT_SPECIFICATION_NAME = "testMeasurementSpecficiationName";
+	public static final String TEST_MEASUREMENT_SPECIFICATION_NAME = "testmeasurementspecficiationname";
 	
 	/**
 	 * The "clearup" scenario is always needed in the database: It's needed to switch to this scenario and
 	 * delete the example scenario everytime.
 	 */
-	public static final String TEST_CLEAN_SCENARIO_NAME = "emptyScenarioName";
+	public static final String TEST_CLEAN_SCENARIO_NAME = "emptyscenarioname";
 	
 	/**
 	 * The TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME defines the name for the measurement
 	 * specification for the "cleanup" scenario.
 	 */
-	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "emptyMeasurementSpecficiationName";
+	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "emptymeasurementspecficiationname";
 }
