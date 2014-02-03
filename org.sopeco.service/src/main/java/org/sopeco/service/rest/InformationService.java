@@ -9,11 +9,17 @@ import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
+/**
+ * The <code>InformationService</code> provides simple information about the SoPeCo service layer.
+ * When requested with a browsers, the default <code>getInformation()</code> method is called.
+ * 
+ * @author Peter Merkert
+ */
 @Path(ServiceConfiguration.SVC_INFO)
 public class InformationService {
 
 	/**
-	 * Prints information about the SoPeCo Service
+	 * Prints information about the SoPeCo Service.
 	 * 
 	 * @return information text about this service
 	 */
