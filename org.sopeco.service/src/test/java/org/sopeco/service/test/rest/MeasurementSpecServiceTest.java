@@ -20,11 +20,20 @@ import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
 import com.sun.jersey.test.framework.WebAppDescriptor;
 
+/**
+ * The <code>MeasurementSpecServiceTest</code> tests various features of the
+ * <code>MeasurementSpecificationService</code> RESTful services.
+ * 
+ * @author Peter Merkert
+ */
 public class MeasurementSpecServiceTest extends JerseyTest {
 
 	@SuppressWarnings("unused")
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementSpecServiceTest.class.getName());
 	
+	/**
+	 * The default constructor calling the JerseyTest constructor.
+	 */
 	public MeasurementSpecServiceTest() {
 		super();
 	}
@@ -63,7 +72,6 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	 * 3. switch to newly created scenario
 	 * 4.
 	 */
-	@SuppressWarnings("unchecked")
 	@Test
 	public void testMeasurementSpecNameListing() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -72,6 +80,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		String measurementSpecName = "examplespecname";
 		String measurementSpecName2 = "examplespecname2";
 		String measurementSpecName3 = "examplespecname3";
+		final int measurementSpecCount = 3;
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -116,7 +125,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		List<String> measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 										         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
 										         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-										         .get(new GenericType<List<String>>(){});
+										         .get(new GenericType<List<String>>() { });
 
 		assertEquals(true, measurementList.size() >= 1);
 		assertEquals(true, measurementList.contains(measurementSpecName));
@@ -134,16 +143,26 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName3)
 		          .post(Boolean.class);
 		
-		measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-			       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-				   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-			       .get(List.class);
+		measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+						       	    .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+						       	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+						       	    .get(new GenericType<List<String>>() { });
 
-		assertEquals(true, measurementList.size() >= 3);
+		assertEquals(true, measurementList.size() >= measurementSpecCount);
 		assertEquals(true, measurementList.contains(measurementSpecName2));
 		assertEquals(true, measurementList.contains(measurementSpecName3));
 	}
 
+	/**
+	 * Tests adding a MeasurementSpecification with the same name twice.
+	 * 
+	 * 1. login
+	 * 2. add scenario
+	 * 3. switch scenario
+	 * 4. create measurementspecification
+	 * 5. switch measurementspecification
+	 * 6. create measurementspecification (with same name as in step 4)
+	 */
 	@Test
 	public void testMeasurementSpecNameDoubleAdding() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -282,11 +301,10 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		assertEquals(true, b);
 		
 		// now lookup the name we just added
-		@SuppressWarnings("unchecked")
-		List<String> measurementList = (List<String>)resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-														       .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-															   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-														       .get(List.class);
+		List<String> measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+										         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+										         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+										         .get(new GenericType<List<String>>() { });
 		
 		assertEquals(true, measurementList.contains(measurementSpecName));
 	}
