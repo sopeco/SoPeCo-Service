@@ -37,7 +37,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementEnvironmentDefinitionServiceTest.class.getName());
 	
-	private static final String SCENARIO_NAME = "examplescenario";
+	private static final String SCENARIO_NAME = TestConfiguration.TEST_SCENARIO_NAME;
 	
 	/**
 	 * The default constructor calling the JerseyTest constructor.
@@ -87,7 +87,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		LOGGER.debug("Cleaning up the database.");
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String scenarioNameEmpty = "emptyscenario";
+		String scenarioNameEmpty = TestConfiguration.TEST_CLEAN_SCENARIO_NAME;
+		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
 		
 		// log into the account
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -102,7 +103,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 				  .path(scenarioNameEmpty)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, "emptyspecname")
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
@@ -116,6 +117,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 				  .accept(MediaType.APPLICATION_JSON)
 				  .put(Boolean.class);
 		
+		// delete the example scenario
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)

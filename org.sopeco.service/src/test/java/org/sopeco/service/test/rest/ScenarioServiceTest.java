@@ -4,8 +4,10 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Ignore;
+import org.junit.After;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sopeco.engine.model.ScenarioDefinitionReader;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
@@ -28,6 +30,11 @@ import com.sun.jersey.test.framework.WebAppDescriptor;
  */
 public class ScenarioServiceTest extends JerseyTest {
 
+	private static final Logger LOGGER = LoggerFactory.getLogger(ScenarioServiceTest.class);
+
+	private static final String SCENARIO_NAME = TestConfiguration.TEST_SCENARIO_NAME;
+	private static final String MEASUREMENT_SPECIFICATION_NAME = TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME;
+	
 	/**
 	 * The default constructor calling the JerseyTest constructor.
 	 */
@@ -55,6 +62,58 @@ public class ScenarioServiceTest extends JerseyTest {
 	    return config;
 	}
 
+	
+	/**
+	 * Cleans up the database means: Delete the scenario with name {@link 
+	 * MeasurementControllerServiceTest.SCENARIO_NAME} in the database. This scenario
+	 * is used by every single test and it can cause errors, when the scenario is created,
+	 * but already in the database. Because the database instance is then not updated,
+	 * which can result in unexpected behaviour.
+	 */
+	@After
+	public void cleanUpDatabase() {
+		LOGGER.debug("Cleaning up the database.");
+		String accountname = TestConfiguration.TESTACCOUNTNAME;
+		String password = TestConfiguration.TESTPASSWORD;
+		String scenarioNameEmpty = TestConfiguration.TEST_CLEAN_SCENARIO_NAME;
+		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
+		
+		// log into the account
+		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+							  .get(Message.class);
+		
+		String token = m.getMessage();
+
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				  .path(scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .type(MediaType.APPLICATION_JSON)
+				  .post(Boolean.class, esd);
+		
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
+				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				  .accept(MediaType.APPLICATION_JSON)
+				  .put(Boolean.class);
+		
+		// delete the example scneario from the db
+		resource().path(ServiceConfiguration.SVC_SCENARIO)
+				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, SCENARIO_NAME)
+			      .delete(Boolean.class);
+	}
+	
+	
 	/**
 	 * Try adding two scenarios with the same name. The second addition must fail.
 	 * 
@@ -67,8 +126,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
+		String measurmentspecificationname = MEASUREMENT_SPECIFICATION_NAME;
+		String scenarioname = SCENARIO_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -115,8 +174,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
+		String measurmentspecificationname = MEASUREMENT_SPECIFICATION_NAME;
+		String scenarioname = SCENARIO_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -155,14 +214,13 @@ public class ScenarioServiceTest extends JerseyTest {
 	 * 2. add scenario
 	 * 3. delete scenario
 	 */
-	@Ignore
 	@Test
 	public void testScenarioDeletion() {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
+		String measurmentspecificationname = MEASUREMENT_SPECIFICATION_NAME;
+		String scenarioname = SCENARIO_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -183,7 +241,7 @@ public class ScenarioServiceTest extends JerseyTest {
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
 				  .post(Boolean.class, esd);
-		
+
 		// now try to delete the scenario
 		Boolean b = resource().path(ServiceConfiguration.SVC_SCENARIO)
 							  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
@@ -208,8 +266,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
+		String measurmentspecificationname = MEASUREMENT_SPECIFICATION_NAME;
+		String scenarioname = SCENARIO_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -261,8 +319,8 @@ public class ScenarioServiceTest extends JerseyTest {
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String measurmentspecificationname = "examplespecname";
-		String scenarioname = "examplescenario";
+		String measurmentspecificationname = MEASUREMENT_SPECIFICATION_NAME;
+		String scenarioname = SCENARIO_NAME;
 		
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
