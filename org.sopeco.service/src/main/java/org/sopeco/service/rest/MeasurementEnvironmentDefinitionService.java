@@ -23,6 +23,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.shared.ServiceResponse;
 
 /**
  * The <code>MeasurementEnvironmentDefinitionService</code> class provides RESTful services
@@ -72,7 +73,7 @@ public class MeasurementEnvironmentDefinitionService {
 	@Path(ServiceConfiguration.SVC_MED_SET + "/"
 		  + ServiceConfiguration.SVC_MED_SET_BLANK)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MeasurementEnvironmentDefinition getMEDefinitionFromBlank(@QueryParam(TOKEN) String usertoken) {
+	public ServiceResponse<MeasurementEnvironmentDefinition> getMEDefinitionFromBlank(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -84,7 +85,9 @@ public class MeasurementEnvironmentDefinitionService {
 		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
 		setNewMEDefinition(med, u);
 		
-		return med;
+		ServiceResponse<MeasurementEnvironmentDefinition> m = new ServiceResponse<MeasurementEnvironmentDefinition>(med);
+		
+		return m;
 	}
 	
 	/**

@@ -15,8 +15,10 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.Message;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -161,11 +163,12 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 				  .put(Boolean.class);
 		
 		// blank the MeasurementEnvironmentDefinition
-		MeasurementEnvironmentDefinition med = resource().path(ServiceConfiguration.SVC_MED)
-														 .path(ServiceConfiguration.SVC_MED_SET)
-														 .path(ServiceConfiguration.SVC_MED_SET_BLANK)
-													     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
-													     .put(MeasurementEnvironmentDefinition.class);
+		ServiceResponse<MeasurementEnvironmentDefinition> mymed = resource().path(ServiceConfiguration.SVC_MED)
+					 .path(ServiceConfiguration.SVC_MED_SET)
+					 .path(ServiceConfiguration.SVC_MED_SET_BLANK)
+				     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+				     .put(new GenericType<ServiceResponse<MeasurementEnvironmentDefinition>>() { });
+		MeasurementEnvironmentDefinition med = mymed.getObject();
 		
 		// as the namespace is not set yet, it must be null
 		assertEquals("root", med.getRoot().getName());
