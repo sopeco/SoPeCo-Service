@@ -50,7 +50,7 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 @Entity
 @NamedQuery(name = "getUserByToken", query = "SELECT u FROM Users u WHERE u.token = :token")
 public class Users {
-	
+
 	private static final Logger LOGGER = LoggerFactory.getLogger(Users.class.getName());
 
 	@Id
@@ -74,6 +74,13 @@ public class Users {
 	protected Users() {
 	}
 	
+	/**
+	 * Creates a user with the given data. The last reuqeust time is automatically
+	 * initialized with the currentTimeMillis(). A new account blank account is created to avoid
+	 * NULL pointers. The user gets a a default ScenarioDefinitionBuilder.
+	 * 
+	 * @param token the user unique token
+	 */
 	public Users(String token) {
 		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
