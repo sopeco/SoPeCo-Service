@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.builder.MeasurementSpecificationBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -52,12 +53,35 @@ public class MeasurementSpecificationService {
 			return null;
 		}
 		
-		List<String> returnList = new ArrayList<String>();
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getMeasurementSpecifications()) {
-			returnList.add(ms.getName());
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection to account database found.");
+			return null;
+		} 
+		
+		String scenarioname = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName();
+		
+		try {
+			
+			ScenarioDefinition scenarioDefinition = dbCon.loadScenarioDefinition(scenarioname);
+			
+			if (scenarioDefinition == null) {
+				LOGGER.warn("ScenarioDefinition is invalid.");
+				return null;
+			}
+			
+			List<String> returnList = new ArrayList<String>();
+			for (MeasurementSpecification ms : scenarioDefinition.getMeasurementSpecifications()) {
+				returnList.add(ms.getName());
+			}
+			return returnList;
+			
+		} catch (DataNotFoundException e) {
+			LOGGER.warn("Cannot fetch ScenarioDefinition from account database.");
+			return null;
 		}
-
-		return returnList;
+		
 	}
 	
 	/**
@@ -78,13 +102,35 @@ public class MeasurementSpecificationService {
 			return null;
 		}
 		
-		List<MeasurementSpecification> returnList = new ArrayList<MeasurementSpecification>();
-		for (MeasurementSpecification ms : u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition()
-				.getMeasurementSpecifications()) {
-			returnList.add(ms);
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection to account database found.");
+			return null;
+		} 
+		
+		String scenarioname = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName();
+		
+		try {
+			
+			ScenarioDefinition scenarioDefinition = dbCon.loadScenarioDefinition(scenarioname);
+			
+			if (scenarioDefinition == null) {
+				LOGGER.warn("ScenarioDefinition is invalid.");
+				return null;
+			}
+			
+			List<MeasurementSpecification> returnList = new ArrayList<MeasurementSpecification>();
+			for (MeasurementSpecification ms : scenarioDefinition.getMeasurementSpecifications()) {
+				returnList.add(ms);
+			}
+			return returnList;
+			
+		} catch (DataNotFoundException e) {
+			LOGGER.warn("Cannot fetch ScenarioDefinition from account database.");
+			return null;
 		}
-
-		return returnList;
+		
 	}
 	
 	/**
@@ -176,6 +222,7 @@ public class MeasurementSpecificationService {
 	
 	/**
 	 * Renames the current selected MS. Fails if the user has not MS currently selected.
+	 * Changes the selected MS of the user to the new name, too.
 	 * 
 	 * @param usertoken the user identification
 	 * @param specname the new MS name
@@ -199,14 +246,17 @@ public class MeasurementSpecificationService {
 			LOGGER.warn("Can't rename, because specification with the name '{}' already exists.", specname);
 			return false;
 		}
-
+		
 		MeasurementSpecification msss = u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecification(u.getMeasurementSpecification());
-
+		
 		if (msss == null) {
 			LOGGER.warn("User has no MeasurementSpecification selected. Therefore a renaming cannot be completed.");
 			return false;
 		}
+
+		msss.setName(specname);
 		
+		// the user has now another selected MeasurementSpecification
 		u.setMeasurementSpecification(specname);
 		
 		// store the scenario definition in the databse of the current user
@@ -217,6 +267,7 @@ public class MeasurementSpecificationService {
 			return false;
 		}
 		
+		// store the scenario definiton with the new measurementspecification in the database
 		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 		dbCon.store(scenarioDef);
 

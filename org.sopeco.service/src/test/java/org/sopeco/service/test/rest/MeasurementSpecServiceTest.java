@@ -7,7 +7,6 @@ import java.util.List;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -288,14 +287,12 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	 * 5. switch to newly created measurementspecification
 	 * 6. rename current selected measurementspecification
 	 * 
-	 * TODO false check at the end of the test
 	 */
-	@Ignore
 	@Test
 	public void testMeasurementSpecSwitchWorkingSpec() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
-		String newMeasurementSpecName = "newmeasurementspecexample";
+		String newMeasurementSpecName = "newMeasurementSpecificationName";
 		
 		// just create the account once to be sure it already exists
 		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -358,7 +355,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 										         .get(new GenericType<List<String>>() { });
 		
 		assertEquals(false, measurementList.contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
-		assertEquals(true, measurementList.contains(TEST_MEASUREMENT_SPECIFICATION_NAME)); // TODO
+		assertEquals(true, measurementList.contains(newMeasurementSpecName));
 	}
 	
 }
