@@ -297,6 +297,7 @@ public class ScenarioService {
 			return false;
 		}
 		
+		// if the string comparison is made with equals(), two test cases fail!
 		if (u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName() == scenarioname) {
 			LOGGER.warn("Can't delete the current selected scenario. First must switch to another one.");
 			return false;
