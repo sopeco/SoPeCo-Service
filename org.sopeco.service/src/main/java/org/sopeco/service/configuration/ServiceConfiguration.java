@@ -73,16 +73,7 @@ public abstract class ServiceConfiguration {
 	 * 		- med (measurment environment definition)
 	 * 			- blank
 	 * 		- current (MED)
-	 * 		- namespace
-	 * 			- add
-	 * 			- remove
-	 * 			- rename
-	 * 		- parameter
-	 * 			- add
-	 * 			- remove
-	 * 			- update
 	 * 		- check (if Port is reachable)
-	 * 		- list
 	 * 
 	 * measurementenviromentdefintion (MED)
 	 * 		- med
@@ -96,8 +87,6 @@ public abstract class ServiceConfiguration {
 	 * 			- add
 	 * 			- remove
 	 * 			- update
-	 * 		- check (if Port is reachable)
-	 * 		- list
 	 * 
 	 * execute
 	 * 		- schedule (POST, GET, REMOVE)
