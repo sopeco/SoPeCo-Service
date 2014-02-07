@@ -271,11 +271,12 @@ public class ScheduledExperiment implements Serializable {
 	 * - controller url
 	 * - label
 	 */
+	@Override
 	public boolean equals(Object obj) {
 		
 		if (obj instanceof ScheduledExperiment) {
 			
-			ScheduledExperiment se = (ScheduledExperiment)obj;	
+			ScheduledExperiment se = (ScheduledExperiment) obj;	
 			
 			return se.addedTime == this.addedTime
 					&& se.isRepeating == this.isRepeating
