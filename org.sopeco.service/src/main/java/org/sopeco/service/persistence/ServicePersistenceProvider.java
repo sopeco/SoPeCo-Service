@@ -158,6 +158,15 @@ public final class ServicePersistenceProvider {
 		return loadSingleById(MECLog.class, id);
 	}
 	
+	public long storeExecutedExperimentDetails(ExecutedExperimentDetails experimentDetails) {
+		ExecutedExperimentDetails entity = store(experimentDetails);
+		return entity == null ? -1 : entity.getId();
+	}
+	
+	public void storeMECLog(MECLog mecLog) {
+		store(mecLog);
+	}
+	
 	/********************************************************************/
 	/**
 	 * The methods are taken out of the WebUI from Marius Oehler.
