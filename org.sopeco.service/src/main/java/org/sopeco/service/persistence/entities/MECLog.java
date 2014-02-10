@@ -34,7 +34,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Lob;
 
-import org.sopeco.service.rest.helper.MECLogEntry;
+import org.sopeco.service.execute.MECLogEntry;
 
 /**
  * 

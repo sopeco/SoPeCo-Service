@@ -25,13 +25,13 @@ import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.runner.SoPeCoRunner;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.rest.helper.ScheduleExpression;
 
 /**
  * The <code>ExecutionService</code> class provides the service to {@link ScheduledExperiment}s,

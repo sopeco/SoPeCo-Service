@@ -37,7 +37,7 @@ import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
-import org.sopeco.service.rest.helper.MECLogEntry;
+import org.sopeco.service.execute.MECLogEntry;
 
 /**
  * 
