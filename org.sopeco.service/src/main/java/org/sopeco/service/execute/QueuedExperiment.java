@@ -99,7 +99,7 @@ public class QueuedExperiment {
 	}
 
 	// TODO
-	/*public List<MECLogEntry> getEventLogLiteList() {
+	public List<MECLogEntry> getEventLogLiteList() {
 		List<MECLogEntry> list = new ArrayList<MECLogEntry>();
 		for (StatusMessage log : statusMessageList) {
 
@@ -138,7 +138,7 @@ public class QueuedExperiment {
 			list.add(logLite);
 		}
 		return list;
-	}*/
+	}
 
 	// TODO
 	public static String getStatusString(EventType type) {
