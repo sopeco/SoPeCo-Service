@@ -16,7 +16,6 @@ import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
-import org.sopeco.service.shared.Message;
 import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
@@ -105,7 +104,7 @@ public class ExecutionTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
@@ -113,14 +112,14 @@ public class ExecutionTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// delete the example scenario
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
-			      .delete(Boolean.class);
+			      .delete(new GenericType<ServiceResponse<Boolean>>() { });
 	}
 	
 	/**
@@ -144,20 +143,20 @@ public class ExecutionTest extends JerseyTest {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
+		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  .get(new GenericType<ServiceResponse<String>>() { });
 		
-		String token = m.getMessage();
+		String token = sr.getObject();
 
 		// account is needed for account id
-		Account account = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-								    .path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
-								    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
-								    .accept(MediaType.APPLICATION_JSON)
-								    .get(Account.class);
+		ServiceResponse<Account> sr_account = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+													     .path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
+													     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
+													     .accept(MediaType.APPLICATION_JSON)
+													     .get(new GenericType<ServiceResponse<Account>>() { });
 		
 		// add scenario and switch to
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
@@ -169,7 +168,7 @@ public class ExecutionTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
@@ -177,23 +176,23 @@ public class ExecutionTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 
-		ScenarioDefinition sd = resource().path(ServiceConfiguration.SVC_SCENARIO)
-										  .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
-										  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-										  .type(MediaType.APPLICATION_JSON)
-										  .get(ScenarioDefinition.class);
+		ServiceResponse<ScenarioDefinition> sr_sd = resource().path(ServiceConfiguration.SVC_SCENARIO)
+														  .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+														  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+														  .type(MediaType.APPLICATION_JSON)
+														  .get(new GenericType<ServiceResponse<ScenarioDefinition>>() { });
 
-		assertEquals(true, sd != null); // the user must have a scenario now
+		assertEquals(true, sr_sd.getObject() != null); // the user must have a scenario now
 		
 		//switch to created measurement specification
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .put(Boolean.class);
+		ServiceResponse<Boolean> b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+											  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+											  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+											  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+											  .accept(MediaType.APPLICATION_JSON)
+											  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();
@@ -201,12 +200,12 @@ public class ExecutionTest extends JerseyTest {
 		boolean repeating = false;
 		String controllerURL = "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
 		String label = "myScheduledExperiment";
-		long accountId = account.getId();
+		long accountId = sr_account.getObject().getId();
 		boolean scenarioActive = true;
 		long addedTime = System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
-		se.setScenarioDefinition(sd);
+		se.setScenarioDefinition(sr_sd.getObject());
 		se.setAccountId(accountId);
 		se.setControllerUrl(controllerURL);
 		se.setRepeating(repeating);
@@ -220,17 +219,17 @@ public class ExecutionTest extends JerseyTest {
 					  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 					  .accept(MediaType.APPLICATION_JSON)
 					  .type(MediaType.APPLICATION_JSON)
-					  .post(Boolean.class, se);
+					  .post(new GenericType<ServiceResponse<Boolean>>() { }, se);
 
 		assertEquals(true, b);
 		
 		// get if for the added scenario
-		long tmpID = resource().path(ServiceConfiguration.SVC_EXECUTE)
-						       .path(ServiceConfiguration.SVC_EXECUTE_ID)
-							   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-							   .accept(MediaType.APPLICATION_JSON)
-							   .type(MediaType.APPLICATION_JSON)
-							   .put(long.class, se);
+		ServiceResponse<Long> tmpID = resource().path(ServiceConfiguration.SVC_EXECUTE)
+										        .path(ServiceConfiguration.SVC_EXECUTE_ID)
+											    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+											    .accept(MediaType.APPLICATION_JSON)
+											    .type(MediaType.APPLICATION_JSON)
+											    .put(new GenericType<ServiceResponse<Long>>() { }, se);
 		
 		String id = String.valueOf(tmpID);
 		
@@ -240,7 +239,7 @@ public class ExecutionTest extends JerseyTest {
 				       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				       .accept(MediaType.APPLICATION_JSON)
 				       .type(MediaType.APPLICATION_JSON)
-				       .put(Boolean.class);
+				       .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		assertEquals(true, b);
 	}

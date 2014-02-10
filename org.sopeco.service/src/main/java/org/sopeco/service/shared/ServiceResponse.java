@@ -60,17 +60,6 @@ public class ServiceResponse<T> {
 	public ServiceResponse(Status status, T object) {
 		this(status, object, "");
 	}
-
-	/**
-	 * A new {@link ServiceResponse} is created with the given object and
-	 * status. The message will be left empty.
-	 * 
-	 * @param object the object to pass
-	 * @param status the HTTP status
-	 */
-	public ServiceResponse(Status status, String message) {
-		this(status, null, message);
-	}
 	
 	/**
 	 * The general constructor to set all attributes of the {@link ServiceResponse}.

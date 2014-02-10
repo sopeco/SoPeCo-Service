@@ -97,7 +97,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 											  .get(new GenericType<ServiceResponse<String>>() { });
 		
 		String token = sr.getObject();
-
+		
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
@@ -106,7 +106,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 		
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
@@ -114,14 +114,15 @@ public class MeasurementEnvironmentDefinitionServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// delete the example scenario
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
 				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
 			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			      .delete(Boolean.class);
+			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
+			      .delete(new GenericType<ServiceResponse<Boolean>>() { });
+		
 	}
 	
 	/**
