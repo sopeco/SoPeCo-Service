@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import javax.ws.rs.core.MediaType;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -134,6 +135,7 @@ public class ExecutionTest extends JerseyTest {
 	 * 9. get ID of ScheduledExperiment from step 8
 	 * 10. execute the ScheduledeExperiment with ID from step 9
 	 */
+	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account
