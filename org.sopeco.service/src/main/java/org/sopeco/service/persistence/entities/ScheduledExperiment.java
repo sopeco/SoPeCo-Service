@@ -259,6 +259,39 @@ public class ScheduledExperiment implements Serializable {
 	}
 
 	/**
+	 * Hash function which append all the variables to a string and
+	 * creates the hash function via the string. String has a quite 
+	 * good hash function enabled. Of course, the execution times 
+	 * are ignored creating the hash code, as they change over time.<br />
+	 * <br />
+	 * If a better hash function is required, if can just be created here.
+	 */
+	@Override
+	public int hashCode() {
+		
+		String active = String.valueOf(this.active);
+		String addedTime = String.valueOf(this.addedTime);
+		String properties = String.valueOf(this.properties.hashCode());
+		String scenarioDefinition = this.scenarioDefinition.toString();
+		String account = String.valueOf(this.account);
+		String controllerUrl = this.controllerUrl;
+		String id = String.valueOf(this.id);
+		String isRepeating = String.valueOf(this.isRepeating);
+		String label = this.label;
+		String repeatDays = this.repeatDays;
+		String repeatHours = this.repeatHours;
+		String repeatMinutes = this.repeatMinutes;
+		String durations = String.valueOf(this.durations.hashCode());
+		String selectedExperiments = String.valueOf(this.selectedExperiments.hashCode());
+		
+		return (active + addedTime + properties + scenarioDefinition
+				+ account + controllerUrl + id + isRepeating
+				+ label + repeatDays + repeatHours + repeatMinutes
+				+ durations + selectedExperiments).hashCode();
+	}
+	
+	
+	/**
 	 * Most of the time, the requester does not have the unique
 	 * id for a ScheduledExperiment. This method is used to
 	 * compare two ScheduledExperiments.
