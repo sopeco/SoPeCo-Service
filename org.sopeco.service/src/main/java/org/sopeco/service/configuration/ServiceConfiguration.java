@@ -1,5 +1,7 @@
 package org.sopeco.service.configuration;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * The default service configuration. Here you can find all the URI for the RESTful service and
  * a lot of configuration lookup properties of the SoPeCo Configuration.
@@ -21,6 +23,10 @@ public abstract class ServiceConfiguration {
 	 */
 	public static final int SOCKET_TEST_TIMEOUT_MS = 10000;
 
+	// timeunit for the scheduling times can be configured below them
+	public static final int SCHEDULING_REPEATE_INTERVAL = 5;
+	public static final int SCHEDULING_TIMEOUT_INTERVAL = 5; // waits for the experiment scheduler to finish
+	public static final TimeUnit SCHEDULING_TIME_UNIT = TimeUnit.SECONDS; // in seconds
 	
 	public static final String DEFAULT_MEASUREMENTSPECIFICATION_NAME = "MeasurementSpecification";
 	

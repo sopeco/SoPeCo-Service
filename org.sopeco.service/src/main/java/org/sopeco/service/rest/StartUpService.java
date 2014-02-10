@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAcception;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.execute.ExperimentScheduler;
 
 /**
  * The <code>StartUpService</code> class is used to handle the initialization of Servlets.
@@ -45,6 +46,9 @@ public final class StartUpService implements ServletContextListener {
 			LOGGER.warn("Port {} already in use.", ServiceConfiguration.MEC_SOCKET_PORT);
 		}
 		
+		// start the experiment scheduler to peek for executable senarios
+		ExperimentScheduler.getInstance().startScheduler();
+		
     }
 
 	/**
@@ -54,7 +58,13 @@ public final class StartUpService implements ServletContextListener {
 	 */
 	@Override
     public void contextDestroyed(ServletContextEvent sce) {
-		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");	
+		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");
+		
+		// start the experiment scheduler to peek for executable senarios
+		while (!ExperimentScheduler.getInstance().stopScheduler()) {
+			LOGGER.info("Shutdown of experiment scheduler failed. Try again.");
+		}
+		
     }
     
 }
