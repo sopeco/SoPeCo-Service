@@ -9,6 +9,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -85,7 +86,7 @@ public class MeasurementEnvironmentDefinitionService {
 		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
 		setNewMEDefinition(med, u);
 		
-		ServiceResponse<MeasurementEnvironmentDefinition> m = new ServiceResponse<MeasurementEnvironmentDefinition>(med);
+		ServiceResponse<MeasurementEnvironmentDefinition> m = new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, med);
 		
 		return m;
 	}

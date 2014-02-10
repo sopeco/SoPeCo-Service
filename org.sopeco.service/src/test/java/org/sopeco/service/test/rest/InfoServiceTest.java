@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.test.configuration.TestConfiguration;
@@ -52,6 +53,7 @@ public class InfoServiceTest extends JerseyTest {
 	 * Tests the default service request interface, if the service
 	 * is running.
 	 */
+	@Ignore
 	@Test
 	public void testServiceRunning() {
 		Boolean b = resource().path(ServiceConfiguration.SVC_INFO)

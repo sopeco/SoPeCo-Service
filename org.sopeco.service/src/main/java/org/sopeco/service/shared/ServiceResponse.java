@@ -41,23 +41,13 @@ public class ServiceResponse<T> {
 	}
 	
 	/**
-	 * this constructor does only need the object as such. The HTTP status
-	 * is <b>not set</b>.
-	 * 
-	 * @param object the object to pass
-	 */
-	public ServiceResponse(T object) {
-		this(object, null, "");
-	}
-	
-	/**
 	 * This constructor only take a status. No object is set, instead
 	 * <i>null</i> is passed to the next constructor.
 	 * 
 	 * @param status
 	 */
 	public ServiceResponse(Status status) {
-		this(null, status, "");
+		this(status, null, "");
 	}
 	
 	/**
@@ -67,8 +57,19 @@ public class ServiceResponse<T> {
 	 * @param object the object to pass
 	 * @param status the HTTP status
 	 */
-	public ServiceResponse(T object, Status status) {
-		this(object, status, "");
+	public ServiceResponse(Status status, T object) {
+		this(status, object, "");
+	}
+
+	/**
+	 * A new {@link ServiceResponse} is created with the given object and
+	 * status. The message will be left empty.
+	 * 
+	 * @param object the object to pass
+	 * @param status the HTTP status
+	 */
+	public ServiceResponse(Status status, String message) {
+		this(status, null, message);
 	}
 	
 	/**
@@ -78,7 +79,7 @@ public class ServiceResponse<T> {
 	 * @param status  the HTTP status
 	 * @param message the message
 	 */
-	public ServiceResponse(T object, Status status, String message) {
+	public ServiceResponse(Status status, T object, String message) {
 		this.object  = object;
 		this.status  = status;
 		this.message = message;

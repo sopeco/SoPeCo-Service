@@ -8,6 +8,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,7 @@ import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.security.Crypto;
 import org.sopeco.service.shared.Message;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 
@@ -44,13 +46,14 @@ public class AccountService {
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message createAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+	public ServiceResponse<Boolean> createAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
 								 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
-		Message m = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
 		
-		return m;
+		ServiceResponse<Boolean> sr = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
+		
+		return sr;
 	}
 	
 	
@@ -64,29 +67,29 @@ public class AccountService {
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Boolean checkExistence(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
+	public ServiceResponse<Boolean> checkExistence(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
 		LOGGER.debug("Trying to check account existence");
 		Boolean exists = accountExist(accountname);
 		
-		return exists;
+		return new ServiceResponse<Boolean>(Status.OK, exists);
 	}
 	
 	
 	/**
 	 * Access the account information for a given username.
 	 * 
-	 * @param accountname the accountname the information is requested to
-	 * @return AccountDetails object with all the account details
+	 * @param accountname 	the accountname the information is requested to
+	 * @return 				AccountDetails object with all the account details
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
 	@Produces(MediaType.APPLICATION_JSON)
-	public AccountDetails getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
+	public ServiceResponse<AccountDetails> getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
 		
 		Long accountID = ServicePersistenceProvider.getInstance().loadAccount(accountname).getId();
 		AccountDetails accountDetails = ServicePersistenceProvider.getInstance().loadAccountDetails(accountID);
 
-		return accountDetails;
+		return new ServiceResponse<AccountDetails>(Status.OK, accountDetails);
 	}
 	
 
@@ -94,12 +97,12 @@ public class AccountService {
 	 * Access the account as such with the given user token.
 	 * 
 	 * @param usertoken the user identification
-	 * @return the account the current user is related to
+	 * @return 			the account the current user is related to
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Account getAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+	public ServiceResponse<Account> getAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -108,7 +111,9 @@ public class AccountService {
 			return null;
 		}
 		
-		return ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
+		Account a = ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
+		
+		return new ServiceResponse<Account>(Status.OK, a);
 	}
 	
 	
@@ -116,37 +121,40 @@ public class AccountService {
 	 * The login method to authentificate that the current client has the permission to
 	 * change something on this account.
 	 * 
-	 * @param accountname the account name to connect to
-	 * @param password the password for the account
-	 * @return a message, whose status is the token to authentificate afterwards, when it has not failed
+	 * @param accountname 	the account name to connect to
+	 * @param password 		the password for the account
+	 * @return 				a message, whose status is the token to authentificate afterwards, when it has not failed
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Message loginWithPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+	public ServiceResponse<String> loginWithPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
 									 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
-		Message m = new Message("", 0);
+		ServiceResponse<String> sr = new ServiceResponse<String>();
 		
 		Account account = ServicePersistenceProvider.getInstance().loadAccount(accountname);
 
 		if (account == null) {
 			LOGGER.debug("Account '{}' doesn't exist.", accountname);
-			m.setMessage("Account does not exist.");
-			return m;
+			sr.setMessage("Account does not exist.");
+			sr.setStatus(Status.FORBIDDEN);
+			return sr;
 		}
 		if (!account.getPasswordHash().equals(Crypto.sha256(password))) {
 			LOGGER.debug("Wrong password. Password hashes are not equal!");
-			m.setMessage("Wrong password. Password hashes are not equal!");
-			return m;
+			sr.setMessage("Wrong password. Password hashes are not equal!");
+			sr.setStatus(Status.UNAUTHORIZED);
+			return sr;
 		}
 		
 		// create a unique token for the requester
 		String uuid = UUID.randomUUID().toString();
 
 		// login successful, send unique token to user
-		m.setStatus(1);
-		m.setMessage(uuid);
+		sr.setMessage(uuid);
+		sr.setObject(uuid);
+		sr.setStatus(Status.OK);
 		
 		// save the current user
 		Users u = new Users(uuid);
@@ -165,7 +173,7 @@ public class AccountService {
 		// update the SoPeCo configuration for the configuration with the usertoken
 		UserPersistenceProvider.updatePersistenceProviderConfiguration(uuid);
 
-		return m;
+		return sr;
 	}
 	
 	
@@ -175,18 +183,18 @@ public class AccountService {
 	/**
 	 * Creates an fresh new account with all the given settings. The account is stored in the database.
 	 * 
-	 * @param accountName the name for this account
-	 * @param password the password to login into this account
-	 * @param dbHost the database for this account
-	 * @param dbPort the database port for this account
-	 * @return message with the status, which indicates if the account could be created
+	 * @param accountName 	the name for this account
+	 * @param password  	the password to login into this account
+	 * @param dbHost 		the database for this account
+	 * @param dbPort 		the database port for this account
+	 * @return            	message with the status, which indicates if the account could be created
 	 */
-	private Message createAccount(String accountName, String password, String dbHost, int dbPort) {
+	private ServiceResponse<Boolean> createAccount(String accountName, String password, String dbHost, int dbPort) {
 		
 		if (accountExist(accountName)) {
 			LOGGER.info("It already exists an account named '{}'", accountName);
 			
-			return new Message("Account with the name \"" + accountName + "\" already exists", 0);
+			return new ServiceResponse<Boolean>(Status.FORBIDDEN, false, "Account with the name \"" + accountName + "\" already exists.");
 		}
 
 		Account account = new Account();
@@ -202,9 +210,15 @@ public class AccountService {
 
 		LOGGER.debug("Account created with id {}", account.getId());
 
-		return new Message("Account successfully created", 1);
+		return new ServiceResponse<Boolean>(Status.OK, true, "Account with the name \"" + accountName + "\" created!");
 	}
 
+	/**
+	 * Checks the database for the given account name.
+	 * 
+	 * @param accountName the name to check
+	 * @return            true, if the name does not exist
+	 */
 	private boolean accountExist(String accountName) {
 		Account testIfExist = ServicePersistenceProvider.getInstance().loadAccount(accountName);
 

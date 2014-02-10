@@ -17,9 +17,11 @@ import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.Message;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -87,13 +89,13 @@ public class ExecutionTest extends JerseyTest {
 		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
 		
 		// log into the account
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
+		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  .get(new GenericType<ServiceResponse<String>>() { });
 		
-		String token = m.getMessage();
+		String token = sr.getObject();
 
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		resource().path(ServiceConfiguration.SVC_SCENARIO)

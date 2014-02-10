@@ -3,14 +3,16 @@ package org.sopeco.service.test.rest;
 import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.shared.Message;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -75,15 +77,16 @@ public class AccountServiceTest extends JerseyTest {
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
 				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
-				  .post(Message.class);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-						      .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
-							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
-						      .post(Message.class);
+		ServiceResponse<Boolean> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+										        .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+										        .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
+										        .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
+										        .post(new GenericType<ServiceResponse<Boolean>>() { });
 
-		assertEquals(true, m.failed());
+		assertEquals(false, sr.getObject());
+		assertEquals(true, Status.FORBIDDEN == sr.getStatus());
 	}
 
 	/**
@@ -100,15 +103,15 @@ public class AccountServiceTest extends JerseyTest {
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
 				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
-				  .post(Message.class);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { });
 
-		Boolean b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
-							  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .get(Boolean.class);
+		ServiceResponse<Boolean> b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											   .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
+											   .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
+											   .accept(MediaType.APPLICATION_JSON)
+											   .get(new GenericType<ServiceResponse<Boolean>>() { });
 
-		assertEquals(true, b);
+		assertEquals(true, b.getObject());
 	}
 	
 }

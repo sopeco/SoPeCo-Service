@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,6 +82,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 2. get MEC status (invalid URL)
 	 * 3. get MEC status (invalid token)
 	 */
+	@Ignore
 	@Test
 	public void testMECStatus() {
 		LOGGER.debug("Testing fetch of MEC status.");
@@ -128,6 +130,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 2. startup the TestMEC
 	 * 3. request MEC status
 	 */
+	@Ignore
 	@Test
 	public void testMECStatusValidController() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
@@ -166,6 +169,7 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 1. log in
 	 * 2. get MEC list
 	 */
+	@Ignore
 	@Test
 	public void testMECGetControllerList() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
