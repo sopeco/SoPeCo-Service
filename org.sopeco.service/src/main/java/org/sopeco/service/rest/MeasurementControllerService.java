@@ -13,6 +13,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.shared.MECStatus;
+import org.sopeco.service.shared.ServiceResponse;
 
 /**
  * The <code>MeasurementControllerService</code> provides services to handle MeasurementEnvironemtControllers (MEC)
@@ -67,19 +69,19 @@ public class MeasurementControllerService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MECStatus getMECStatus(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public ServiceResponse<MECStatus> getMECStatus(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 								  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String url) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new MECStatus(-1);
+			return new ServiceResponse<MECStatus>(Status.UNAUTHORIZED);
 		}
 
 		if (!checkUrlIsValid(url) || url == null) {
 			LOGGER.debug("Controller-Status: NO_VALID_MEC_URL");
-			return new MECStatus(MECStatus.NO_VALID_MEC_URL);
+			return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.NO_VALID_MEC_URL));
 		}
 		
 	
@@ -89,28 +91,28 @@ public class MeasurementControllerService {
 
 			if (mec == null) {
 				LOGGER.debug("Controller not reachable: NO_VALID_MEC_URL");
-				return new MECStatus(MECStatus.NO_VALID_MEC_URL);
+				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.NO_VALID_MEC_URL));
 			}
 			
 			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
 
 			if (med == null) {
 				LOGGER.debug("Controller-Status: STATUS_ONLINE_NO_META");
-				return new MECStatus(MECStatus.STATUS_ONLINE_NO_META);
+				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_ONLINE_NO_META));
 			} else {
 				LOGGER.debug("Controller-Status: STATUS_ONLINE");
-				return new MECStatus(MECStatus.STATUS_ONLINE);
+				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_ONLINE));
 			}
 
 		} catch (URISyntaxException e) {
 			LOGGER.error(e.getMessage());
-			return null;
+			return new ServiceResponse<MECStatus>(Status.CONFLICT, null, "invalid URI");
 		} catch (RemoteException e) {
 			LOGGER.error(e.getMessage());
-			return null;
+			return new ServiceResponse<MECStatus>(Status.INTERNAL_SERVER_ERROR, null, "connection establishing failed");
 		} catch (IllegalStateException x) {
 			LOGGER.debug("Controller-Status: STATUS_OFFLINE");
-			return new MECStatus(MECStatus.STATUS_OFFLINE);
+			return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_OFFLINE));
 		}
 	
 	}
@@ -127,25 +129,26 @@ public class MeasurementControllerService {
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public List<String> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public ServiceResponse<List<String>> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_ID) String id) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return null;
+			return new ServiceResponse<List<String>>(Status.UNAUTHORIZED, null);
 		}
 		
 		SocketAppWrapper app = SocketManager.getSocketApp(id);
 		
 		if (app == null) {
 			LOGGER.info("SocketAppWrapper is in invalid state.");
-			return null;
+			return new ServiceResponse<List<String>>(Status.INTERNAL_SERVER_ERROR, null);
 		}
 			
-		return Arrays.asList(app.getAvailableController());
+		List<String> tmpList = Arrays.asList(app.getAvailableController());
 
+		return new ServiceResponse<List<String>>(Status.OK, tmpList);
 	}
 	
 	/**
@@ -165,14 +168,14 @@ public class MeasurementControllerService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_MED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MeasurementEnvironmentDefinition getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public ServiceResponse<MeasurementEnvironmentDefinition> getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 																   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
 		}
 		
 		try {
@@ -182,27 +185,27 @@ public class MeasurementControllerService {
 			
 			if (mec == null) {
 				LOGGER.info("The connected MEC cannot be fetched correctly.");
-				return null;
+				return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.ACCEPTED, null, "The connected MEC cannot be fetched correctly.");
 			}
 			
 			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
 			
 			if (med == null) {
 				LOGGER.info("The connected med has no valid MeasurementEnvironmentDefinition.");
-				return null;
+				return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.CONFLICT, null, "The connected med has no valid MeasurementEnvironmentDefinition.");
 			}
 			
-			return med;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, med);
 			
 		} catch (URISyntaxException e) {
 			LOGGER.error(e.getMessage());
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.CONFLICT, null, "URI invalid");
 		} catch (RemoteException e) {
 			LOGGER.error(e.getMessage());
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.INTERNAL_SERVER_ERROR, null, "remote exception");
 		} catch (IllegalStateException x) {
 			LOGGER.error("Controller probably offline.");
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.INTERNAL_SERVER_ERROR, null, "controller probably offline");
 		}
 	}
 	
@@ -226,18 +229,18 @@ public class MeasurementControllerService {
 	@POST
 	@Path(ServiceConfiguration.SVC_MEC_MED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public ServiceResponse<Boolean> setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 										  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 		
-		MeasurementEnvironmentDefinition med = getMEDefinitionFromMEC(usertoken, uri);
-		return MeasurementEnvironmentDefinitionService.setNewMEDefinition(med, u);
+		ServiceResponse<MeasurementEnvironmentDefinition> sr_med = getMEDefinitionFromMEC(usertoken, uri);
+		return MeasurementEnvironmentDefinitionService.setNewMEDefinition(sr_med.getObject(), u);
 	}
 	
 	/**************************************HELPER****************************************/

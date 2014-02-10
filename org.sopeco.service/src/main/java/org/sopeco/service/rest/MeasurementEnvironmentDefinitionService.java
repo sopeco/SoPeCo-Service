@@ -49,14 +49,14 @@ public class MeasurementEnvironmentDefinitionService {
 	@POST
 	@Path(ServiceConfiguration.SVC_MED_SET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean setMEDefinition(@QueryParam(TOKEN) String usertoken,
+	public ServiceResponse<Boolean> setMEDefinition(@QueryParam(TOKEN) String usertoken,
 								   MeasurementEnvironmentDefinition med) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 		
 		return setNewMEDefinition(med, u);
@@ -406,7 +406,7 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param u 			the user whose MED is to set
 	 * @return 				true, if the MED could be stored successfully
 	 */
-	protected static boolean setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
+	protected static ServiceResponse<Boolean> setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
 		
 		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
@@ -416,13 +416,13 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		if (dbCon == null) {
 			LOGGER.warn("Database connection to account database failed. Cancelling adding MED from MEC to database.");
-			return false;
+			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
 		}
 		
 		dbCon.store(sd);
 		dbCon.closeProvider();
 		
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 }
