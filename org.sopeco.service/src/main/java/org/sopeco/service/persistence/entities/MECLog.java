@@ -43,7 +43,7 @@ import org.sopeco.service.execute.MECLogEntry;
 @Entity
 public class MECLog implements Serializable {
 
-	private static final long serialVersionUID = 2684562217685786325L;
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	private long id;
