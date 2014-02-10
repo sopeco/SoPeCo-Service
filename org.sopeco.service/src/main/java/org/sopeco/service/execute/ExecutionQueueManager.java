@@ -27,22 +27,36 @@
 package org.sopeco.service.execute;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
+ * The <code>ExecutionQueueManager</code> handles all the {@link ExecutionQueue}s
+ * of the SoPeCo Service Layer. <br />
+ * Everything is accessed in a static way.
+ * 
  * 
  * @author Marius Oehler
+ * @author Peter Merkert
  */
 public final class ExecutionQueueManager {
 
+	/**
+	 * The class is more a utility class and everything is accessed in a static way.
+	 */
 	private ExecutionQueueManager() {
 	};
 
 	private static Map<String, ExecutionQueue> queueMap = new HashMap<String, ExecutionQueue>();
 
+	/**
+	 * Returns the {@link ExecutionQueue} corresponding to the given URL.
+	 * If the queue does not exist yet, it will be created.
+	 * 
+	 * @param url the URL to the controller
+	 * @return the {@link ExecutionQueue} to the given URL
+	 */
 	public static ExecutionQueue get(String url) {
 		if (!queueMap.containsKey(url)) {
 			queueMap.put(url, new ExecutionQueue(url));
@@ -72,19 +86,6 @@ public final class ExecutionQueueManager {
 			}
 		}
 		return controllerList;
-	}
-
-	public static Collection<ExecutionQueue> getAllQueuesClone() {
-		return new HashMap<String, ExecutionQueue>(queueMap).values();
-	}
-
-	public static boolean hasRunningQueues() {
-		for (ExecutionQueue cq : queueMap.values()) {
-			if (cq.isLoaded()) {
-				return true;
-			}
-		}
-		return false;
 	}
 
 }
