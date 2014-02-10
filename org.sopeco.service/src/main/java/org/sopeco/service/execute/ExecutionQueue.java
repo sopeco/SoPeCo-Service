@@ -45,7 +45,6 @@ import org.sopeco.engine.status.EventType;
 import org.sopeco.engine.status.IStatusListener;
 import org.sopeco.engine.status.ProgressInfo;
 import org.sopeco.engine.status.StatusBroker;
-import org.sopeco.engine.status.StatusManager;
 import org.sopeco.engine.status.StatusMessage;
 import org.sopeco.runner.SoPeCoRunner;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -88,6 +87,8 @@ public class ExecutionQueue implements IStatusListener {
 	 * Stores the given controller URL. <br />
 	 * Adds itself to the {@link StatusManager} to receive updates about
 	 * the running experiments.
+	 * 
+	 * @param pControllerURL the URL to the controller this queue correpsonds to
 	 */
 	public ExecutionQueue(String pControllerURL) {
 		experimentQueue = new ArrayList<QueuedExperiment>();
@@ -280,18 +281,21 @@ public class ExecutionQueue implements IStatusListener {
 	}
 
 	/**
-	 * Pushes the next status of the running experiment.
+	 * Adds the given {@link StatusMessage} to the currently running experiment.
+	 * If this queue has no active experiment, then the message is discarded.
 	 * 
-	 * @param statusMessage
+	 * @param statusMessage the message which should be added to the experiment
 	 */
-	public void nextStatusMessage(StatusMessage statusMessage) {
+	public void addStatusMessageToExperiment(StatusMessage statusMessage) {
 		if (runningExperiment == null) {
 			return;
 		}
+		
 		runningExperiment.getStatusMessageList().add(statusMessage);
 		if (statusMessage.getStatusInfo() != null && statusMessage.getStatusInfo() instanceof ProgressInfo) {
 			runningExperiment.setLastProgressInfo((ProgressInfo) statusMessage.getStatusInfo());
 		}
+		
 
 	}
 
@@ -313,12 +317,14 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * The method for the {@link IStatusListener} which is called by the {@link StatusManager}
 	 * to fire status messages for the executed controllers.
+	 * 
+	 * @param statusMessage the status message to proceed
 	 */
 	@Override
 	public void onNewStatus(StatusMessage statusMessage) {
 		LOGGER.info("New Status on '" + this.controllerURL + "': " + statusMessage.getEventType());
 		
-		nextStatusMessage(statusMessage);
+		addStatusMessageToExperiment(statusMessage);
 
 		if (statusMessage.getEventType() == EventType.EXECUTION_FAILED) {
 			LOGGER.warn("Experiment could not be executed succesfully. Status: Execution failed");
@@ -389,7 +395,9 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * Creates the CurrentControllerExperiment object, that contains all
 	 * necessary information about the current controller state.
-	 * */
+	 * 
+	 * @return a status package with all informatio about the currently running experiment
+	 */
 	public RunningControllerStatus createControllerStatusPackage() {
 		if (runningExperiment == null) {
 			return null;
@@ -411,7 +419,8 @@ public class ExecutionQueue implements IStatusListener {
 
 		if (runningExperiment.getLastProgressInfo() != null) {
 			ProgressInfo info = runningExperiment.getLastProgressInfo();
-			float progress = 100F / info.getNumberOfRepetition() * info.getRepetition();
+			final float maxPercentage = 100F;
+			float progress = maxPercentage / info.getNumberOfRepetition() * info.getRepetition();
 			cce.setProgress(progress);
 		} else {
 			cce.setProgress(-1);
