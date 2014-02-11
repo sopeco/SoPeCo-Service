@@ -80,7 +80,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
 		}
 		
 		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
