@@ -222,12 +222,12 @@ public class ExecutionService {
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return null;
+			return new ServiceResponse<ScheduledExperiment>(Status.CONFLICT, null, "Invalid scheduling id.");
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return null;
+			return new ServiceResponse<ScheduledExperiment>(Status.UNAUTHORIZED, null, "Others users experiment!");
 		}
 		
 		return new ServiceResponse<ScheduledExperiment>(Status.OK, exp);
