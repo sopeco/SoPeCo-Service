@@ -100,16 +100,18 @@ public class MeasurementEnvironmentDefinitionService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MED_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public MeasurementEnvironmentDefinition getCurrentMEDefinition(@QueryParam(TOKEN) String usertoken) {
+	public ServiceResponse<MeasurementEnvironmentDefinition> getCurrentMEDefinition(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return null;
+			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
 		}
 	
-		return u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
+		MeasurementEnvironmentDefinition tmpMED = u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
+		
+		return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, tmpMED);
 	}
 	
 	/**
@@ -122,14 +124,14 @@ public class MeasurementEnvironmentDefinitionService {
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean addNamespace(@QueryParam(TOKEN) String usertoken,
+	public ServiceResponse<Boolean> addNamespace(@QueryParam(TOKEN) String usertoken,
 								@QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -137,12 +139,14 @@ public class MeasurementEnvironmentDefinitionService {
 							 	 .addNamespaces(path);
 
 		if (ns == null) {
-			return false;
+			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
 		}
 		
-		storeUserAndScenario(u);
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
 
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**
@@ -155,14 +159,14 @@ public class MeasurementEnvironmentDefinitionService {
 	@DELETE
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean removeNamespace(@QueryParam(TOKEN) String usertoken,
+	public ServiceResponse<Boolean> removeNamespace(@QueryParam(TOKEN) String usertoken,
 								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -171,15 +175,16 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.warn("Namespace with the path '{}' does not exist!", path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
 		}
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().removeNamespace(ns);
 		
-		// store the updated scenario with removed namespace in database
-		storeUserAndScenario(u);
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
 
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**
@@ -194,7 +199,7 @@ public class MeasurementEnvironmentDefinitionService {
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/"
 			+ ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean renameNamespace(@QueryParam(TOKEN) String usertoken,
+	public ServiceResponse<Boolean> renameNamespace(@QueryParam(TOKEN) String usertoken,
 								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
 								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW) String newName) {
 		
@@ -202,7 +207,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -211,14 +216,16 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
 		}
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().renameNamespace(ns, newName);
 		
-		storeUserAndScenario(u);
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
 
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**
@@ -237,7 +244,7 @@ public class MeasurementEnvironmentDefinitionService {
 			+ ServiceConfiguration.SVC_MED_PARAM_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean addParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+	public ServiceResponse<Boolean> addParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
 			      				@QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
 			      				@QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
 			      				@QueryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP) String paramType,
@@ -247,7 +254,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -258,16 +265,18 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
 		}
 
 		u.getCurrentScenarioDefinitionBuilder()
 		 .getMeasurementEnvironmentBuilder()
 		 .addParameter(paramName, paramType, role, ns);
 
-		storeUserAndScenario(u);
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
 
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**
@@ -285,7 +294,7 @@ public class MeasurementEnvironmentDefinitionService {
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/" + ServiceConfiguration.SVC_MED_PARAM_UPDATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public boolean updateParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+	public ServiceResponse<Boolean> updateParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
 			      				   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
 			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
 			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME_NEW) String paramNameNew,
@@ -296,7 +305,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -307,7 +316,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
 		}
 
 		ParameterDefinition parameter = u.getCurrentScenarioDefinitionBuilder()
@@ -316,16 +325,18 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		if (parameter == null) {
 			LOGGER.info("Parameter '{}' does not exist in the namespace with path '{}'!", paramName, path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "parameter does not exist");
 		}
 		
 		parameter.setName(paramNameNew);
 		parameter.setRole(role);
 		parameter.setType(paramType);
 
-		storeUserAndScenario(u);
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
 
-		return true;
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**
@@ -340,7 +351,7 @@ public class MeasurementEnvironmentDefinitionService {
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
 			+ ServiceConfiguration.SVC_MED_PARAM_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public boolean removeParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+	public ServiceResponse<Boolean> removeParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
 			      				   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
 			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName) {
 		
@@ -348,7 +359,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return false;
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -359,16 +370,22 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return false;
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
 		}
 		
 		boolean b = u.getCurrentScenarioDefinitionBuilder()
 					 .getMeasurementEnvironmentBuilder()
 					 .removeNamespace(ns);
 
-		storeUserAndScenario(u);
+		if (!b) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "namespace removal failed");
+		}
 
-		return b;
+		if (!storeUserAndScenario(u)) {
+			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+		}
+
+		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	
 	/**************************************HELPER****************************************/
@@ -377,16 +394,17 @@ public class MeasurementEnvironmentDefinitionService {
 	 * Stores the current user state in the service database. The current scenario state for the given
 	 * user is stored in the connected account database.
 	 * 
-	 * @param u the user whose information should be stored
+	 * @param u 	the user whose information should be stored
+	 * @return 		true, if the user and the scenario was stored in the databases
 	 */
-	private void storeUserAndScenario(Users u) {
+	private boolean storeUserAndScenario(Users u) {
 		// store scenario in account database
 		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
 		
 		if (dbCon == null) {
 			LOGGER.warn("Cannot open the account database. Given token is '{}'", u.getToken());
-			return;
+			return false;
 		}
 		
 		dbCon.store(sd);
@@ -394,6 +412,8 @@ public class MeasurementEnvironmentDefinitionService {
 
 		// store user information in Service-database
 		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		return true;
 	}
 	
 	/**
