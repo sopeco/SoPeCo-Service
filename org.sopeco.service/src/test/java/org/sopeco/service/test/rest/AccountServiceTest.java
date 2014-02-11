@@ -45,8 +45,8 @@ public class AccountServiceTest extends JerseyTest {
 	@Override
 	public WebAppDescriptor configure() {
 		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
-				.clientConfig(createClientConfig())
-				.build();
+								   .clientConfig(createClientConfig())
+								   .build();
 	}
 
 	/**
@@ -69,8 +69,8 @@ public class AccountServiceTest extends JerseyTest {
 	public void testAccountDoubleCreation() {
 		LOGGER.debug("Starting test for double account creation.");
 		
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
+		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
+		String password 	= TestConfiguration.TESTPASSWORD;
 		
 		// just create the account once to be sure it already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
@@ -94,8 +94,8 @@ public class AccountServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void testCheckAccountExistence() {
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
+		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
+		String password 	= TestConfiguration.TESTPASSWORD;
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
