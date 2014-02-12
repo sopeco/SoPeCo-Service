@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.shared.Message;
 import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
@@ -86,10 +85,10 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		
 		// log into the account
 		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-											  .get(new GenericType<ServiceResponse<String>>() { });
+											   .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											   .get(new GenericType<ServiceResponse<String>>() { });
 
 		String token = sr.getObject();
 
@@ -127,23 +126,22 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	 * 3. switch to newly created scenario
 	 * 4.
 	 */
-	@Ignore
 	@Test
 	public void testMeasurementSpecNameListing() {
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
-		String measurementSpecName2 = "examplespecname2";
-		String measurementSpecName3 = "examplespecname3";
-		final int measurementSpecCount = 3;
+		String accountname 				= TestConfiguration.TESTACCOUNTNAME;
+		String password 				= TestConfiguration.TESTPASSWORD;
+		String measurementSpecName2 	= "examplespecname2";
+		String measurementSpecName3 	= "examplespecname3";
+		final int measurementSpecCount 	= 3;
 		
 		// just create the account once to be sure it already exists
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
-		
-		String token = m.getMessage();
+		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  .get(new GenericType<ServiceResponse<String>>() { });
+
+		String token = sr.getObject();
 		 
 		// add at least the examplescenario for ensurance that there is an measurementSpec available
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
@@ -154,7 +152,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 
 		// switch to scenario (if not already in this scenario)
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
@@ -163,48 +161,48 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// switch to the newly created measurmentspecification
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .put(Boolean.class);
+		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+												  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+												  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+												  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+												  .accept(MediaType.APPLICATION_JSON)
+												  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// the switch to the newly created measurmentspecification must go right!
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 		
-		List<String> measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-										         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-										         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-										         .get(new GenericType<List<String>>() { });
+		ServiceResponse<List<String>> sr_measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+															         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+															         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+															         .get(new GenericType<ServiceResponse<List<String>>>() { });
 
-		assertEquals(true, measurementList.size() >= 1);
-		assertEquals(true, measurementList.contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
+		assertEquals(true, sr_measurementList.getObject().size() >= 1);
+		assertEquals(true, sr_measurementList.getObject().contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
 		
 		// nwo create two more specifications
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName2)
-		          .post(Boolean.class);
+		          .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, measurementSpecName3)
-		          .post(Boolean.class);
+		          .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
-		measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-						       	    .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-						       	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-						       	    .get(new GenericType<List<String>>() { });
+		sr_measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+					       	    	   .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+					       	    	   .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+					       	    	   .get(new GenericType<ServiceResponse<List<String>>>() { });
 
-		assertEquals(true, measurementList.size() >= measurementSpecCount);
-		assertEquals(true, measurementList.contains(measurementSpecName2));
-		assertEquals(true, measurementList.contains(measurementSpecName3));
+		assertEquals(true, sr_measurementList.getObject().size() >= measurementSpecCount);
+		assertEquals(true, sr_measurementList.getObject().contains(measurementSpecName2));
+		assertEquals(true, sr_measurementList.getObject().contains(measurementSpecName3));
 	}
 
 	/**
@@ -217,20 +215,19 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	 * 5. switch measurementspecification
 	 * 6. create measurementspecification (with same name as in step 4)
 	 */
-	@Ignore
 	@Test
 	public void testMeasurementSpecNameDoubleAdding() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		
 		// just create the account once to be sure it already exists
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
-		
-		String token = m.getMessage();
+		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  .get(new GenericType<ServiceResponse<String>>() { });
+
+		String token = sr.getObject();
 		
 		// add at least the examplescenario for ensurance that there is an measurementSpec available
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
@@ -241,7 +238,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 		
 		// switch to scenario (if not already in this scenario)
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
@@ -250,35 +247,35 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// now create a new measurement spec for the user once
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-		          .post(Boolean.class);
+		          .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// switch to the newly created measurmentspecification
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
 							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 							  .accept(MediaType.APPLICATION_JSON)
-							  .put(Boolean.class);
+							  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// the switch to the newly created measurmentspecification must go right!
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 		
 		//create it now a second time, this must fail
-		b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-			          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-			          .post(Boolean.class);
+		sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+			             .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
+			             .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			             .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+			             .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// the second addition must fail
-		assertEquals(false, b);
+		assertEquals(false, sr_b.getObject());
 	}
 	
 	/**
@@ -290,9 +287,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 	 * 4. create new measurementspecification
 	 * 5. switch to newly created measurementspecification
 	 * 6. rename current selected measurementspecification
-	 * 
 	 */
-	@Ignore
 	@Test
 	public void testMeasurementSpecSwitchWorkingSpec() {
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -300,13 +295,13 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 		String newMeasurementSpecName = "newMeasurementSpecificationName";
 		
 		// just create the account once to be sure it already exists
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
-		
-		String token = m.getMessage();
+		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											   .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											   .get(new GenericType<ServiceResponse<String>>() { });
+
+		String token = sr.getObject();
 		
 		// add at least the examplescenario for ensurance that there is an measurementSpec available
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
@@ -317,7 +312,7 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
 				  .type(MediaType.APPLICATION_JSON)
-				  .post(Boolean.class, esd);
+				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
 		
 		// switch to scenario (if not already in this scenario)
 		resource().path(ServiceConfiguration.SVC_SCENARIO)
@@ -326,41 +321,41 @@ public class MeasurementSpecServiceTest extends JerseyTest {
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
 				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				  .accept(MediaType.APPLICATION_JSON)
-				  .put(Boolean.class);
+				  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// now create the measurement spec for the user once
 		resource().path(ServiceConfiguration.SVC_MEASUREMENT)
 		          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-		          .post(Boolean.class);
+		          .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// switch to the newly created measurmentspecification
-		Boolean b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-							  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-							  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .put(Boolean.class);
+		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+						  						  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+						  						  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+						  						  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+						  						  .accept(MediaType.APPLICATION_JSON)
+						  						  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// rename the current selected measurementspecification
-		b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-			          .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
-			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-			          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, newMeasurementSpecName)
-			          .put(Boolean.class);
+		sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+			             .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
+			             .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			             .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, newMeasurementSpecName)
+			             .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// the renaming should work fine
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 		
 		// now lookup the name we just added
-		List<String> measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-										         .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-										         .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-										         .get(new GenericType<List<String>>() { });
+		ServiceResponse<List<String>> sr_measurementList = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+														         	 .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
+														         	 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+														         	 .get(new GenericType<ServiceResponse<List<String>>>() { });
 		
-		assertEquals(false, measurementList.contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
-		assertEquals(true, measurementList.contains(newMeasurementSpecName));
+		assertEquals(false, sr_measurementList.getObject().contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
+		assertEquals(true,  sr_measurementList.getObject().contains(newMeasurementSpecName));
 	}
 	
 }
