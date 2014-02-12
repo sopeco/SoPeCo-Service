@@ -136,7 +136,6 @@ public class ExecutionTest extends JerseyTest {
 	 * 9. get ID of ScheduledExperiment from step 8
 	 * 10. execute the ScheduledeExperiment with ID from step 9
 	 */
-	@Ignore
 	@Test
 	public void testExecution() {
 		// connect to test users account
@@ -187,12 +186,12 @@ public class ExecutionTest extends JerseyTest {
 		assertEquals(true, sr_sd.getObject() != null); // the user must have a scenario now
 		
 		//switch to created measurement specification
-		ServiceResponse<Boolean> b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-											  .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-											  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-											  .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-											  .accept(MediaType.APPLICATION_JSON)
-											  .put(new GenericType<ServiceResponse<Boolean>>() { });
+		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
+											      .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+											      .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+											      .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+											      .accept(MediaType.APPLICATION_JSON)
+											      .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();
@@ -214,14 +213,14 @@ public class ExecutionTest extends JerseyTest {
 		se.setAddedTime(addedTime);
 		
 		// add to execution list
-		b = resource().path(ServiceConfiguration.SVC_EXECUTE)
-					  .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
-					  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-					  .accept(MediaType.APPLICATION_JSON)
-					  .type(MediaType.APPLICATION_JSON)
-					  .post(new GenericType<ServiceResponse<Boolean>>() { }, se);
+		sr_b = resource().path(ServiceConfiguration.SVC_EXECUTE)
+					     .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+					     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+					     .accept(MediaType.APPLICATION_JSON)
+					  	 .type(MediaType.APPLICATION_JSON)
+					  	 .post(new GenericType<ServiceResponse<Boolean>>() { }, se);
 
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 		
 		// get if for the added scenario
 		ServiceResponse<Long> tmpID = resource().path(ServiceConfiguration.SVC_EXECUTE)
@@ -231,17 +230,17 @@ public class ExecutionTest extends JerseyTest {
 											    .type(MediaType.APPLICATION_JSON)
 											    .put(new GenericType<ServiceResponse<Long>>() { }, se);
 		
-		String id = String.valueOf(tmpID);
+		String id = String.valueOf(tmpID.getObject());
 		
-		b =  resource().path(ServiceConfiguration.SVC_EXECUTE)
-				       .path(id)
-				       .path(ServiceConfiguration.SVC_EXECUTE_EXECUTE)
-				       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				       .accept(MediaType.APPLICATION_JSON)
-				       .type(MediaType.APPLICATION_JSON)
-				       .put(new GenericType<ServiceResponse<Boolean>>() { });
+		sr_b =  resource().path(ServiceConfiguration.SVC_EXECUTE)
+				       	  .path(id)
+				       	  .path(ServiceConfiguration.SVC_EXECUTE_EXECUTE)
+				       	  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				       	  .accept(MediaType.APPLICATION_JSON)
+				       	  .type(MediaType.APPLICATION_JSON)
+				       	  .put(new GenericType<ServiceResponse<Boolean>>() { });
 		
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 	}
 	
 }
