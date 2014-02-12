@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.exchange.ServiceResponse;
