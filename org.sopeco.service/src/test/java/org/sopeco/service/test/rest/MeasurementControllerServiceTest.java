@@ -11,9 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.StartUpService;
+import org.sopeco.service.rest.exchange.MECStatus;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
-import org.sopeco.service.shared.MECStatus;
-import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 

@@ -33,7 +33,7 @@ import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.shared.ServiceResponse;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>ExecutionService</code> class provides the service to {@link ScheduledExperiment}s,

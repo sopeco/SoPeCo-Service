@@ -15,8 +15,8 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.rest.StartUpService;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
-import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 

@@ -9,7 +9,7 @@ import javax.ws.rs.core.Response.Status;
 import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.shared.ServiceResponse;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>InformationService</code> provides simple information about the SoPeCo service layer.

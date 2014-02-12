@@ -14,8 +14,8 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
-import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.GenericType;

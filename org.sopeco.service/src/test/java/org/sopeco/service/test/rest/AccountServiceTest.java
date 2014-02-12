@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.shared.ServiceResponse;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.GenericType;

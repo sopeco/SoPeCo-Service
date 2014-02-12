@@ -7,7 +7,7 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.shared.ServiceResponse;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 import com.sun.jersey.api.client.GenericType;

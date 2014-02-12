@@ -1,4 +1,4 @@
-package org.sopeco.service.shared;
+package org.sopeco.service.rest.exchange;
 
 import javax.ws.rs.core.Response.Status;
 

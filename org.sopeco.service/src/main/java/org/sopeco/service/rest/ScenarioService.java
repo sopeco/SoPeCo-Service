@@ -33,7 +33,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.shared.ServiceResponse;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
 /**

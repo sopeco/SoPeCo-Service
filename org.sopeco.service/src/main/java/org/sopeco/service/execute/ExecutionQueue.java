@@ -51,7 +51,7 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
-import org.sopeco.service.shared.RunningControllerStatus;
+import org.sopeco.service.rest.exchange.RunningControllerStatus;
 
 /**
  * @author Marius Oehler

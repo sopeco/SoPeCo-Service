@@ -1,4 +1,4 @@
-package org.sopeco.service.shared;
+package org.sopeco.service.rest.exchange;
 
 /**
  * This object is used to be shared between the RESTful service and the requester.

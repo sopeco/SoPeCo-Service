@@ -18,9 +18,8 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.security.Crypto;
-import org.sopeco.service.shared.Message;
-import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 
@@ -39,9 +38,9 @@ public class AccountService {
 	 * Creates a new user Account with the given username and password.
 	 * This is a POST request.
 	 * 
-	 * @param accountname the accountname
-	 * @param password the password for the account
-	 * @return a {@link Message} with a status and a message string
+	 * @param accountname 	the accountname
+	 * @param password	 	the password for the account
+	 * @return 				a {@link Message} with a status and a message string
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
@@ -61,8 +60,8 @@ public class AccountService {
 	/**
 	 * Checks if an account with the given name exists.
 	 * 
-	 * @param accountname the accountname
-	 * @return true, if the account exists
+	 * @param accountname 	the accountname
+	 * @return 				true, if the account exists
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
