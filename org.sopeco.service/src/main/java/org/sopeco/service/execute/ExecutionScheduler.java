@@ -1,5 +1,6 @@
 package org.sopeco.service.execute;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -157,7 +158,7 @@ public final class ExecutionScheduler implements Runnable {
 
 		if (experiment.isRepeating()) {
 			
-			LOGGER.info("Update execution times for the experiment with hashcode '{}'", experiment.hashCode());
+			LOGGER.info("Update execution times for the experiment with hashcode '{}'", experiment.getExperimentKey());
 			experiment.setLastExecutionTime(System.currentTimeMillis());
 			updateNextExecutionTime(experiment);
 			
@@ -168,7 +169,7 @@ public final class ExecutionScheduler implements Runnable {
 			
 		}
 
-		return String.valueOf(experiment.hashCode());
+		return String.valueOf(experiment.getExperimentKey());
 		
 	}
 	
@@ -176,9 +177,10 @@ public final class ExecutionScheduler implements Runnable {
 	 * Fetches the status of the experiment with the given key.
 	 * 
 	 * @param experimentKey	the key to identify the experiment
-	 * @return				{@link ExperimentStatus} of the experiment with the given key
+	 * @return				{@link ExperimentStatus} of the experiment with the given key, null if
+	 * 						the key does not match
 	 */
-	private ExperimentStatus getExperimentStatus(String experimentKey) {
+	public ExperimentStatus getExperimentStatus(String experimentKey) {
 		
 		// this can be a bottleneck, when a lot of experiments are enqueued
 		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
@@ -191,7 +193,27 @@ public final class ExecutionScheduler implements Runnable {
 			
 		}
 		
-		return null;
+		// now check the ScheduledExperiment database for the experiment
+		for (ScheduledExperiment se : ServicePersistenceProvider.getInstance().loadAllScheduledExperiments()) {
+			
+			if (se.getExperimentKey() == Integer.parseInt(experimentKey)) {
+				ExperimentStatus status = new ExperimentStatus();
+				status.setAccount(se.getAccountId());
+				status.setEventLogList(new ArrayList<MECLogEntry>());
+				status.setHasFinished(false);
+				status.setLabel("");
+				status.setProgress(0.0f);
+				status.setScenario(se.getScenarioDefinition().getScenarioName());
+				status.setTimeStart(0);
+				status.setTimeRemaining(0);
+				
+				return status;
+			}
+			
+		}
+		
+		
+		return null ;
 	}
 	
 	/**
