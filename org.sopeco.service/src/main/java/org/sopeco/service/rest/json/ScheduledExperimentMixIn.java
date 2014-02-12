@@ -30,4 +30,18 @@ public final class ScheduledExperimentMixIn {
 	public void setProperties(IConfiguration configuration) {
 	}
 	
+	/**
+	 * The method is used for a better acces to the experimentkey. The original
+	 * key is calculated via the hash code of the {@link ScheduledExperiment} and
+	 * therefor is no class field. But Jackson tries to may this getter to a 
+	 * property of the class and fails.<br />
+	 * A <code>@JsonIgnore</code> is needed.
+	 * 
+	 * @return the experiment key
+	 */
+	@JsonIgnore
+	public int getExperimentKey() {
+		return 0;
+	}
+	
 }
