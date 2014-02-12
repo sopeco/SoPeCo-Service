@@ -170,6 +170,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MED_PARAM_TYP = "paramtype";
 
 	public static final String SVC_EXECUTE = "execution";
+	public static final String SVC_EXECUTE_ESD = "esd";
 	public static final String SVC_EXECUTE_SCHEDULE = "schedule";
 	public static final String SVC_EXECUTE_ENABLE = "enable";
 	public static final String SVC_EXECUTE_DISABLE = "disable";
@@ -180,6 +181,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_EXECUTE_EXECUTE = "execute";
 	public static final String SVCP_EXECUTE_TOKEN = "token";
 	public static final String SVCP_EXECUTE_ID = "id";
+	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	
 	/**
 	 * QueryParam name for the account name.
@@ -192,4 +194,6 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	public static final String SVC_USER = "user";
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
+
 }

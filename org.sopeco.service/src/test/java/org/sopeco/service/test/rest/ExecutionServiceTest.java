@@ -509,7 +509,8 @@ public class ExecutionServiceTest extends JerseyTest {
 					        .type(MediaType.APPLICATION_JSON)
 					        .get(new GenericType<ServiceResponse<ScheduledExperiment>>() { });
 
-		assertEquals(scenarioActive, sr_se2.getObject().isActive());
+		// be aware! as no ExperimentSeries have been selected, the scenario is not turned active!
+		assertEquals(false, sr_se2.getObject().isActive());
 		
 		// now delete the scheduled experiment
 		sr_b = resource().path(ServiceConfiguration.SVC_EXECUTE)
