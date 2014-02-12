@@ -150,7 +150,6 @@ public class ExecutionServiceTest extends JerseyTest {
 	 * 6. delete schedulede experiment
 	 * 7. check list of scheduled experiments
 	 */
-	@Ignore
 	@Test
 	public void testScheduleExperimentDeletion() {
 		// connect to test users account
@@ -252,7 +251,6 @@ public class ExecutionServiceTest extends JerseyTest {
 	 * 7. get ID of scheduled experiment
 	 * 8. get list of schedulede experiments
 	 */
-	@Ignore
 	@Test
 	public void testScheduleExperiment() {
 		// connect to test users account
@@ -333,16 +331,16 @@ public class ExecutionServiceTest extends JerseyTest {
 											    .put(new GenericType<ServiceResponse<Long>>() { }, se);
 		
 		// now try to get the scheduled experiment
-		List<ScheduledExperiment> list = (List<ScheduledExperiment>) resource().path(ServiceConfiguration.SVC_EXECUTE)
-																		       .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
-																		       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-																		       .accept(MediaType.APPLICATION_JSON)
-																		       .get(new GenericType<List<ScheduledExperiment>>() { });
-		
+		ServiceResponse<List<ScheduledExperiment>> sr_list = resource().path(ServiceConfiguration.SVC_EXECUTE)
+														        	   .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+														        	   .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+														        	   .accept(MediaType.APPLICATION_JSON)
+														        	   .get(new GenericType<ServiceResponse<List<ScheduledExperiment>>>() { });
+
 		// check the list for my added scenario to execution list
-		for (int i = 0; i < list.size(); i++) {
+		for (int i = 0; i < sr_list.getObject().size(); i++) {
 			
-			ScheduledExperiment scheduledExperiment = list.get(i);
+			ScheduledExperiment scheduledExperiment = sr_list.getObject().get(i);
 			
 			// if the scenario in the list is the shortly added one, we have to check it's attributes
 			if (scheduledExperiment.getId() == sr_id.getObject()) {
@@ -377,7 +375,6 @@ public class ExecutionServiceTest extends JerseyTest {
 	 * 13. delete scheduled experiment
 	 * 14. check if scheduled experiment is deleted
 	 */
-	@Ignore
 	@Test
 	public void testScheduleExperimentEnablingDisabling() {
 		// connect to test users account
@@ -536,21 +533,6 @@ public class ExecutionServiceTest extends JerseyTest {
 		
 		// as the scenario does not exists with the given ID, a conflict is thrown!
 		assertEquals(Status.CONFLICT, sr_se2.getStatus());
-		
-		/*try {
-			sr_se2 =  resource().path(ServiceConfiguration.SVC_EXECUTE)
-						        .path(id)
-						        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-						        .accept(MediaType.APPLICATION_JSON)
-						        .type(MediaType.APPLICATION_JSON)
-						        .get(ScheduledExperiment.class);
-		} catch (UniformInterfaceException ex) {
-
-            final int status = ex.getResponse().getStatus();
-            assertEquals(HttpStatus.NO_CONTENT_204.getStatusCode(), status);
-            
-        }*/
-		
 	}
 	
 	/**
@@ -563,7 +545,6 @@ public class ExecutionServiceTest extends JerseyTest {
 	 * 4. get scenario definition
 	 * 5. get ExecutedExperimentDetails of the current user
 	 */
-	@Ignore
 	@Test
 	public void testGetExecutionDetails() {
 		// connect to test users account
