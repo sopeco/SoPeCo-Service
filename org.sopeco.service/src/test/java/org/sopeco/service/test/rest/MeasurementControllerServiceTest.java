@@ -4,7 +4,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
-import org.junit.Ignore;
+import javax.ws.rs.core.Response.Status;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +13,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.shared.MECStatus;
-import org.sopeco.service.shared.Message;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 
@@ -82,7 +83,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 2. get MEC status (invalid URL)
 	 * 3. get MEC status (invalid token)
 	 */
-	@Ignore
 	@Test
 	public void testMECStatus() {
 		LOGGER.debug("Testing fetch of MEC status.");
@@ -91,31 +91,31 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		String password = TestConfiguration.TESTPASSWORD;
 		
 		// log into the account
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
+		ServiceResponse<String> sr_m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  	 .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  	 .get(new GenericType<ServiceResponse<String>>() { });
 		
-		String token = m.getMessage();
+		String token = sr_m.getObject();
 		
 		// connect to a random string
-		MECStatus mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
-									    .path(ServiceConfiguration.SVC_MEC_STATUS)
-									    .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-									    .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
-									    .get(MECStatus.class);
-		
-		assertEquals(MECStatus.NO_VALID_MEC_URL, mecStatus.getStatus());
+		ServiceResponse<MECStatus> sr_mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
+														    .path(ServiceConfiguration.SVC_MEC_STATUS)
+														    .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+														    .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
+														    .get(new GenericType<ServiceResponse<MECStatus>>() { });
+					
+		assertEquals(MECStatus.NO_VALID_MEC_URL, sr_mecStatus.getObject().getStatus());
 	
 		// check if a wrong token fails, too
-		mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
-						      .path(ServiceConfiguration.SVC_MEC_STATUS)
-						      .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, "myrandomtoken")
-						      .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
-						      .get(MECStatus.class);
+		sr_mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
+						      	 .path(ServiceConfiguration.SVC_MEC_STATUS)
+						      	 .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, "myrandomtoken")
+						      	 .queryParam(ServiceConfiguration.SVCP_MEC_URL, "random")
+						      	 .get(new GenericType<ServiceResponse<MECStatus>>() { });
 		
-		assertEquals(-1, mecStatus.getStatus());
+		assertEquals(Status.UNAUTHORIZED, sr_mecStatus.getStatus());
 		
 	}
 	
@@ -130,7 +130,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 2. startup the TestMEC
 	 * 3. request MEC status
 	 */
-	@Ignore
 	@Test
 	public void testMECStatusValidController() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
@@ -138,25 +137,25 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		String socketURI 	= "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
 		
 		// log into the account
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
+		ServiceResponse<String> sr_m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  	 .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  	 .get(new GenericType<ServiceResponse<String>>() { });
 		
-		String token = m.getMessage();
+		String token = sr_m.getObject();
 
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();
 		
 		// now the controller status is requested
-		MECStatus mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
-								        .path(ServiceConfiguration.SVC_MEC_STATUS)
-								        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-								        .queryParam(ServiceConfiguration.SVCP_MEC_URL, socketURI)
-								        .get(MECStatus.class);
+		ServiceResponse<MECStatus> sr_mecStatus = resource().path(ServiceConfiguration.SVC_MEC)
+													        .path(ServiceConfiguration.SVC_MEC_STATUS)
+													        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+													        .queryParam(ServiceConfiguration.SVCP_MEC_URL, socketURI)
+													        .get(new GenericType<ServiceResponse<MECStatus>>() { });
 		
-		assertEquals(MECStatus.STATUS_ONLINE, mecStatus.getStatus());
+		assertEquals(MECStatus.STATUS_ONLINE, sr_mecStatus.getObject().getStatus());
 		
 	}
 	
@@ -169,7 +168,6 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 	 * 1. log in
 	 * 2. get MEC list
 	 */
-	@Ignore
 	@Test
 	public void testMECGetControllerList() {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
@@ -177,28 +175,28 @@ public class MeasurementControllerServiceTest extends JerseyTest {
 		String mecID 		= TestMEC.MEC_ID;
 		
 		// log into the account
-		Message m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-							  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-							  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-							  .get(Message.class);
+		ServiceResponse<String> sr_m = resource().path(ServiceConfiguration.SVC_ACCOUNT)
+											  	 .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+											  	 .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+											  	 .get(new GenericType<ServiceResponse<String>>() { });
 		
-		String token = m.getMessage();
+		String token = sr_m.getObject();
 
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();
 		
 		// now the controller status is requested
-		List<String> controllerList = resource().path(ServiceConfiguration.SVC_MEC)
-										        .path(ServiceConfiguration.SVC_MEC_LIST)
-										        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
-										        .queryParam(ServiceConfiguration.SVCP_MEC_ID, mecID)
-										        .get(new GenericType<List<String>>() { });
+		ServiceResponse<List<String>> sr_controllerList = resource().path(ServiceConfiguration.SVC_MEC)
+															        .path(ServiceConfiguration.SVC_MEC_LIST)
+															        .queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token)
+															        .queryParam(ServiceConfiguration.SVCP_MEC_ID, mecID)
+															        .get(new GenericType<ServiceResponse<List<String>>>() { });
 		
 		// now test for each controller in the MEC
-		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_1));
-		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_2));
-		assertEquals(true, controllerList.contains(TestMEC.MEC_SUB_ID_3));
+		assertEquals(true, sr_controllerList.getObject().contains(TestMEC.MEC_SUB_ID_1));
+		assertEquals(true, sr_controllerList.getObject().contains(TestMEC.MEC_SUB_ID_2));
+		assertEquals(true, sr_controllerList.getObject().contains(TestMEC.MEC_SUB_ID_3));
 		
 	}
 }
