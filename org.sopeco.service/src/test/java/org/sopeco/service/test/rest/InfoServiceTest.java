@@ -7,8 +7,10 @@ import javax.ws.rs.core.MediaType;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.shared.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.client.config.DefaultClientConfig;
 import com.sun.jersey.test.framework.JerseyTest;
@@ -53,15 +55,14 @@ public class InfoServiceTest extends JerseyTest {
 	 * Tests the default service request interface, if the service
 	 * is running.
 	 */
-	@Ignore
 	@Test
 	public void testServiceRunning() {
-		Boolean b = resource().path(ServiceConfiguration.SVC_INFO)
-							  .path(ServiceConfiguration.SVC_INFO_RUNNING)
-							  .accept(MediaType.APPLICATION_JSON)
-							  .get(Boolean.class);
+		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_INFO)
+												  .path(ServiceConfiguration.SVC_INFO_RUNNING)
+												  .accept(MediaType.APPLICATION_JSON)
+												  .get(new GenericType<ServiceResponse<Boolean>>() { });
 
-		assertEquals(true, b);
+		assertEquals(true, sr_b.getObject());
 	}
 	
 }
