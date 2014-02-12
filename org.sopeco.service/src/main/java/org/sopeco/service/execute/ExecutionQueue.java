@@ -158,7 +158,7 @@ public class ExecutionQueue implements IStatusListener {
 			// check if another experiment in the queue was requested
 			for (QueuedExperiment exp : experimentQueue) {
 				
-				if (String.valueOf(exp.getScheduledExperiment().hashCode()).equals(experimentKey)) {
+				if (String.valueOf(exp.getScheduledExperiment().getExperimentKey()).equals(experimentKey)) {
 					experiment = exp; // found the searched experiment
 					break;
 				}
@@ -450,7 +450,7 @@ public class ExecutionQueue implements IStatusListener {
 			LOGGER.error("Invalid controller URL '{}'.", experiment.getScheduledExperiment().getControllerUrl());
 		}
 		
-		experimentHashCode = String.valueOf(experiment.getScheduledExperiment().hashCode());
+		experimentHashCode = String.valueOf(experiment.getScheduledExperiment().getExperimentKey());
 		
 		//TODO check the selected experiments!!
 		SoPeCoRunner runner = new SoPeCoRunner(experimentHashCode,
@@ -517,7 +517,7 @@ public class ExecutionQueue implements IStatusListener {
 		eed.setTimeStarted(experiment.getTimeStarted());
 		eed.setName(experiment.getScheduledExperiment().getLabel());
 		eed.setControllerURL(experiment.getScheduledExperiment().getControllerUrl());
-		eed.setExperimentKey(String.valueOf(experiment.getScheduledExperiment().hashCode()));
+		eed.setExperimentKey(String.valueOf(experiment.getScheduledExperiment().getExperimentKey()));
 		eed.setAccountId(experiment.getScheduledExperiment().getAccountId());
 		eed.setScenarioName(experiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
 		// TODO why was commented out? Why is the event log not set - Answer: Because the MECLog is stored on it's own
@@ -534,7 +534,7 @@ public class ExecutionQueue implements IStatusListener {
 	 */
 	private void storeMECLog(QueuedExperiment experiment) {
 		
-		int hashcode = experiment.getScheduledExperiment().hashCode();
+		int hashcode = experiment.getScheduledExperiment().getExperimentKey();
 		
 		MECLog log = ServicePersistenceProvider.getInstance().loadMECLog(hashcode);
 		
