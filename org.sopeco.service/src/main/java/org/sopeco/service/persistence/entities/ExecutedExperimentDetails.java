@@ -65,9 +65,9 @@ public class ExecutedExperimentDetails implements Serializable {
 	@Column(name = "timeFinished")
 	private long timeFinished;
 
-	@Lob
+	/*@Lob
 	@Column(name = "eventLog")
-	private List<MECLogEntry> eventLog;
+	private List<MECLogEntry> eventLog;*/
 
 	@Column(name = "successful")
 	private boolean successful;
@@ -78,6 +78,9 @@ public class ExecutedExperimentDetails implements Serializable {
 	@Column(name = "controllerURL")
 	private String controllerURL;
 
+	@Column(name = "experimentKey")
+	private String experimentKey;
+	
 	public long getAccountId() {
 		return accountId;
 	}
@@ -110,6 +113,14 @@ public class ExecutedExperimentDetails implements Serializable {
 		this.controllerURL = pControllerURL;
 	}
 
+	public String getExperimentKey() {
+		return experimentKey;
+	}
+
+	public void setExperimentKey(String experimentKey) {
+		this.experimentKey = experimentKey;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -134,13 +145,13 @@ public class ExecutedExperimentDetails implements Serializable {
 		this.timeFinished = pTimeFinished;
 	}
 
-	public List<MECLogEntry> getEventLog() {
+	/*public List<MECLogEntry> getEventLog() {
 		return eventLog;
 	}
 
 	public void setEventLog(List<MECLogEntry> pEventLog) {
 		this.eventLog = pEventLog;
-	}
+	}*/
 
 	public boolean isSuccessful() {
 		return successful;

@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
+import org.sopeco.service.rest.exchange.ExperimentStatus;
 
 /**
  * The singleton class provides a scheduler for the experiments. The class mainly enables
@@ -139,11 +140,14 @@ public final class ExecutionScheduler implements Runnable {
 	
 	/**
 	 * Inserts an experiment into the execution queue. If the experiment has been added to
-	 * the execution queue <b>it will be deleted as {@link ScheduledExperiment} out of the database</b>!
+	 * the execution queue <b>it will be deleted as {@link ScheduledExperiment} out of the database</b>!<br />
+	 * However, the experiment status can be queried via the return key of this method.
 	 * 
-	 * @param experiment the experiment to enqueue to the experiment queue
+	 * @param experiment 	the experiment to enqueue to the experiment queue
+	 * @return 				the hashcode to access the added experiment afterwards
 	 */
-	private void enqueueExperiment(ScheduledExperiment experiment) {
+	private String enqueueExperiment(ScheduledExperiment experiment) {
+		
 		LOGGER.info("Insert experiment '" + experiment.getLabel()
 					+ "' (id: " + experiment.getId()
 					+ " - account: " + experiment.getAccountId()
@@ -164,6 +168,30 @@ public final class ExecutionScheduler implements Runnable {
 			
 		}
 
+		return String.valueOf(experiment.hashCode());
+		
+	}
+	
+	/**
+	 * Fetches the status of the experiment with the given key.
+	 * 
+	 * @param experimentKey	the key to identify the experiment
+	 * @return				{@link ExperimentStatus} of the experiment with the given key
+	 */
+	private ExperimentStatus getExperimentStatus(String experimentKey) {
+		
+		// this can be a bottleneck, when a lot of experiments are enqueued
+		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
+			
+			ExperimentStatus status = queue.getExperimentStatus(experimentKey);
+
+			if (status != null) {
+				return status;
+			}
+			
+		}
+		
+		return null;
 	}
 	
 	/**

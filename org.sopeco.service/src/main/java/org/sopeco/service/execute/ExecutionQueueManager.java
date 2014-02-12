@@ -81,7 +81,7 @@ public final class ExecutionQueueManager {
 	public static List<ExecutionQueue> getAllRunningQueues() {
 		List<ExecutionQueue> controllerList = new ArrayList<ExecutionQueue>();
 		for (ExecutionQueue cq : queueMap.values()) {
-			if (cq.isLoaded()) {
+			if (cq.isExecuting()) {
 				controllerList.add(cq);
 			}
 		}

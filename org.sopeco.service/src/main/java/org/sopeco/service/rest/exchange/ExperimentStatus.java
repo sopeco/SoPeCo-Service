@@ -35,7 +35,7 @@ import org.sopeco.service.execute.MECLogEntry;
  * @author Marius Oehler
  * 
  */
-public class RunningControllerStatus {
+public class ExperimentStatus {
 
 	private long timeStart;
 	private long timeRemaining;

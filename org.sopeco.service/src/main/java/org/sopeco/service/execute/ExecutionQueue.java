@@ -51,7 +51,7 @@ import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
-import org.sopeco.service.rest.exchange.RunningControllerStatus;
+import org.sopeco.service.rest.exchange.ExperimentStatus;
 
 /**
  * @author Marius Oehler
@@ -76,43 +76,47 @@ public class ExecutionQueue implements IStatusListener {
 	 */
 	private QueuedExperiment runningExperiment;
 
+	/**
+	 * If this object is not <code>null</code>, then an experiment is running.
+	 */
 	private Future<?> executeStatus;
 
+	/**
+	 * The URL for this execution queue. All experiment run on the controller connected to this URL.
+	 */
 	private String controllerURL;
 
+	/**
+	 * Stores the current hashcode of the running experiment (actually the {@link ScheduledExperiment} hashcode).
+	 * This hashcode enables to have a unique identifier for the {@link Configuration}.
+	 * 
+	 *  This hashcode is always refreshed with the current hashcode of the running {@link QueuedExperiment} and
+	 *  it's {@link ScheduledExperiment} hashcode.
+	 */
 	private String experimentHashCode;
 
 	/**
 	 * Constructor creates a new empty {@link QueuedExperiment} list.
 	 * Stores the given controller URL. <br />
 	 * Adds itself to the {@link StatusManager} to receive updates about
-	 * the running experiments.
+	 * the running experiments.<br />
+	 * Initializes the threadpool via initThreadPool().
 	 * 
-	 * @param pControllerURL the URL to the controller this queue correpsonds to
+	 * @param controllerURL the URL to the controller this queue correpsonds to
 	 */
-	public ExecutionQueue(String pControllerURL) {
-		experimentQueue = new ArrayList<QueuedExperiment>();
-		controllerURL = pControllerURL;
+	public ExecutionQueue(String controllerURL) {
+		this.experimentQueue 	= new ArrayList<QueuedExperiment>();
+		this.controllerURL 		= controllerURL;
 
-		StatusBroker.getManager(pControllerURL).addStatusListener(this);
+		// register to the StatusManager and recevie updates from SoPeCo about this controller
+		StatusBroker.getManager(controllerURL).addStatusListener(this);
+		initThreadPool();
 	}
 	
 	/**
-	 * Creates an ThreadPool, which is responsible for the SoPeCo Runners.
-	 * 
-	 * @return ExecutorService
-	 */
-	private ExecutorService getThreadPool() {
-		if (threadPool == null) {
-			threadPool = Executors.newCachedThreadPool();
-		}
-		return threadPool;
-	}
-
-	/**
 	 * Returns whether the active experiment is executed by a thread.
 	 * 
-	 * @return true, if the SoPeCo currently runs an experiment
+	 * @return true, if this queue has currently an experiment running
 	 */
 	public boolean isExecuting() {
 		
@@ -133,18 +137,45 @@ public class ExecutionQueue implements IStatusListener {
 	}
 
 	/**
-	 * Returns whether an experiment is loaded, and perhaps is executed.
+	 * Returns the {@link ExperimentStatus} of the {@link QueuedExperiment} with the
+	 * given experiment key.
 	 * 
-	 * @return true, if an experiment is active
+	 * @param experimentKey the unique key to the experiment, which is returned when adding
+	 * 						it to the {@link ExecutionScheduler}.
+	 * @return				the {@link ExperimentStatus} of the {@link QueuedExperiment}
 	 */
-	public boolean isLoaded() {
-		if (runningExperiment != null) {
-			return true;
+	public ExperimentStatus getExperimentStatus(String experimentKey) {
+		
+		QueuedExperiment experiment = null;
+		
+		if (experimentHashCode == experimentKey) {
+			
+			// the current running experiment is requested
+			experiment = runningExperiment;
+			
+		} else {
+			
+			// check if another experiment in the queue was requested
+			for (QueuedExperiment exp : experimentQueue) {
+				
+				if (String.valueOf(exp.getScheduledExperiment().hashCode()).equals(experimentKey)) {
+					experiment = exp; // found the searched experiment
+					break;
+				}
+				
+			}
+			
 		}
 		
-		return false;
+		if (experiment != null) {
+			return createExperimentStatusPackage(experiment);
+		}
+		
+		return null;
+		
 	}
-
+	
+	
 	/**
 	 * Adds an experiment to this {@link ExecutionQueue}. If no experiment is executed
 	 * yet, a new one will be executed.
@@ -155,7 +186,10 @@ public class ExecutionQueue implements IStatusListener {
 		LOGGER.info("Adding experiment id:" + experiment.getScheduledExperiment().getId() + " to queue.");
 		experiment.setTimeQueued(System.currentTimeMillis());
 		experimentQueue.add(experiment);
-		checkToExecuteNext();
+		
+		
+		
+		checkToExecuteNext(); //TODO not nice style to execute here!
 	}
 
 	/**
@@ -178,107 +212,42 @@ public class ExecutionQueue implements IStatusListener {
 		
 		synchronized (experimentQueue) {
 			
-			LOGGER.debug("Looking for waiting experiment..");
+			LOGGER.debug("Checking the current execution of the ExecutionQueue corresponding to Controller URL '{}'", controllerURL);
 			
 			if (isExecuting()) {
 				
-				LOGGER.info("Controller is running.");
+				LOGGER.info("Experiment is currently already running.");
 				
 			} else if (isLoaded()) {
 				
-				LOGGER.info("Experiment is already loaded.");
+				LOGGER.info("Experiment is already loaded, but it is not running yet.");
 				
 			} else if (experimentQueue.isEmpty()) {
 				
-				LOGGER.info("Queue is empty.");
+				LOGGER.info("Queue is empty. There is no experiment in execution.");
 				
 			} else {
 				
+				// now the queue is not empty and it the next experimetn can be executed
 				runningExperiment = experimentQueue.get(0);
 				experimentQueue.remove(0);
 				
-				executeNext();
+				execute(runningExperiment);
 				
 			}
 		}
 	}
 
 	/**
-	 * Start the next execution. 
-	 */
-	private void executeNext() {
-		LOGGER.info("Start experiment id:" + runningExperiment.getScheduledExperiment().getId()
-					+ " on: " + runningExperiment.getScheduledExperiment().getControllerUrl());
-
-		// prepare execution properties
-		Map<String, Object> executionProperties = new HashMap<String, Object>();
-		
-		try {
-			// copy all the current experiment properties
-			executionProperties.putAll(runningExperiment.getScheduledExperiment().getProperties());
-			
-			LOGGER.debug("Experiement settings controller URL: '{}'", runningExperiment.getScheduledExperiment().getControllerUrl());
-			
-			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_URI, new URI(runningExperiment.getScheduledExperiment().getControllerUrl()));
-			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_CLASS_NAME, null); // only if class name is null, URI is searched
-			executionProperties.put(IConfiguration.CONF_SCENARIO_DESCRIPTION, runningExperiment.getScheduledExperiment().getScenarioDefinition());
-			
-		} catch (URISyntaxException e) {
-			LOGGER.error("Invalid controller URL '{}'.", runningExperiment.getScheduledExperiment().getControllerUrl());
-		}
-		
-		experimentHashCode = String.valueOf(runningExperiment.getScheduledExperiment().hashCode());
-		
-		//TODO check the selected experiments!!
-		SoPeCoRunner runner = new SoPeCoRunner(experimentHashCode,
-											   executionProperties,
-											   runningExperiment.getScheduledExperiment().getSelectedExperiments());
-		
-		/* Example execution for test cases.
-		// fetch example experiement to execute
-		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));	
-		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
-												executionProperties,
-												exp.getSelectedExperiments());
-		*/
-		
-		executeStatus = getThreadPool().submit(runner);
-
-		runningExperiment.setTimeStarted(System.currentTimeMillis());
-		
-	}
-
-	/**
-	 * Stores the duration of this execution in the list, which is stored in the
-	 * ScheduledExperiment.
-	 */
-	private void saveDurationInExperiment() {
-		
-		ScheduledExperiment exp = ServicePersistenceProvider.getInstance()
-															.loadScheduledExperiment(runningExperiment.getScheduledExperiment().getId());
-		
-		if (exp != null) {
-			
-			if (exp.getDurations() == null) {
-				exp.setDurations(new ArrayList<Long>());
-			}
-			
-			long duration = runningExperiment.getTimeEnded() - runningExperiment.getTimeStarted();
-			exp.getDurations().add(duration);
-			
-			ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
-		}
-		
-	}
-
-	/**
+	 * TODO: this method should not be possible. Be aware otherwise of side-effects!
+	 * 
 	 * Returns the experiment which is loaded at the moment.
 	 * 
 	 * @return QueuedExperiment
 	 */
-	public QueuedExperiment getCurrentlyRunning() {
+	/*public QueuedExperiment getCurrentlyRunning() {
 		return runningExperiment;
-	}
+	}*/
 
 	/**
 	 * Adds the given {@link StatusMessage} to the currently running experiment.
@@ -296,6 +265,7 @@ public class ExecutionQueue implements IStatusListener {
 			runningExperiment.setLastProgressInfo((ProgressInfo) statusMessage.getStatusInfo());
 		}
 		
+		storeMECLog(runningExperiment);
 
 	}
 
@@ -303,7 +273,7 @@ public class ExecutionQueue implements IStatusListener {
 	 * Checks for failed adding of {@link EventType.MEASUREMENT_FINISHED}. Fires this
 	 * event manually with a {@link StatusMessage}.
 	 * 
-	 * Marked as TODO for Marius Öhler. Why is this method used?
+	 * Marked as TODO for Marius Öhler. Why is this method needed?
 	 */
 	public void check() {
 		if (!isExecuting() && runningExperiment != null) {
@@ -337,7 +307,8 @@ public class ExecutionQueue implements IStatusListener {
 
 	/**
 	 * Ends the execution of the current experiment and stores information about
-	 * it in the database.
+	 * it in the database.<br />
+	 * Afterwards it's tried to execute the next experiment.
 	 */
 	private synchronized void processFinishedExperiment() {
 		LOGGER.info("Experiment id:" + runningExperiment.getScheduledExperiment().getId()
@@ -345,64 +316,48 @@ public class ExecutionQueue implements IStatusListener {
 
 		runningExperiment.setTimeEnded(System.currentTimeMillis());
 		
-		saveDurationInExperiment();
+		storeDurationInExperiment();
 
-		storeExecutedExperimentDetails();
-
+		storeExecutedExperimentDetails(runningExperiment);
+		storeMECLog(runningExperiment);
+		
 		Configuration.removeConfiguration(experimentHashCode);
 
-		executeStatus = null;
-		runningExperiment = null;
+		executeStatus 		= null;
+		runningExperiment 	= null;
+		experimentHashCode 	= "";
+		
+		// now the next experiment can be executed
 		checkToExecuteNext();
 	}
 
+
+
+
+	
+	
+	
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////// HELPER ///////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////
+	
 	/**
-	 * Stores the final results for the exectured experiment in the database as
-	 * an {@link ExecutedExperimentDetails} object. 
-	 */
-	private void storeExecutedExperimentDetails() {
-		
-		boolean hasError = false;
-		
-		for (StatusMessage sm : runningExperiment.getStatusMessageList()) {
-			if (sm.getStatusInfo() != null && sm.getStatusInfo() instanceof ErrorInfo) {
-				hasError = true;
-				break;
-			}
-		}
-
-		ExecutedExperimentDetails eed = new ExecutedExperimentDetails();
-		// eed.setEventLog(runningExperiment.getEventLogLiteList()); // TODO why was commented out?
-
-		eed.setSuccessful(!hasError);
-		eed.setTimeFinished(runningExperiment.getTimeEnded());
-		eed.setTimeStarted(runningExperiment.getTimeStarted());
-		eed.setName(runningExperiment.getScheduledExperiment().getLabel());
-		eed.setControllerURL(runningExperiment.getScheduledExperiment().getControllerUrl());
-
-		eed.setAccountId(runningExperiment.getScheduledExperiment().getAccountId());
-		eed.setScenarioName(runningExperiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
-
-		long generatedId = ServicePersistenceProvider.getInstance().storeExecutedExperimentDetails(eed);
-
-		MECLog log = new MECLog();
-		log.setId(generatedId);
-		log.setEntries(runningExperiment.getEventLogLiteList());
-
-		ServicePersistenceProvider.getInstance().storeMECLog(log);
-	}
-
-	/**
-	 * Creates the CurrentControllerExperiment object, that contains all
+	 * Creates the {@link ExperimentStatus} object, that contains all
 	 * necessary information about the current controller state.
 	 * 
-	 * @return a status package with all informatio about the currently running experiment
+	 * @param experiment 	the experiment, whose details are requested
+	 * @return 				a status package with all informatio about the currently running experiment
 	 */
-	public RunningControllerStatus createControllerStatusPackage() {
-		if (runningExperiment == null) {
+	private ExperimentStatus createExperimentStatusPackage(QueuedExperiment experiment) {
+		
+		if (experiment == null) {
 			return null;
 		}
-		RunningControllerStatus cce = new RunningControllerStatus();
+		
+		ExperimentStatus cce = new ExperimentStatus();
 
 		cce.setAccount(runningExperiment.getScheduledExperiment().getAccountId());
 		cce.setScenario(runningExperiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
@@ -423,7 +378,8 @@ public class ExecutionQueue implements IStatusListener {
 			float progress = maxPercentage / info.getNumberOfRepetition() * info.getRepetition();
 			cce.setProgress(progress);
 		} else {
-			cce.setProgress(-1);
+			// then the experiment has not started yet
+			cce.setProgress(0.0f);
 		}
 
 		if (runningExperiment.getScheduledExperiment().getDurations().size() > 2) {
@@ -437,5 +393,159 @@ public class ExecutionQueue implements IStatusListener {
 
 		return cce;
 	}
+	
+	/**
+	 * Creates an threadpool, which is responsible for the SoPeCo Runners. This is a singleton method
+	 * for the threadpool and currently a cached thread pool is created, which has a varying numbers
+	 * of thread in it.
+	 * 
+	 * @return the new created {@link ExecutorService}
+	 */
+	private ExecutorService initThreadPool() {
+		if (threadPool == null) {
+			threadPool = Executors.newCachedThreadPool();
+		}
+		return threadPool;
+	}
+	
+	/**
+	 * Returns whether an experiment is loaded. This means, thaht an experiment has been
+	 * submitted to the threadpool to be executed in a {@link SoPeCoRunner}.<br />
+	 * <br />
+	 * This method does <b>not</b> query, if an experiment is currently really executed!
+	 * 
+	 * @return true, if an experiment is loaded
+	 */
+	private boolean isLoaded() {
+		if (runningExperiment != null) {
+			return true;
+		}
+		
+		return false;
+	}
+	
+	/**
+	 * Start the next execution. Only called by <code>checkToExecuteNext()</code>!
+	 * 
+	 * @param experiment the experiment to execute next
+	 */
+	private void execute(QueuedExperiment experiment) {
+		LOGGER.info("Start experiment id:" + experiment.getScheduledExperiment().getId()
+					+ " on: " + experiment.getScheduledExperiment().getControllerUrl());
 
+		// prepare execution properties
+		Map<String, Object> executionProperties = new HashMap<String, Object>();
+		
+		try {
+			// copy all the current experiment properties
+			executionProperties.putAll(experiment.getScheduledExperiment().getProperties());
+			
+			LOGGER.debug("Experiement settings controller URL: '{}'", experiment.getScheduledExperiment().getControllerUrl());
+			
+			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_URI, new URI(experiment.getScheduledExperiment().getControllerUrl()));
+			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_CLASS_NAME, null); // only if class name is null, URI is searched
+			executionProperties.put(IConfiguration.CONF_SCENARIO_DESCRIPTION, experiment.getScheduledExperiment().getScenarioDefinition());
+			
+		} catch (URISyntaxException e) {
+			LOGGER.error("Invalid controller URL '{}'.", experiment.getScheduledExperiment().getControllerUrl());
+		}
+		
+		experimentHashCode = String.valueOf(experiment.getScheduledExperiment().hashCode());
+		
+		//TODO check the selected experiments!!
+		SoPeCoRunner runner = new SoPeCoRunner(experimentHashCode,
+											   executionProperties,
+											   experiment.getScheduledExperiment().getSelectedExperiments());
+		
+		/* Example execution for test cases.
+		// fetch example experiement to execute
+		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));	
+		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
+												executionProperties,
+												exp.getSelectedExperiments());
+		*/
+		
+		executeStatus = threadPool.submit(runner);
+
+		experiment.setTimeStarted(System.currentTimeMillis());
+		
+	}
+	
+	/**
+	 * Stores the duration of this execution in the list, which is stored in the
+	 * ScheduledExperiment.
+	 */
+	private void storeDurationInExperiment() {
+		
+		ScheduledExperiment exp = ServicePersistenceProvider.getInstance()
+															.loadScheduledExperiment(runningExperiment.getScheduledExperiment().getId());
+		
+		if (exp != null) {
+			
+			if (exp.getDurations() == null) {
+				exp.setDurations(new ArrayList<Long>());
+			}
+			
+			long duration = runningExperiment.getTimeEnded() - runningExperiment.getTimeStarted();
+			exp.getDurations().add(duration);
+			
+			ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
+		}
+		
+	}
+	
+	/**
+	 * Stores the final results for the exectured experiment in the database as
+	 * an {@link ExecutedExperimentDetails} object. 
+	 */
+	private void storeExecutedExperimentDetails(QueuedExperiment experiment) {
+		
+		boolean hasError = false;
+		
+		// check for errors in the experiment
+		for (StatusMessage sm : experiment.getStatusMessageList()) {
+			if (sm.getStatusInfo() != null && sm.getStatusInfo() instanceof ErrorInfo) {
+				hasError = true;
+				break;
+			}
+		}
+
+		// TODO maybe merge ID and ExperimentKey, as both are unique
+		ExecutedExperimentDetails eed = new ExecutedExperimentDetails();
+		eed.setSuccessful(!hasError);
+		eed.setTimeFinished(experiment.getTimeEnded());
+		eed.setTimeStarted(experiment.getTimeStarted());
+		eed.setName(experiment.getScheduledExperiment().getLabel());
+		eed.setControllerURL(experiment.getScheduledExperiment().getControllerUrl());
+		eed.setExperimentKey(String.valueOf(experiment.getScheduledExperiment().hashCode()));
+		eed.setAccountId(experiment.getScheduledExperiment().getAccountId());
+		eed.setScenarioName(experiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
+		// TODO why was commented out? Why is the event log not set - Answer: Because the MECLog is stored on it's own
+		// eed.setEventLog(runningExperiment.getEventLogLiteList());
+
+		ServicePersistenceProvider.getInstance().storeExecutedExperimentDetails(eed);
+	}
+	
+	/**
+	 * Stores the {@link MECLog} for the the given {@link QueuedExperiment}. When A MECLog with the
+	 * experiment hashcode has already existed, then it's updated.
+	 * 
+	 * @param experiment the experiment to store the {@link MECLog} to
+	 */
+	private void storeMECLog(QueuedExperiment experiment) {
+		
+		int hashcode = experiment.getScheduledExperiment().hashCode();
+		
+		MECLog log = ServicePersistenceProvider.getInstance().loadMECLog(hashcode);
+		
+		if (log == null) {
+			log = new MECLog();
+			log.setId(hashcode);
+		}
+		
+		log.setEntries(experiment.getEventLogLiteList());
+
+		ServicePersistenceProvider.getInstance().storeMECLog(log);
+	}
+	
 }
