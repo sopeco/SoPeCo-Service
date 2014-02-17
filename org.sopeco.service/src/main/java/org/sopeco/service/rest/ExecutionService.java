@@ -341,7 +341,7 @@ public class ExecutionService {
 	 * @return true, if the ScheduledExperiment could be removed
 	 */
 	@DELETE
-	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DELETE)
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ServiceResponse<Boolean> removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     					  @QueryParam(TOKEN) String usertoken) {
