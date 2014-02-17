@@ -42,8 +42,12 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 /**
- * The User class stores all important information for one user in the database.
+ * The {@link Users} class stores all important information for one user in the database.
  * E.g. the current selected scenario of a user is stored here.
+ * <br />
+ * <br />
+ * The class cannot be names <code>User</code>, as this name is prohibited to use in a
+ * Derby/MySQL database.
  * 
  * @author Peter Merkert
  */
@@ -132,18 +136,29 @@ public class Users {
 		return ServicePersistenceProvider.getInstance().loadAccountDetails(currentAccount.getId());
 	}
 	
+	/**
+	 * Returns whether the user token has timed out.
+	 * 
+	 * @return true, if the user token has times out
+	 */
 	public boolean isExpired() {
 		LOGGER.debug("Checking user with token '{}' for being expired.", this.toString());
 		
 		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
 		int userTimeout = config.getPropertyAsInteger(ServiceConfiguration.USER_TIMEOUT, 0);
+		
 		if (userTimeout == 0 || System.currentTimeMillis() < lastRequestTime + userTimeout) {
+			
 			return false;
+			
 		} else {
+			
 			return true;
+			
 		}
 	}
 	
+	@Override
 	public String toString() {
 		return 	"_persisted user information_" + "\n"
 				+ "token: " + token + "\n"
