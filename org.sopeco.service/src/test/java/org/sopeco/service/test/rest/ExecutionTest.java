@@ -3,6 +3,7 @@ package org.sopeco.service.test.rest;
 import static org.junit.Assert.assertEquals;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response.Status;
 
 import org.junit.After;
 import org.junit.Test;
@@ -14,6 +15,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.rest.StartUpService;
+import org.sopeco.service.rest.exchange.ExperimentStatus;
 import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.rest.json.CustomObjectWrapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
@@ -264,6 +266,19 @@ public class ExecutionTest extends JerseyTest {
 		
 		assertEquals(sr_se.getObject().getExperimentKey(), sr_key.getObject().intValue());
 		assertEquals(true, se.getExperimentKey() != sr_key.getObject().intValue());
+		
+		String experimentKey = String.valueOf(sr_key.getObject());
+		
+		ServiceResponse<ExperimentStatus> sr_status =  resource().path(ServiceConfiguration.SVC_EXECUTE)
+													       	     .path(ServiceConfiguration.SVC_EXECUTE_STATUS)
+													       	     .queryParam(ServiceConfiguration.SVCP_EXECUTE_KEY, experimentKey)
+													       	     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+													       	     .accept(MediaType.APPLICATION_JSON)
+													       	     .type(MediaType.APPLICATION_JSON)
+													       	     .get(new GenericType<ServiceResponse<ExperimentStatus>>() { });
+
+		assertEquals(Status.OK, sr_status.getStatus());
+		assertEquals(TestConfiguration.TEST_SCENARIO_NAME, sr_status.getObject().getScenarioName());
 	}
 	
 }

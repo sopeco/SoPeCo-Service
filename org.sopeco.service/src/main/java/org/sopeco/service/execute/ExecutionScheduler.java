@@ -198,12 +198,12 @@ public final class ExecutionScheduler implements Runnable {
 			
 			if (se.getExperimentKey() == Integer.parseInt(experimentKey)) {
 				ExperimentStatus status = new ExperimentStatus();
-				status.setAccount(se.getAccountId());
+				status.setAccountId(se.getAccountId());
 				status.setEventLogList(new ArrayList<MECLogEntry>());
-				status.setHasFinished(false);
+				status.setFinished(false);
 				status.setLabel("");
 				status.setProgress(0.0f);
-				status.setScenario(se.getScenarioDefinition().getScenarioName());
+				status.setScenarioName(se.getScenarioDefinition().getScenarioName());
 				status.setTimeStart(0);
 				status.setTimeRemaining(0);
 				

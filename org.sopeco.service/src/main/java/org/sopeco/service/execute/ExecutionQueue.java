@@ -359,17 +359,17 @@ public class ExecutionQueue implements IStatusListener {
 		
 		ExperimentStatus cce = new ExperimentStatus();
 
-		cce.setAccount(runningExperiment.getScheduledExperiment().getAccountId());
-		cce.setScenario(runningExperiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
+		cce.setAccountId(runningExperiment.getScheduledExperiment().getAccountId());
+		cce.setScenarioName(runningExperiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
 		cce.setTimeStart(runningExperiment.getTimeStarted());
 		cce.setLabel(runningExperiment.getScheduledExperiment().getLabel());
 		cce.setEventLogList(runningExperiment.getEventLogLiteList());
 
 		if (runningExperiment.getStatusMessageList().get(runningExperiment.getStatusMessageList().size() - 1)
 				.getEventType() == EventType.MEASUREMENT_FINISHED) {
-			cce.setHasFinished(true);
+			cce.setFinished(true);
 		} else {
-			cce.setHasFinished(false);
+			cce.setFinished(false);
 		}
 
 		if (runningExperiment.getLastProgressInfo() != null) {

@@ -23,6 +23,7 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.ExecutionScheduler;
+import org.sopeco.service.execute.QueuedExperiment;
 import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
@@ -30,6 +31,7 @@ import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.exchange.ExperimentStatus;
 import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
@@ -336,9 +338,9 @@ public class ExecutionService {
 	/**
 	 * Removes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
+	 * @param id 		the ID of the ScheduledExperiment
 	 * @param usertoken the user identification
-	 * @return true, if the ScheduledExperiment could be removed
+	 * @return 			true, if the ScheduledExperiment could be removed
 	 */
 	@DELETE
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
@@ -368,6 +370,40 @@ public class ExecutionService {
 		ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
 
 		return new ServiceResponse<Boolean>(Status.OK, true);
+	}
+	
+	/**
+	 * Returns the current status of the experiment with the given key. Both, the table for {@link ScheduledExperiment}s
+	 * and the one for {@link QueuedExperiment}s is searched for the given key. This implies, that this
+	 * method can be called for active and inactive {@link ScheduledExperiment}s.
+	 * 
+	 * @param id		the experiment key
+	 * @param usertoken	the user identification
+	 * @return			the {@link ExperimentStatus} of the experiment
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_EXECUTE_STATUS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<ExperimentStatus> getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+									     					  			  @QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return new ServiceResponse<ExperimentStatus>(Status.UNAUTHORIZED, null);
+		}
+		
+		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(String.valueOf(key));
+		
+		// if the status is null, the key must be corrupt, because the table ScheduledExepriment
+		// and the QueuedExperiment is searched for the key.
+		if (status == null) {
+			LOGGER.info("The experiment key is corrupt.", usertoken);
+			return new ServiceResponse<ExperimentStatus>(Status.CONFLICT, null, "The experiment key is corrupt.");
+		}
+		
+		return new ServiceResponse<ExperimentStatus>(Status.OK, status);
 	}
 	
 	/**

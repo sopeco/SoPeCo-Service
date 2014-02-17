@@ -26,137 +26,167 @@
  */
 package org.sopeco.service.rest.exchange;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sopeco.service.execute.MECLogEntry;
 
 /**
+ * The {@link ExperimentStatus} comprises all relevant information for an scenario
+ * in execution.
  * 
- * @author Marius Oehler
- * 
+ * @author Peter Merkert
  */
 public class ExperimentStatus {
 
-	private long timeStart;
-	private long timeRemaining;
-
-	private String label;
-	private long accountId;
-	private String scenario;
-	private float progress;
-
-	private List<MECLogEntry> eventLogList;
-
-	private boolean hasFinished;
+	private long timeStart					= -1l;		
+	private long timeRemaining				= -1l;
+	private String label					= "";
+	private long accountId					= -1l;
+	private String scenarioName				= "";
+	private float progress					= 0.0f;
+	private List<MECLogEntry> eventLogList 	= new ArrayList<MECLogEntry>();
+	private boolean finished 				= false;
 
 	/**
-	 * @return the eventLogList
+	 * Returns the event log list of this experiment.
+	 * 
+	 * @return the event log list
 	 */
 	public List<MECLogEntry> getEventLogList() {
 		return eventLogList;
 	}
 
 	/**
-	 * @param eventLogList
-	 *            the eventLogList to set
+	 * Sets the event log list with the given list of {@link MECLogEntry}s.
+	 * 
+	 * @param eventLogList the log list to set
 	 */
 	public void setEventLogList(List<MECLogEntry> eventLogList) {
 		this.eventLogList = eventLogList;
 	}
 
+	/**
+	 * Returns true, if this experiment has finished.
+	 * 
+	 * @return true, if this experiment has finished
+	 */
 	public boolean isFinished() {
-		return hasFinished;
-	}
-
-	public void setHasFinished(boolean hasFinished) {
-		this.hasFinished = hasFinished;
+		return finished;
 	}
 
 	/**
-	 * @return the timeStart
+	 * Set the finish parameter.
+	 * 
+	 * @param finished if the experiment is finished
+	 */
+	public void setFinished(boolean finished) {
+		this.finished = finished;
+	}
+
+	/**
+	 * Returns the time when the experiment has started the last time.
+	 * 
+	 * @return the time when started as long
 	 */
 	public long getTimeStart() {
 		return timeStart;
 	}
 
 	/**
-	 * @param timeStart
-	 *            the timeStart to set
+	 * Sets the start time.
+	 * 
+	 * @param timeStart the start time
 	 */
 	public void setTimeStart(long timeStart) {
 		this.timeStart = timeStart;
 	}
 
 	/**
-	 * @return the timeRemaining
+	 * Returns the remeining time for the experiment.
+	 * 
+	 * @return the remeining time for the experiment
 	 */
 	public long getTimeRemaining() {
 		return timeRemaining;
 	}
 
 	/**
-	 * @param timeRemaining
-	 *            the timeRemaining to set
+	 * Sets the remaining time for the experiment.
+	 * 
+	 * @param timeRemaining the remeining time
 	 */
 	public void setTimeRemaining(long timeRemaining) {
 		this.timeRemaining = timeRemaining;
 	}
 
 	/**
-	 * @return the account
+	 * Returns the ID of the related account for this experiment.
+	 * 
+	 * @return the account id
 	 */
-	public long getAccount() {
+	public long getAccountId() {
 		return accountId;
 	}
 
 	/**
-	 * @param account
-	 *            the account to set
+	 * Sets the account ID of the related account.
+	 * 
+	 * @param account the account ID to set
 	 */
-	public void setAccount(long account) {
-		this.accountId = account;
+	public void setAccountId(long accountId) {
+		this.accountId = accountId;
 	}
 
 	/**
-	 * @return the scenario
+	 * Returns the name of the scenario on which the experiment is executed.
+	 * 
+	 * @return the name of the scenario on which the experiment is executed
 	 */
-	public String getScenario() {
-		return scenario;
+	public String getScenarioName() {
+		return scenarioName;
 	}
 
 	/**
-	 * @param scenario
-	 *            the scenario to set
+	 * Sets the scenario name on which this experiment is executed.
+	 * 
+	 * @param scenario the scenario name
 	 */
-	public void setScenario(String scenario) {
-		this.scenario = scenario;
+	public void setScenarioName(String scenario) {
+		this.scenarioName = scenario;
 	}
 
 	/**
-	 * @return the progress
+	 * Returns the progress of this experiment.
+	 * 
+	 * @return the progress of this experiment
 	 */
 	public float getProgress() {
 		return progress;
 	}
 
 	/**
-	 * @param progress
-	 *            the progress to set
+	 * Sets the progress of this experiment.
+	 * 
+	 * @param progress the progress
 	 */
 	public void setProgress(float progress) {
 		this.progress = progress;
 	}
 
 	/**
-	 * @return the label
+	 * Returns the label of this experiment.
+	 * 
+	 * @return the label of this experiment
 	 */
 	public String getLabel() {
 		return label;
 	}
 
 	/**
-	 * @param label
-	 *            the label to set
+	 * Sets the label of the experiment.
+	 * 
+	 * @param label the label
 	 */
 	public void setLabel(String label) {
 		this.label = label;
