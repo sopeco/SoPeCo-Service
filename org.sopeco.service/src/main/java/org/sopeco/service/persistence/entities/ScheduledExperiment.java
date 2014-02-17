@@ -277,48 +277,84 @@ public class ScheduledExperiment implements Serializable {
 	 * good hash function enabled. <br />
 	 * Of course, the execution times are ignored creating the hash
 	 * code, as they change over time. In Addition the active state
-	 * if not taken into account, as it changes over time, too.<br />
-	 * To be honest, the properties are not inserted, too, as they
-	 * are too complex to flatten the map. HashCode() cannot be used
-	 * as it is not the same value before and after persisting!
+	 * is not taken into account, as it changes over time, too.<br />
+	 * To be honest, the properties are not inserted, too, as it is
+	 * too complex to flatten the map. HashCode() for the map cannot
+	 * be used as it is not the same value before and after persisting!
+	 * <br />
+	 * <br />
+	 * This method is absolut null-safe. There is no possiblity thath this
+	 * method fails, as it is a really important one.
+	 * <br />
 	 * <br />
 	 * If a better hash function is required, if can just be created here.
 	 */
 	@Override
 	public int hashCode() {
 		
-		String addedTime = String.valueOf(this.addedTime);
-		String scenarioDefinition = this.scenarioDefinition.toString();
-		String account = String.valueOf(this.account);
-		String controllerUrl = this.controllerUrl;
-		String id = String.valueOf(this.id);
-		String isRepeating = String.valueOf(this.isRepeating);
-		String label = this.label;
-		String repeatDays = (this.repeatDays != null) ? this.repeatDays : "0";
-		String repeatHours = (this.repeatHours != null) ? this.repeatHours : "0";
-		String repeatMinutes = (this.repeatMinutes != null) ? this.repeatMinutes : "0";
+		String addedTime			= String.valueOf(this.addedTime);
+		String account				= String.valueOf(this.account);
+		String id					= String.valueOf(this.id);
+		String isRepeating			= String.valueOf(this.isRepeating);
+		String label				= "";
+		String repeatDays			= "";
+		String repeatHours			= "";
+		String repeatMinutes		= "";
+		String scenarioDefinition	= "";
+		String controllerUrl		= "";
+		String durations 			= "";
+		String selectedExperiments 	= "";
 		
-		String durations = "";
-		for (long l : this.durations) {
-			durations += String.valueOf(l);
+		if (scenarioDefinition != null) {
+			scenarioDefinition = this.scenarioDefinition.toString();
 		}
 		
-		String selectedExperiments = "";
-		for (String s : this.selectedExperiments) {
-			selectedExperiments += s;
+		if (this.controllerUrl != null) {
+			controllerUrl = this.controllerUrl;
 		}
 		
+		if (this.label != null) {
+			label = this.label;
+		}
+		
+		if (this.repeatDays != null) {
+			repeatDays = this.repeatDays;
+		}
+		
+		if (this.repeatHours != null) {
+			repeatHours = this.repeatHours;
+		}
+		
+		if (this.repeatMinutes != null) {
+			repeatMinutes = this.repeatMinutes;
+		}
+		
+		if (this.durations != null) {
+			
+			for (long l : this.durations) {
+				durations += String.valueOf(l);
+			}
+			
+		}
+		
+		if (this.selectedExperiments != null) {
+			
+			for (String s : this.selectedExperiments) {
+				selectedExperiments += s;
+			}
+			
+		}
 		
 		return (addedTime
-				+ scenarioDefinition
 				+ account
-				+ controllerUrl
 				+ id
 				+ isRepeating
 				+ label
 				+ repeatDays
 				+ repeatHours
 				+ repeatMinutes
+				+ scenarioDefinition
+				+ controllerUrl
 				+ durations
 				+ selectedExperiments).hashCode();
 	}
