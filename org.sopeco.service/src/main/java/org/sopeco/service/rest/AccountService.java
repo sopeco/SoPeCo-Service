@@ -36,26 +36,45 @@ public class AccountService {
 	
 	/**
 	 * Creates a new user Account with the given username and password.
-	 * This is a POST request.
+	 * Uses the configuration default values for database choice.
 	 * 
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
-	 * @return 				a {@link Message} with a status and a message string
+	 * @return 				true, if the account creation was succesful
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public ServiceResponse<Boolean> createAccount(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
-								 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
+								 			      @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		PersistenceConfiguration c = PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
-		
-		ServiceResponse<Boolean> sr = createAccount(accountname, password, c.getMetaDataHost(), Integer.parseInt(c.getMetaDataPort()));
+
+		return createAccountCustomized(accountname, password, c.getMetaDataHost(), c.getMetaDataPort());
+	}
+	
+	/**
+	 * Creates a new user Account with the given username and password and customized database
+	 * credentials.
+	 * 
+	 * @param accountname 	the accountname
+	 * @param password	 	the password for the account
+	 * @param dbname		the database name
+	 * @param dbpassword	the database password
+	 * @return 				true, if the account creation was succesful
+	 */
+	@POST
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/" + ServiceConfiguration.SVC_ACCOUNT_CUSTOMIZE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> createAccountCustomized(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password,
+							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_DATABASENAME) String dbname,
+							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_DATABASEPW) String dbpassword) {
+
+		ServiceResponse<Boolean> sr = createAccount(accountname, password, dbname, Integer.parseInt(dbpassword));
 		
 		return sr;
 	}
-	
-	
 	
 	/**
 	 * Checks if an account with the given name exists.
@@ -78,7 +97,7 @@ public class AccountService {
 	 * Access the account information for a given username.
 	 * 
 	 * @param accountname 	the accountname the information is requested to
-	 * @return 				AccountDetails object with all the account details
+	 * @return 				{@link AccountDetails} object with all the account details
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
@@ -128,7 +147,7 @@ public class AccountService {
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public ServiceResponse<String> loginWithPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
-									 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
+									 				 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		ServiceResponse<String> sr = new ServiceResponse<String>();
 		
