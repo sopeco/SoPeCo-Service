@@ -60,7 +60,7 @@ public class AccountService {
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
 	 * @param dbname		the database name
-	 * @param dbpassword	the database password
+	 * @param dbport	the database password
 	 * @return 				true, if the account creation was succesful
 	 */
 	@POST
@@ -69,9 +69,9 @@ public class AccountService {
 	public ServiceResponse<Boolean> createAccountCustomized(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
 							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password,
 							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_DATABASENAME) String dbname,
-							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_DATABASEPW) String dbpassword) {
+							 			      			 	@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_DATABASEPORT) String dbport) {
 
-		ServiceResponse<Boolean> sr = createAccount(accountname, password, dbname, Integer.parseInt(dbpassword));
+		ServiceResponse<Boolean> sr = createAccount(accountname, password, dbname, Integer.parseInt(dbport));
 		
 		return sr;
 	}

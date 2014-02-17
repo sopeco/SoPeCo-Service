@@ -109,7 +109,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_ACCOUNT_PASSWORD = "password";
 	public static final String SVCP_ACCOUNT_TOKEN = "token";
 	public static final String SVCP_ACCOUNT_DATABASENAME = "dbname";
-	public static final String SVCP_ACCOUNT_DATABASEPW = "dbpw";
+	public static final String SVCP_ACCOUNT_DATABASEPORT = "dbpw";
 
 	public static final String SVC_INFO = "info";
 	public static final String SVC_INFO_RUNNING = "running";
