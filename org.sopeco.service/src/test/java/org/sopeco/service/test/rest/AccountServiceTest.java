@@ -75,14 +75,14 @@ public class AccountServiceTest extends JerseyTest {
 		// just create the account once to be sure it already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
-				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
+				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 				  .post(new GenericType<ServiceResponse<Boolean>>() { });
 		
 		ServiceResponse<Boolean> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 										        .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-										        .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
-										        .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
+										        .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+										        .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 										        .post(new GenericType<ServiceResponse<Boolean>>() { });
 
 		assertEquals(false, sr.getObject());
@@ -101,13 +101,13 @@ public class AccountServiceTest extends JerseyTest {
 		// with username "testuser" already exists
 		resource().path(ServiceConfiguration.SVC_ACCOUNT)
 				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
-				  .queryParam(ServiceConfiguration.SVC_ACCOUNT_PASSWORD, password)
+				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 				  .post(new GenericType<ServiceResponse<Boolean>>() { });
 
 		ServiceResponse<Boolean> b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
 											   .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
-											   .queryParam(ServiceConfiguration.SVC_ACCOUNT_ACCOUNTNAME, accountname)
+											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
 											   .accept(MediaType.APPLICATION_JSON)
 											   .get(new GenericType<ServiceResponse<Boolean>>() { });
 
