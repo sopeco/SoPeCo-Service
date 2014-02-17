@@ -2,8 +2,10 @@ package org.sopeco.service.rest;
 
 import java.util.UUID;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -92,9 +94,58 @@ public class AccountService {
 		return new ServiceResponse<Boolean>(Status.OK, exists);
 	}
 	
+	/**
+	 * Stores the given {@link AccountDetails} in the database. Existing information
+	 * will be overwritten. This method is privileged and need a correct token, to modify
+	 * the database.
+	 * 
+	 * @param usertoken			the user authentification
+	 * @param accountDetails	the {@link AccountDetails}
+	 * @return 					true, if the {@link AccountDetails} could be stored
+	 */
+	@PUT
+	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> setInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken,
+										 	AccountDetails accountDetails) {
+		
+		if (accountDetails == null) {
+			LOGGER.debug("AccountDetails invalid");
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false,"AccountDetails invalid");
+		}
+		
+		ServiceResponse<Account> sr_account = getAccount(usertoken);
+		
+		if (sr_account.getStatus() != Status.OK) {
+			LOGGER.debug("Invalid token");
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+		
+		Account account = sr_account.getObject();
+		
+		if (account == null) {
+			LOGGER.debug("Invalid token");
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+	
+		// now check if account details correspond to the given token
+		if (accountDetails.getId() == account.getId() &&
+			accountDetails.getAccountName().equals(account.getName())) {
+
+			ServicePersistenceProvider.getInstance().storeAccountDetails(accountDetails);
+			return new ServiceResponse<Boolean>(Status.OK, true);
+			
+		} else {
+			
+			LOGGER.debug("Token does not authorize to modify this account.");
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			
+		}
+	}
 	
 	/**
-	 * Access the account information for a given username.
+	 * Access the {@link AccountDetails} information for a given username.
 	 * 
 	 * @param accountname 	the accountname the information is requested to
 	 * @return 				{@link AccountDetails} object with all the account details
@@ -110,8 +161,10 @@ public class AccountService {
 		return new ServiceResponse<AccountDetails>(Status.OK, accountDetails);
 	}
 	
+	
 	/**
-	 * Access the account as such with the given user token.
+	 * Access the account as such with the given user token. The result should not be <code>null</code>,
+	 * but might be.
 	 * 
 	 * @param usertoken the user identification
 	 * @return 			the account the current user is related to
@@ -242,6 +295,30 @@ public class AccountService {
 		return sr;
 	}
 	
+	/**
+	 * Logout just means to remove the user with the given token in the database.
+	 * 
+	 * @param usertoken 	the user authentification
+	 * @return 				true, if the logout was successful; false, if the token
+	 * 						is not valid
+	 */
+	@PUT
+	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> logout(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+		
+		Users u = AccountService.loadUserAndUpdateExpiration(usertoken);
+		
+		if (u == null) {
+			LOGGER.debug("Invalid token.");
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+
+		ServicePersistenceProvider.getInstance().removeUser(u);
+		
+		return new ServiceResponse<Boolean>(Status.OK, true);
+	}
+	
 	
 	
 
@@ -331,7 +408,7 @@ public class AccountService {
 		
 		u.setLastRequestTime(System.currentTimeMillis());
 		
-		ServicePersistenceProvider.getInstance().removeUser(u);
+		ServicePersistenceProvider.getInstance().storeUser(u);
 
 		return u;
 	}
