@@ -426,7 +426,7 @@ public class ExecutionServiceTest extends JerseyTest {
 		String controllerURL 	= "myCustomURL";
 		String label 			= "myScheduledExperiment";
 		long accountId 			= sr_account.getObject().getId();
-		boolean scenarioActive 	= true;
+		boolean scenarioActive 	= false; // must be false, otherwise will fail on scheduledExperiment integrity check when adding
 		long addedTime 			= System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
@@ -487,7 +487,7 @@ public class ExecutionServiceTest extends JerseyTest {
 					        .type(MediaType.APPLICATION_JSON)
 					        .get(new GenericType<ServiceResponse<ScheduledExperiment>>() { });
 
-		assertEquals(scenarioActive, sr_se2.getObject().isActive());
+		assertEquals(false, sr_se2.getObject().isActive());
 		
 		// now enable the scheulded experiment again
 		scenarioActive = true;

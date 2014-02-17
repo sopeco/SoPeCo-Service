@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.ExecutionScheduler;
 import org.sopeco.service.execute.ScheduleExpression;
@@ -48,15 +49,17 @@ public class ExecutionService {
 	/**
 	 * Adds a {@link ScheduledExperiment} to the service.
 	 * The last execution time for the schedule is set to <i>-1</i> and the
-	 * properties are referenced from the Configuration with the given token.
+	 * properties are referenced from the Configuration with the given token.<br />
+	 * An integrity check is done for active scenarios: Their selected experiment
+	 * list if checked to be valid. If this test fails, the adding fails.
 	 * <br />
 	 * <br />
 	 * If the schedule is set reapeated, the next valid execution date is calculated. But even
 	 * if the ScheduledExperiment is not repeated, the execution time is set.
 	 * 
-	 * @param usertoken the user identification
-	 * @param scheduledExperiment the ScheduledExperiment object
-	 * @return true, if the ScheduledExperiement has be added
+	 * @param usertoken 			the user identification
+	 * @param scheduledExperiment 	the ScheduledExperiment object
+	 * @return 						true, if the ScheduledExperiement has be added
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -70,6 +73,12 @@ public class ExecutionService {
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+		
+		// test if the set scheduled experiments is valid for active scenarios
+		if (scheduledExperiment.isActive() && !experimentSeriesIsValid(scheduledExperiment)) {
+			LOGGER.info("The selected experiments are corrupt.");
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "The selected experiments are corrupt.");
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
@@ -228,6 +237,8 @@ public class ExecutionService {
 		
 		return new ServiceResponse<ScheduledExperiment>(Status.OK, exp);
 	}
+	
+	
 	
 	/**
 	 * Enables the given {@link ScheduledExperiment} via it's ID. The experiment is only
@@ -450,9 +461,6 @@ public class ExecutionService {
 
 		for (ExperimentSeriesDefinition esd : exp.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
 			
-
-			System.out.println(esd.getName());
-			
 			if (esd.getName().equals(experimentseriesname)) {
 				validName = true;
 				break;
@@ -529,5 +537,56 @@ public class ExecutionService {
 		
 		return new ServiceResponse<MECLog>(Status.OK, tmpMECLog);
 	}
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////// HELPER ///////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Returns whether the given {@link ScheduledExperiment} has a valid list of
+	 * scheduled experiments. The integrity test first tests if the list as such
+	 * is valid. If the list is valid, every entry in the list is checked to
+	 * maps to an existing {@link ExperimentSeriesDefinition} in the underlying
+	 * {@link ScenarioDefinition}.
+	 * 
+	 * @param experiment	the {@link ScheduledExperiment} to check
+	 * @return				true, if the scheduled experiment list is valid
+	 */
+	private boolean experimentSeriesIsValid(ScheduledExperiment experiment) {
+		
+		// first check for a valid selected experiment list
+		List<String> selectedExperiment = experiment.getSelectedExperiments();
+		
+		if (selectedExperiment == null || selectedExperiment.isEmpty()) {
+			return false;
+		}
+		
+		// second check for valid selected names
+		boolean validName = false;
+
+		for (String experimentName : selectedExperiment) {
+			
+			for (ExperimentSeriesDefinition esd : experiment.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
+				
+				if (esd.getName().equals(experimentName)) {
+					validName = true;
+				}
+				
+			}
+			
+			// only if no experimentSeries with the given name was found
+			if (!validName) {
+				return false;
+			}
+			
+			validName = false;
+			
+		}
+		
+		return true;
+	}
+	
 	
 }
