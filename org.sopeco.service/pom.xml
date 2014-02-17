@@ -14,6 +14,10 @@
 		<jersey.version>1.17.1</jersey.version>
 		<jackson.version>2.3.0</jackson.version>
 		<qos-logback.version>1.0.13</qos-logback.version>
+		<org.apache.maven.jar-plugins.version>2.4</org.apache.maven.jar-plugins.version>
+		<org.apache.maven.war-plugins.version>2.4</org.apache.maven.war-plugins.version>
+		<org.apache.maven.compiler-plugins.version>3.1</org.apache.maven.compiler-plugins.version>
+		<org.apache.maven.install-plugins.version>2.5.1</org.apache.maven.install-plugins.version>
 	</properties>
 	
 	<!-- ================REPOSITORIES================= -->
@@ -112,7 +116,7 @@
 			<plugin>
 		        <groupId>org.apache.maven.plugins</groupId>
 		        <artifactId>maven-compiler-plugin</artifactId>
-		        <version>3.0</version>
+				<version>${org.apache.maven.compiler-plugins.version}</version>
 		        <configuration>
 		           <source>1.7</source>
 		           <target>1.7</target>
@@ -123,7 +127,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.4</version>
+				<version>${org.apache.maven.war-plugins.version}</version>
 				<configuration>
 				    
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
@@ -141,6 +145,46 @@
 					</webResources>
 					
 				</configuration>
+			</plugin>
+			
+			<!-- in addition to the war-file build a jar file -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>${org.apache.maven.jar-plugins.version}</version>
+				<executions>
+					<execution>
+						<id>make-a-jar</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			
+			<!-- move the jar into the local repository after building -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-install-plugin</artifactId>
+				<version>${org.apache.maven.install-plugins.version}</version>
+				<executions>
+					<execution>
+						<phase>install</phase>
+						<goals>
+							<goal>install-file</goal>
+						</goals>
+						<configuration>
+							<packaging>jar</packaging>
+							<artifactId>${project.artifactId}</artifactId>
+							<groupId>${project.groupId}</groupId>
+							<version>${project.version}</version>
+							<file>
+								${project.build.directory}/${project.artifactId}-${project.version}.jar
+							</file>
+						</configuration>
+					</execution>
+				</executions>
 			</plugin>
 			
 		</plugins>
