@@ -60,7 +60,7 @@ public class AccountService {
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
 	 * @param dbname		the database name
-	 * @param dbport	the database password
+	 * @param dbport		the database password
 	 * @return 				true, if the account creation was succesful
 	 */
 	@POST
@@ -136,8 +136,36 @@ public class AccountService {
 	
 	
 	/**
+	 * Access the account as such with the given user token.
+	 * 
+	 * @param usertoken the user identification
+	 * @return 			the account the current user is related to
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CHECK + "/" + ServiceConfiguration.SVC_ACCOUNT_PASSWORD)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> checkPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+			      								  @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
+
+		Account account = ServicePersistenceProvider.getInstance().loadAccount(accountname);
+	
+		if (account == null) {
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+		
+		if (!account.getPasswordHash().equals(Crypto.sha256(password))) {
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+	
+		return new ServiceResponse<Boolean>(Status.OK, true);
+	}
+	
+	/**
 	 * The login method to authentificate that the current client has the permission to
 	 * change something on this account.
+	 * This method does only throw an <code>Status.UNAUTHORIZED</code> when the request fails.
+	 * This is for security, that attacker cannot guess usernames and get a wrong-right answer
+	 * on usernames.
 	 * 
 	 * @param accountname 	the account name to connect to
 	 * @param password 		the password for the account
@@ -156,7 +184,7 @@ public class AccountService {
 		if (account == null) {
 			LOGGER.debug("Account '{}' doesn't exist.", accountname);
 			sr.setMessage("Account does not exist.");
-			sr.setStatus(Status.FORBIDDEN);
+			sr.setStatus(Status.UNAUTHORIZED);
 			return sr;
 		}
 		if (!account.getPasswordHash().equals(Crypto.sha256(password))) {
@@ -196,7 +224,10 @@ public class AccountService {
 	
 	
 	
-	/*****************HELPER***********************/
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////// HELPER //////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Creates an fresh new account with all the given settings. The account is stored in the database.
@@ -243,4 +274,45 @@ public class AccountService {
 		return testIfExist != null;
 	}
 	
+	
+	
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////// GLOBAL STATIC HELPER ///////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Loads the {@link Users} with the given token. First it's checked if the token
+	 * is still valid. When the token is expired the user (<b>NOT</b> the
+	 * account!) is removed from the database.<br />
+	 * With this test, the {@link Users} last request time is updated with the current
+	 * system time.
+	 * 
+	 * @param usertoken the unique user token
+	 * @return			the {@link Users} with the token, <code>null</code> if the token is
+	 * 					invalid or expired
+	 */
+	public static Users loadUserAndUpdateExpiration(String usertoken) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Token invalid.");
+			return null;
+		}
+		
+		if (u.isExpired()) {
+			
+			LOGGER.info("Token expired. Login again please.");
+			ServicePersistenceProvider.getInstance().removeUser(u);
+			return null;
+			
+		}
+		
+		u.setLastRequestTime(System.currentTimeMillis());
+		
+		ServicePersistenceProvider.getInstance().removeUser(u);
+
+		return u;
+	}
 }

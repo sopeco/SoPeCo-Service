@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ServiceConfiguration {
 	
 	public static final String USER_TIMEOUT = "sopeco.service.userTimeout";
-
+	
 	public static final String CONFIGURATION_FILE = "sopeco-service.conf";
 
 	public static final String SESSION_ID = "sessionid";
@@ -99,6 +99,7 @@ public abstract class ServiceConfiguration {
 	 * 	 	- details
 	 */
 	public static final String SVC_ACCOUNT = "account";
+	public static final String SVC_ACCOUNT_CHECK = "check";
 	public static final String SVC_ACCOUNT_CREATE = "create";
 	public static final String SVC_ACCOUNT_EXISTS = "exists";
 	public static final String SVC_ACCOUNT_LOGIN = "login";
@@ -186,11 +187,6 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_ID = "id";
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY = "key";
-	
-	/**
-	 * QueryParam name for the account name.
-	 */
-	public static final String SVC_ACCOUNT_ACCOUNTNAME = "accountname";
 	
 	/**
 	 * QueryParam name for the account password.
