@@ -110,7 +110,6 @@ public class AccountService {
 		return new ServiceResponse<AccountDetails>(Status.OK, accountDetails);
 	}
 	
-
 	/**
 	 * Access the account as such with the given user token.
 	 * 
@@ -157,6 +156,27 @@ public class AccountService {
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
 	
+		return new ServiceResponse<Boolean>(Status.OK, true);
+	}
+	
+	/**
+	 * Access the account as such with the given user token.
+	 * 
+	 * @param usertoken the user identification
+	 * @return 			the account the current user is related to
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CHECK + "/" + ServiceConfiguration.SVC_ACCOUNT_TOKEN)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> checkToken(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+		
 		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
 	

@@ -104,6 +104,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_EXISTS = "exists";
 	public static final String SVC_ACCOUNT_LOGIN = "login";
 	public static final String SVC_ACCOUNT_INFO = "info";
+	public static final String SVC_ACCOUNT_TOKEN = "token";
 	public static final String SVC_ACCOUNT_CONNECTED = "connected";
 	public static final String SVC_ACCOUNT_CUSTOMIZE = "customize";
 	public static final String SVCP_ACCOUNT_NAME = "accountname";
@@ -194,6 +195,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	public static final String SVC_USER = "user";
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
 
 
 
