@@ -2,24 +2,18 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
-import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 /**
@@ -68,17 +62,16 @@ public class AccountServiceTest extends JerseyTest {
 			    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
 			    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 			    .request(MediaType.APPLICATION_JSON_TYPE)
-			    .post(Entity.entity(new GenericType<ServiceResponse<Boolean>>() { }, MediaType.APPLICATION_JSON_TYPE));
+			    .post(Entity.entity(Response.class, MediaType.APPLICATION_JSON));
 		
 		Response r = target().path(ServiceConfiguration.SVC_ACCOUNT)
 				             .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
 				             .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
 				             .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
 				             .request(MediaType.APPLICATION_JSON_TYPE)
-				             .post(Entity.entity(new GenericType<ServiceResponse<Boolean>>() { }, MediaType.APPLICATION_JSON_TYPE));
+				             .post(Entity.entity(Response.class, MediaType.APPLICATION_JSON));
 
-		assertEquals(false, r.readEntity(new GenericType<ServiceResponse<Boolean>>() { }).getObject());
-		//assertEquals(true, Status.FORBIDDEN == r.readEntity(new GenericType<ServiceResponse<Boolean>>() { }).getStatus());
+		assertEquals(true, Status.FORBIDDEN.getStatusCode() == r.getStatus());
 	}
 
 	/**
@@ -91,19 +84,21 @@ public class AccountServiceTest extends JerseyTest {
 		
 		// the creation might fail, but we are only interested if afterwards at least one user
 		// with username "testuser" already exists
-		/*resource().path(ServiceConfiguration.SVC_ACCOUNT)
-				  .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
-				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-				  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-				  .post(new GenericType<ServiceResponse<Boolean>>() { });
+		target().path(ServiceConfiguration.SVC_ACCOUNT)
+			    .path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
+			    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+			    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+			    .request(MediaType.APPLICATION_JSON_TYPE)
+			    .post(Entity.entity(Response.class, MediaType.APPLICATION_JSON));
 
-		ServiceResponse<Boolean> b = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-											   .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
-											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-											   .accept(MediaType.APPLICATION_JSON)
-											   .get(new GenericType<ServiceResponse<Boolean>>() { });
+		Response r = target().path(ServiceConfiguration.SVC_ACCOUNT)
+						     .path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+						     .request(MediaType.APPLICATION_JSON_TYPE)
+						     .get(Response.class);
 
-		assertEquals(true, b.getObject());*/
+		assertEquals(true, Status.OK.getStatusCode() == r.getStatus());
+		assertEquals(true, r.readEntity(Boolean.class));
 	}
 	
 }
