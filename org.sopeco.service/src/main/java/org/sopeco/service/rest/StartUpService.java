@@ -1,9 +1,9 @@
 package org.sopeco.service.rest;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 import javax.ws.rs.ext.Provider;
 
+import org.glassfish.jersey.server.spi.AbstractContainerLifecycleListener;
+import org.glassfish.jersey.server.spi.Container;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAcception;
@@ -12,8 +12,8 @@ import org.sopeco.service.execute.ExecutionScheduler;
 
 /**
  * The <code>StartUpService</code> class is used to handle the initialization of Servlets.
- * This class is called once in the program lifetime for the initialization ({@code
- * contextInitialized}) and once when shutting down ({@code contextDestroyed}).
+ * This class is called once in the program lifetime for the initialization {@link
+ * #onStartup(Container)} and once when shutting down {@link #onShutdown(Container)}.
  * <br />
  * <br />
  * One initialization is the ServerSocket startup for listening for MEControllers.
@@ -21,22 +21,20 @@ import org.sopeco.service.execute.ExecutionScheduler;
  * @author Peter Merkert
  */
 @Provider
-public final class StartUpService implements ServletContextListener {
+public final class StartUpService extends AbstractContainerLifecycleListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartUpService.class);
-	
+		
 	/**
 	 * Starts a ServerSocket via the <code>SocketAcception</code> to wait for
 	 * <code>MeasurementEnvironmentController</code> connections.
 	 * <br />
 	 * This is a non-blocking method, because the ServerSocket is handled
 	 * via the class <code>SocketAcception</code>.
-	 * 
-	 * @param sce	the {@link ServletContextEvent}
 	 */
 	@Override
-    public void contextInitialized(ServletContextEvent sce) {
-    	
+	public void onStartup(Container arg0) {
+
 		LOGGER.debug("RESTful SoPeCo Service Layer starting up.");	
 		
 		try {
@@ -49,15 +47,14 @@ public final class StartUpService implements ServletContextListener {
 		// start the experiment scheduler to peek for executable senarios
 		ExecutionScheduler.getInstance().startScheduler();
 		
-    }
+	}
 
 	/**
-	 * Currently this method is empty overwritten.
-	 * 
-	 * @param sce	the {@link ServletContextEvent}
+	 * Stops the {@link ExecutionScheduler}, which was started in the beginning.
 	 */
 	@Override
-    public void contextDestroyed(ServletContextEvent sce) {
+	public void onShutdown(Container arg0) {
+
 		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");
 		
 		// start the experiment scheduler to peek for executable senarios
@@ -65,6 +62,6 @@ public final class StartUpService implements ServletContextListener {
 			LOGGER.info("Shutdown of experiment scheduler failed. Try again.");
 		}
 		
-    }
-    
+	}
+	
 }
