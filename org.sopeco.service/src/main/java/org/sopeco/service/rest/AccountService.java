@@ -153,12 +153,17 @@ public class AccountService {
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<AccountDetails> getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
+	public ServiceResponse<AccountDetails> getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
 		
-		Long accountID = ServicePersistenceProvider.getInstance().loadAccount(accountname).getId();
-		AccountDetails accountDetails = ServicePersistenceProvider.getInstance().loadAccountDetails(accountID);
-
-		return new ServiceResponse<AccountDetails>(Status.OK, accountDetails);
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+				
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return new ServiceResponse<AccountDetails>(Status.UNAUTHORIZED, null);
+		}	
+		
+		return new ServiceResponse<AccountDetails>(Status.OK, u.getAccountDetails());
 	}
 	
 	
@@ -178,7 +183,7 @@ public class AccountService {
 		
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return null;
+			return new ServiceResponse<Account>(Status.UNAUTHORIZED, null);
 		}
 		
 		Account a = ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
@@ -213,10 +218,13 @@ public class AccountService {
 	}
 	
 	/**
-	 * Access the account as such with the given user token.
+	 * Access the account as such with the given user token. It's a GET method, but the last
+	 * request time for the user is refreshed. Actually a GET should not change anything at
+	 * the system. Otherwise this method might say, the token is valid, but in the next millisecond
+	 * the tokens get invalid. This is confusing for clients.
 	 * 
 	 * @param usertoken the user identification
-	 * @return 			the account the current user is related to
+	 * @return 			true, if the given token is valid
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CHECK + "/" + ServiceConfiguration.SVC_ACCOUNT_TOKEN)
@@ -229,6 +237,10 @@ public class AccountService {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
+		
+		// reset the timer for the token
+		u.setLastRequestTime(System.currentTimeMillis());
+		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
@@ -303,7 +315,7 @@ public class AccountService {
 	 * 						is not valid
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
+	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGOUT)
 	@Produces(MediaType.APPLICATION_JSON)
 	public ServiceResponse<Boolean> logout(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
 		
