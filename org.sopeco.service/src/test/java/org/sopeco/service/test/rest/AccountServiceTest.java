@@ -2,23 +2,29 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.AccountService;
+import org.sopeco.service.rest.json.CustomObjectMapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
+
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * The <code>AccountServiceTest</code> tests various features of the
- * <code>AccountService</code> RESTful services.
+ * {@link AccountService} RESTful services.
  * 
  * @author Peter Merkert
  */
@@ -34,17 +40,36 @@ public class AccountServiceTest extends JerseyTest {
 	}
 
 	/**
-	 * Configure is called on the object creation of a JerseyTest. It's used to
-	 * configure where the JerseyTest can find JSON, the REST service to test.
-	 * <br />
-	 * In addition this method can inject custom ObjectWrapper for Jackson
-	 * JSON (un)marshalling.
+	 * This method is called on the Grizzly container creation of a {@link JerseyTest}.
+	 * It's used to configure where the servlet container.<br />
+	 * In this case, the package is definied where the RESTful services are and
+	 * the {@link CustomObjectMapper} is registered.
 	 */
 	@Override
     protected Application configure() {
-		ResourceConfig rc = new ResourceConfig().packages(TestConfiguration.PACKAGE_NAME_REST);
+		ResourceConfig rc = new ResourceConfig();
+		rc.packages(TestConfiguration.PACKAGE_NAME_REST);
+		
+		// the CustomObjectMapper must be wrapped into a Jackson Json Provider
+		// otherwise Jersey does not recognize to use Jackson for JSON
+		// converting
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+		rc.register(provider);
+		
 		return rc;
     }
+
+	/**
+	 * The {@link Client} needs also the {@link CustomObjectMapper}, which
+	 * defines the mixin used when the objects were serialized.
+	 */
+	@Override
+	protected void configureClient(ClientConfig config) {
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+        config.register(provider);
+	}
 	
 	/**
 	 * Checks if it is possible to resgister an account twice.
