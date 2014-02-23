@@ -71,7 +71,7 @@ public class AccountServiceTest extends JerseyTest {
 				             .request(MediaType.APPLICATION_JSON_TYPE)
 				             .post(Entity.entity(Response.class, MediaType.APPLICATION_JSON));
 
-		assertEquals(true, Status.FORBIDDEN.getStatusCode() == r.getStatus());
+		assertEquals(true, Status.CONFLICT.getStatusCode() == r.getStatus());
 	}
 
 	/**

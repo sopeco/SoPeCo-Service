@@ -40,8 +40,7 @@ public class AccountService {
 	 * 
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
-	 * @return 				{@link Response} with Boolean: true, if the account creation
-	 * 						was succesful
+	 * @return 				{@link Response} OK or CONFLICT<br />
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
@@ -62,7 +61,7 @@ public class AccountService {
 	 * @param password	 	the password for the account
 	 * @param dbname		the database name
 	 * @param dbport		the database password
-	 * @return 				{@link Response} with Boolean: true, if the account creation was succesful
+	 * @return 				{@link Response} OK or CONFLICT<br />
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/" + ServiceConfiguration.SVC_ACCOUNT_CUSTOMIZE)
@@ -79,7 +78,7 @@ public class AccountService {
 	 * Checks if an account with the given name exists.
 	 * 
 	 * @param accountname 	the accountname
-	 * @return 				Response with a Boolean: true, if the account exists
+	 * @return 				{@link Response} OK with Boolean: true, if the account exists
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_EXISTS)
@@ -95,7 +94,7 @@ public class AccountService {
 	 * Access the account information for a given username.
 	 * 
 	 * @param accountname 	the accountname the information is requested to
-	 * @return 				{@link Response} with {@link AccountDetails}, AccountDetails can be null
+	 * @return 				{@link Response} with {@link AccountDetails} (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
@@ -113,7 +112,8 @@ public class AccountService {
 	 * Access the account as such with the given user token.
 	 * 
 	 * @param usertoken the user identification
-	 * @return 			the account the current user is related to
+	 * @return 			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with {@link Account} (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
@@ -139,7 +139,8 @@ public class AccountService {
 	 * 
 	 * @param accountname 	the account name to connect to
 	 * @param password 		the password for the account
-	 * @return 				{@link Response} with a the token as a String
+	 * @return 				{@link Response} OK or UNAUTHORIZED<br />
+	 * 						OK with a the token as String
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
@@ -151,7 +152,7 @@ public class AccountService {
 
 		if (account == null) {
 			LOGGER.debug("Account '{}' doesn't exist.", accountname);
-			return Response.status(Status.FORBIDDEN).entity("Account does not exist.").build();
+			return Response.status(Status.UNAUTHORIZED).entity("Account does not exist.").build();
 		}
 		
 		if (!account.getPasswordHash().equals(Crypto.sha256(password))) {
@@ -183,8 +184,9 @@ public class AccountService {
 	}
 	
 	
-	
-	/*****************HELPER***********************/
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////// HELPER /////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Creates an fresh new account with all the given settings. The account is stored in the database.
@@ -193,14 +195,13 @@ public class AccountService {
 	 * @param password  	the password to login into this account
 	 * @param dbHost 		the database for this account
 	 * @param dbPort 		the database port for this account
-	 * @return            	{@link Response} with the status of the request
+	 * @return            	{@link Response} OK or CONFLICT
 	 */
 	private Response createAccount(String accountName, String password, String dbHost, int dbPort) {
 		
 		if (accountExist(accountName)) {
 			LOGGER.info("It already exists an account named '{}'", accountName);
-			
-			return Response.status(Status.FORBIDDEN).entity("Account with the name \"" + accountName + "\" already exists.").build();
+			return Response.status(Status.CONFLICT).entity("Account with the name \"" + accountName + "\" already exists.").build();
 		}
 
 		Account account = new Account();
