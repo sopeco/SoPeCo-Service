@@ -4,12 +4,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 
 import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>InformationService</code> provides simple information about the SoPeCo service layer.
@@ -38,15 +37,15 @@ public class InformationService {
 	}
 	
 	/**
-	 * Returns true, if the service is running.
+	 * Returns always OK.
 	 * 
-	 * @return true, if the service is running
+	 * @return {@link Response} OK
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_INFO_RUNNING)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> running() {
-		return new ServiceResponse<Boolean>(Status.OK, true);
+	public Response running() {
+		return Response.ok().build();
 	}
 	
 }
