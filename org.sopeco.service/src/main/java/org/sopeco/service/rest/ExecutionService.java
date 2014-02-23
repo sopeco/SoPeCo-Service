@@ -13,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -32,7 +33,6 @@ import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.ExperimentStatus;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>ExecutionService</code> class provides the service to {@link ScheduledExperiment}s,
@@ -61,26 +61,27 @@ public class ExecutionService {
 	 * 
 	 * @param usertoken 			the user identification
 	 * @param scheduledExperiment 	the ScheduledExperiment object
-	 * @return 						true, if the ScheduledExperiement has be added
+	 * @return 						{@link Response} with status OK, UNAUTHORIZED, CONFLICT or
+	 * 								INTERNAL_SERVER_ERROR
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> addScheduledExperiment(@QueryParam(TOKEN) String usertoken,
-										  				   ScheduledExperiment scheduledExperiment) {
+	public Response addScheduledExperiment(@QueryParam(TOKEN) String usertoken,
+						  				   ScheduledExperiment scheduledExperiment) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		// test if the set scheduled experiments is valid for active scenarios
 		if (scheduledExperiment.isActive() && !experimentSeriesIsValid(scheduledExperiment)) {
 			LOGGER.info("The selected experiments are corrupt.");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "The selected experiments are corrupt.");
+			return Response.status(Status.CONFLICT).entity("The selected experiments are corrupt.").build();
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
@@ -101,63 +102,66 @@ public class ExecutionService {
 
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(scheduledExperiment);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
-	 * Returns the current list of <code>ScheduledExperiment</code>s for the given account.
-	 * <br />
-	 * To get a single ScheduledExperiment, see <code>getScheduledExperiment()</code> in
+	 * Returns the current list of {@link ScheduledExperiment}s for the given account. <br />
+	 * To get a single ScheduledExperiment, see {@link #getScheduledExperiment(long, String)} in
 	 * this class.
 	 * 
 	 * @param usertoken the user identification
-	 * @return list of <code>ScheduledExperiment</code>, null if there are none
+	 * @return 			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with an entity: list of {@link ScheduledExperiment}s (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<List<ScheduledExperiment>> getScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
+	public Response getScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return null;
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		List<ScheduledExperiment> tmpList =	ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
 		
-		return new ServiceResponse<List<ScheduledExperiment>>(Status.OK, tmpList);
+		return Response.ok(tmpList).build();
 	}
 	
 	/**
-	 * Returns the database ID of the given {@code ScheduledExperiment}. When there is no
-	 * matching {@code ScheduledExperiment} found, -1 is returned.
+	 * Returns the database ID of the given {@link ScheduledExperiment}. When there is no
+	 * matching {@link ScheduledExperiment} found, -1 is returned.
 	 * 
 	 * This method is PUT rather than GET, because we need to pass a complex object to this
 	 * method. This is not possible, when the method is GET.
 	 * 
-	 * @param usertoken authentification for the user
-	 * @param scheduledExperiment the {@code ScheduledExperiment} the ID is searched to
-	 * @return >= 0 if a match was found in the database, < 0 if not
+	 * @param usertoken 			authentification for the user
+	 * @param scheduledExperiment 	the {@code ScheduledExperiment} the ID is searched to
+	 * @return 						{@link Response} OK (+ experiment id),
+	 * 								UNAUTHORIZED or NO_CONTENT<br />
+	 * 								experiment id is >= 0 if a match was found in the
+	 * 								database, < 0 if not
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_EXECUTE_ID)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Long> getScheduledExperimentID(@QueryParam(TOKEN) String usertoken,
-										 				  ScheduledExperiment scheduledExperiment) {
+	public Response getScheduledExperimentID(@QueryParam(TOKEN) String usertoken,
+							 				 ScheduledExperiment scheduledExperiment) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Long>(Status.UNAUTHORIZED, new Long(-1));
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 	
 		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
@@ -166,31 +170,31 @@ public class ExecutionService {
 		for (ScheduledExperiment se : list) {
 			
 			if (se.equals(scheduledExperiment)) {
-				return new ServiceResponse<Long>(Status.OK, new Long(se.getId()));
+				return Response.ok(se.getId()).build();
 			}
 			
 		}
 
 		LOGGER.info("No scheduled experiement matching to the given one was found in the dabatase.");
-		return new ServiceResponse<Long>(Status.NO_CONTENT, new Long(-1));
+		return Response.status(Status.NO_CONTENT).build();
 	}
 	
 	/**
 	 * Deletes all scheduled experiements for the user with the given token.
 	 * 
 	 * @param usertoken authentification for the user
-	 * @return true, if all scheduled experiements for the user could be deleted
+	 * @return 			{@link Response} OK or UNAUTHORIZED
 	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
+	public Response removeScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		List<ScheduledExperiment> scheduledExperiments = ServicePersistenceProvider.getInstance()
@@ -202,42 +206,43 @@ public class ExecutionService {
 			
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 
 	/**
 	 * Returns the <code>ScheduledExperiment</code> behind the current URI.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
+	 * @param id 		the ID of the ScheduledExperiment
 	 * @param usertoken the user identification
-	 * @return the <code>ScheduledExperiment</code> behind the current URI
+	 * @return 			{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
+	 * 					OK has a {@link ScheduledExperiment} as entity
 	 */
 	@GET
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<ScheduledExperiment> getScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+	public Response getScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 										  		      				   @QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<ScheduledExperiment>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<ScheduledExperiment>(Status.CONFLICT, null, "Invalid scheduling id.");
+			return Response.status(Status.CONFLICT).encoding("Invalid scheduling id.").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<ScheduledExperiment>(Status.UNAUTHORIZED, null, "Others users experiment!");
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		return new ServiceResponse<ScheduledExperiment>(Status.OK, exp);
+		return Response.ok(exp).build();
 	}
 	
 	
@@ -252,32 +257,33 @@ public class ExecutionService {
 	 * 
 	 * @param id 		the ID of the {@link ScheduledExperiment}
 	 * @param usertoken the user identification
-	 * @return 			true, if the {@link ScheduledExperiment} could be enabled
+	 * @return 			{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
+	 * 					OK has a an Integer (experiment key) as entity
 	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
 	      + "/" + ServiceConfiguration.SVC_EXECUTE_ENABLE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Integer> setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+	public Response setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												 				  @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Integer>(Status.UNAUTHORIZED, -1);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Integer>(Status.CONFLICT, -1);
+			return Response.status(Status.CONFLICT).entity("Invalid scheduling id.").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Integer>(Status.UNAUTHORIZED, -1);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		// check if any experimentseriesdefinition have been selected
@@ -285,91 +291,92 @@ public class ExecutionService {
 		
 		if (experiments == null || experiments.isEmpty()) {
 			LOGGER.info("No ExperimentSeriesDefinition selected yet. Cannot start scenario.");
-			return new ServiceResponse<Integer>(Status.CONFLICT, -1);
+			return Response.status(Status.CONFLICT).entity("No ExperimentSeriesDefinition selected yet."
+															+ "Cannot start scenario.").build();
 		}	
 		
-		// this is the crutual line. A thread analyses the scheduledexperiment for active one and they are added
-		// to the execution list
+		// this is the crutual line: A background thread analyses the scheduledexperiment in the database for
+		// active ones and they are added to the executionqueue
 		exp.setActive(true);
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 		
-		return new ServiceResponse<Integer>(Status.OK, exp.getExperimentKey());
+		return Response.ok(exp.getExperimentKey()).build();
 	}
 	
 	/**
 	 * Disables the given <code>ScheduledExperiment</code> via it's ID.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
+	 * @param id 		the ID of the ScheduledExperiment
 	 * @param usertoken the user identification
-	 * @return true, if the ScheduledExperiment could be disabled
+	 * @return 			{@link Response} OK, CONFLICT or UNAUTHORIZED
 	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DISABLE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+	public Response setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 											  					   @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false);
+			return Response.status(Status.CONFLICT).entity("Invalid scheduling id").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		exp.setActive(false);
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
-	 * Removes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
+	 * Removes the {@link ScheduledExperiment}, which is identified via the ID in the URI.
 	 * 
 	 * @param id 		the ID of the ScheduledExperiment
 	 * @param usertoken the user identification
-	 * @return 			true, if the ScheduledExperiment could be removed
+	 * @return 			{@link Response} OK, CONFLICT or UNAUTHORIZED
 	 */
 	@DELETE
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+	public Response removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     					  @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false);
+			return Response.status(Status.CONFLICT).entity("Invalid scheduling id").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -379,19 +386,20 @@ public class ExecutionService {
 	 * 
 	 * @param id		the experiment key
 	 * @param usertoken	the user identification
-	 * @return			the {@link ExperimentStatus} of the experiment
+	 * @return			{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
+	 * 					OK with the {@link ExperimentStatus} as entity
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<ExperimentStatus> getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
 									     					  			  @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<ExperimentStatus>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(String.valueOf(key));
@@ -400,10 +408,10 @@ public class ExecutionService {
 		// and the QueuedExperiment is searched for the key.
 		if (status == null) {
 			LOGGER.info("The experiment key is corrupt.", usertoken);
-			return new ServiceResponse<ExperimentStatus>(Status.CONFLICT, null, "The experiment key is corrupt.");
+			return Response.status(Status.CONFLICT).entity("The experiment key is corrupt.").build();
 		}
-		
-		return new ServiceResponse<ExperimentStatus>(Status.OK, status);
+
+		return Response.ok(status).build();
 	}
 	
 	/**
@@ -413,33 +421,32 @@ public class ExecutionService {
 	 * @param id					the ID of the {@link ScheduledExperiment}
 	 * @param experimentseriesname	the name of the {@link ExperimentSeriesDefinition}
 	 * @param usertoken				the user identification
-	 * @return						true, if the {@link ExperimentSeriesDefinition} is removed
+	 * @return						{@link Response} OK, CONFLICT or UNAUTHORIZED
 	 */
 	@DELETE
-	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
-		  + "/" + ServiceConfiguration.SVC_EXECUTE_ESD)
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_ESD)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeSelectedExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
-												  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
-											  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
+	public Response removeSelectedExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+								  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
+							  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "invalid scheduling id");
+			return Response.status(Status.CONFLICT).entity("invalid scheduling id").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		// check for the name in the active ESD list	
@@ -454,7 +461,7 @@ public class ExecutionService {
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -463,33 +470,33 @@ public class ExecutionService {
 	 * @param id					the experiment ID
 	 * @param experimentseriesname	the name of the {@link ExperimentSeriesDefinition}
 	 * @param usertoken				the user identification
-	 * @return						true, if the {@link ExperimentSeriesDefinition} was added
+	 * @return						{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
 	 */
 	@PUT
 	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
 		  + "/" + ServiceConfiguration.SVC_EXECUTE_ESD)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> selectExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
-												  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
-										  	  				 		 @QueryParam(TOKEN) String usertoken) {
+	public Response selectExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+								  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
+						  	  				 		 @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "invalid scheduling id");
+			return Response.status(Status.CONFLICT).entity("invalid scheduling id").build();
 		}
 
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		// check if experiment series name is valid
@@ -506,7 +513,8 @@ public class ExecutionService {
 
 		if (!validName) {
 			LOGGER.info("There is no ExperimentSeriesDefinition with the given name.");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false);
+			return Response.status(Status.CONFLICT).entity("There is no ExperimentSeriesDefinition"
+															+ " with the given name.").build();
 		}
 
 		List<String> experimentList = exp.getSelectedExperiments();
@@ -519,25 +527,26 @@ public class ExecutionService {
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
 	 * Returns the <code>ExecutedExperimentDetails</code> for the user selected scenario.
 	 * 
 	 * @param usertoken the user identification
-	 * @return list of ExecutedExperimentDetails
+	 * @return 			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with list of {@link ExecutedExperimentDetails} (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_DETAILS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<List<ExecutedExperimentDetails>> getExecutedExperimentDetails(@QueryParam(TOKEN) String usertoken) {
+	public Response getExecutedExperimentDetails(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<List<ExecutedExperimentDetails>>(Status.UNAUTHORIZED);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		long accountId = u.getCurrentAccount().getId();
@@ -545,33 +554,33 @@ public class ExecutionService {
 		
 		List<ExecutedExperimentDetails> tmpList = ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(accountId, scenarioName);
 		
-		return new ServiceResponse<List<ExecutedExperimentDetails>>(Status.OK, tmpList);
+		return Response.ok(tmpList).build();
 	}
 	
 	/**
 	 * Returns the <code>MECLog</code> for the given user and MECLog ID.
 	 * 
 	 * @param usertoken the user identification
-	 * @param id the MECLog ID
-	 * 
-	 * @return MECLog with the given ID
+	 * @param id 		the MECLog ID
+	 * @return 			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with {@link MECLog} entity (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_MECLOG)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<MECLog> getMECLog(@QueryParam(TOKEN) String usertoken,
+	public Response getMECLog(@QueryParam(TOKEN) String usertoken,
 				    			    		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<MECLog>(Status.UNAUTHORIZED);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		MECLog tmpMECLog = ServicePersistenceProvider.getInstance().loadMECLog(id);
-		
-		return new ServiceResponse<MECLog>(Status.OK, tmpMECLog);
+
+		return Response.ok(tmpMECLog).build();
 	}
 	
 	

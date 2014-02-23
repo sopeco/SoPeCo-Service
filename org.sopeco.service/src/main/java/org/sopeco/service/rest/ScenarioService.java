@@ -11,7 +11,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -33,7 +35,6 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
 /**
@@ -53,8 +54,7 @@ public class ScenarioService {
 	/**
 	 * Adds a new scenario with the given values. This method <b>DOES NOT</b> switch to the
 	 * newly created scenario. The scenario must be switched manually via the service
-	 * at {@code scenario/switch}.
-	 * <br />
+	 * at {@link #switchScenario(String, String)}.<br />
 	 * <br />
 	 * To have a correct created scenario, the {@link ExperimentSeriesDefinition} must have
 	 * a non-null {@link ExplorationStrategy} added. If it's still null, when attempting to
@@ -64,26 +64,27 @@ public class ScenarioService {
 	 * @param specificationName the measurment specification name
 	 * @param usertoken	 		the user identification
 	 * @param esd 				the {@link ExperimentSeriesDefinition}
-	 * @return 					true, if the scenario was added succesfully. False if a scenario
-	 * 		   					with the given already exists.
+	 * @return 					{@link Response} OK, CONFLICT, UNAUTHORIZED or
+	 * 							INTERNAL_SERVER_ERROR<br />
+	 * 							OK if scenario was added succesfully
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD + "/{" + NAME + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> addScenario(@PathParam(NAME) String scenarioName,
-											    @QueryParam("specname") String specificationName,
-											    @QueryParam(TOKEN) String usertoken,
-											    ExperimentSeriesDefinition esd) {
-
-		LOGGER.debug("Adding scenario with name '{}'", scenarioName);
+	public Response addScenario(@PathParam(NAME) String scenarioName,
+							    @QueryParam("specname") String specificationName,
+							    @QueryParam(TOKEN) String usertoken,
+							    ExperimentSeriesDefinition esd) {
+		
+		LOGGER.debug("Checking scenario adding (scenario name '{}').", scenarioName);
 		
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		// check if a scenario with the given name already exsists
 		if (loadScenarioDefinition(scenarioName, usertoken) != null) {
 			LOGGER.info("A scenario with the given name '{}' already exsits!", scenarioName);
-			return new ServiceResponse<Boolean>(Status.OK, false, "scenario name already exsits");
+			return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
 		}
 		
 		ScenarioDefinitionBuilder sdb = new ScenarioDefinitionBuilder(scenarioName);
@@ -92,12 +93,12 @@ public class ScenarioService {
 
 		if (specificationName == null || specificationName.equals("")) {
 			LOGGER.info("Specification name is invalid.");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "Specification name is invalid.");
+			return Response.status(Status.CONFLICT).entity("Specification name is invalid.").build();
 		}
 		
 		if (esd == null) {
 			LOGGER.info("ExperimentSeriesDefinition is invalid.");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "ESD invalid");
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition is invalid.").build();
 		}
 		
 		// check if ExperimentSeriesDefinitions has an ExplorationStrategy added
@@ -118,7 +119,7 @@ public class ScenarioService {
 
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		LOGGER.debug("Adding scenario with name '{}' to database.", scenarioName);
@@ -128,12 +129,12 @@ public class ScenarioService {
 			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
 				if (sd.getScenarioName().equals(scenarioName)) {
 					LOGGER.info("Scenario with the given name already exists. Aborting database adding.");
-					return new ServiceResponse<Boolean>(Status.OK, false, "scenario name already exsits");
+					return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
 				}
 			}
 	
 		} catch (DataNotFoundException e) {
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
 		dbCon.store(emptyScenario);
@@ -142,52 +143,53 @@ public class ScenarioService {
 		
 		LOGGER.debug("Scenario with name '{}' stored database.", scenarioName);
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
-	 * Adds a new scenario with a completed scenario object as it. The scenario logic is
-	 * not yet checked in this method.
+	 * Adds a new scenario with a given {@link ScenarioDefinition} as it. The scenario
+	 * logic is not yet checked in this method.
 	 * This method DOES NOT switch to the newly created scenario. The scenario must be
-	 * switched manually via the service at @Code{switch}.
+	 * switched manually via the service at {@link #switchScenario(String, String)}.
 	 * 
 	 * @param usertoken the user identification
 	 * @param scenario 	the scenario as a completed object
-	 * @return 			true, if the scenario was added succesfully. False, if a scenario with
-	 * 		   			the given name already exists.
+	 * @return 			{@link Response} OK, CONFLICT, UNAUTHORIZED or
+	 * 					INTERNAL_SERVER_ERROR<br />
+	 * 					OK if scenario was added succesfully
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> addScenario(@QueryParam(TOKEN) String usertoken,
-							   ScenarioDefinition scenario) {
+	public Response addScenario(@QueryParam(TOKEN) String usertoken,
+							   	ScenarioDefinition scenario) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		String scenarioname = scenario.getScenarioName();
 		
 		if (dbCon == null) {
 			// this can be thrown by a wrong token, too
-			LOGGER.warn("No database connection found.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		// test the scenario for non-null values (only in first entry)
 		if (scenario.getAllExperimentSeriesDefinitions() == null) {
 			LOGGER.info("ExperimentSeriesDefinition list is invalid.");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "ExperimentSeriesDefinition list is invalid.");
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition list is invalid.").build();
 		}
 		
 		for (ExperimentSeriesDefinition esd : scenario.getAllExperimentSeriesDefinitions()) {
 			
 			if (esd == null) {
 				LOGGER.info("An ExperimentSeriesDefinition in list is invalid.");
-				return new ServiceResponse<Boolean>(Status.CONFLICT, false, "An ExperimentSeriesDefinition in list is invalid.");
+				return Response.status(Status.CONFLICT).entity("An ExperimentSeriesDefinition in list is invalid.").build();
 			} 
 			
 			if (esd.getExplorationStrategy() == null) {
 				LOGGER.info("ExplorationStrategy is invalid.");
-				return new ServiceResponse<Boolean>(Status.CONFLICT, false, "ExplorationStrategy is invalid.");
+				return Response.status(Status.CONFLICT).entity("ExplorationStrategy is invalid.").build();
 			}
 			
 		}
@@ -198,36 +200,37 @@ public class ScenarioService {
 			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
 				if (sd.getScenarioName().equals(scenarioname)) {
 					LOGGER.info("Scenario with the given name '{}' alaready exists", scenarioname);
-					return new ServiceResponse<Boolean>(Status.CONFLICT, false, "Scenario with given name already exists.");
+					return Response.status(Status.CONFLICT).entity("Scenario with given name already exists.").build();
 				}
 			}
 			
 		} catch (DataNotFoundException e) {
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 
 		dbCon.store(scenario);
 		dbCon.closeProvider();
-		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+
+		return Response.ok().build();
 	}
 	
 	/**
 	 * Return a list with all the scenario names.
 	 * 
 	 * @param usertoken the user identification
-	 * @return 			a list with all the scenario names
+	 * @return 			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR<br />
+	 * 					OK has a String[] as {@link Entity}
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<String[]> getScenarioNames(@QueryParam(TOKEN) String usertoken) {
+	public Response getScenarioNames(@QueryParam(TOKEN) String usertoken) {
 
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
 		if (dbCon == null) {
-			LOGGER.warn("No database connection found.");
-			return new ServiceResponse<String[]>(Status.UNAUTHORIZED, null);
+			LOGGER.warn("Invalid token '{}'", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		List<ScenarioDefinition> scenarioList;
@@ -235,8 +238,8 @@ public class ScenarioService {
 		try {
 			scenarioList = dbCon.loadAllScenarioDefinitions();
 		} catch (DataNotFoundException e) {
-			LOGGER.info("No scenario definitions in database.");
-			return new ServiceResponse<String[]>(Status.CONFLICT, null, "No scenario definitions in database.");
+			LOGGER.info("Fetching scenario list from database failed.");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
 		String[] retValues = new String[scenarioList.size()];
@@ -247,65 +250,70 @@ public class ScenarioService {
 		}
 		
 		dbCon.closeProvider();
-		
-		return new ServiceResponse<String[]>(Status.OK, retValues);
+
+		return Response.ok(retValues).build();
 	}
 	
 	/**
 	 * Returns the current selected {@code ScenarioDefinition} for the user.
 	 * 
 	 * @param usertoken the user identification
-	 * @return 			the current selected {@code ScenarioDefinition} for the user
+	 * @return 			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR<br />
+	 * 					OK with a {@code ScenarioDefinition} as {@link Entity}
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<ScenarioDefinition> getCurrentScenario(@QueryParam(TOKEN) String usertoken) {
+	public Response getCurrentScenario(@QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<ScenarioDefinition>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScenarioDefinition tmpSD = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
-		
-		return new ServiceResponse<ScenarioDefinition>(Status.OK, tmpSD);
+
+		return Response.ok(tmpSD).build();
 	}
 	
 	/**
-	 * Deleted the scenario with the given name. Does not delete the scenario, if the
-	 * given user has currenlty selected the scenario.
-	 * <b>Attention:</b> All the scenario instances related to the scenario will be deleted, too!
+	 * Deleted the scenario with the given name. Fails to delete the scenario, if the
+	 * given user has currently selected the scenario.
+	 * <b>Attention:</b> All the {@link ScenarioInstance}s related to the scenario will
+	 * be deleted, too!
 	 * 
 	 * @param scenarioname 	the scenario name
 	 * @param usertoken 	the user identification
-	 * @return 				true, if scenario has been deleted. False, if the scenario name
-	 * 						is invalid || a scenario with the given name is not found || the
-	 * 						user has currently selected the scenario
+	 * @return 				{@link Response} OK, UNAUTHORIZED, CONFLICT, ACCEPTED or
+	 * 						NO_CONTENT<br />
+	 * 						ACCEPTED can occur, when it's tried to delete
+	 * 						the currently selected scenario<br />
+	 * 						NO_CONTENT indicates, that a scenario with the
+	 * 						given name cannot be found in the database
 	 */
 	@DELETE
-	@Path(ServiceConfiguration.SVC_SCENARIO_DELETE)
+	@Path("{" + NAME + "}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeScenario(@QueryParam(NAME) String scenarioname,
-								  				   @QueryParam(TOKEN) String usertoken) {
+	public Response removeScenario(@PathParam(NAME) String scenarioname,
+								   @QueryParam(TOKEN) String usertoken) {
 		
 		if (!scenarioname.matches("[a-zA-Z0-9_]+")) {
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false);
+			return Response.status(Status.CONFLICT).entity("Scenario name must match pattern [a-zA-Z0-9_]+").build();
 		}
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		// if the string comparison is made with equals(), two test cases fail!
 		if (u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName() == scenarioname) {
 			LOGGER.warn("Can't delete the current selected scenario. First must switch to another one.");
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot delete current selected scenario");
+			return Response.status(Status.ACCEPTED).entity("Cannot delete current selected scenario.").build();
 		}
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -317,14 +325,14 @@ public class ScenarioService {
 			// check for scenario Instances and remove these
 			if (definition == null) {
 				LOGGER.warn("ScenarioDefinition is invalid.");
-				return new ServiceResponse<Boolean>(Status.CONFLICT, false, "ScenarioDefinition is invalid");
+				return Response.status(Status.CONFLICT).entity("ScenarioDefinition is invalid.").build();
 			}
 			
 			List<ScenarioInstance> scenarioInstances = dbCon.loadScenarioInstances(scenarioname);
 			
 			if (scenarioInstances == null) {
 				LOGGER.warn("ScenarioInstances cannot be fetched.");
-				return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+				return Response.status(Status.CONFLICT).entity("No scenario instances for given scenario in database.").build();
 			}
 			
 			for (ScenarioInstance si : scenarioInstances) {
@@ -335,40 +343,48 @@ public class ScenarioService {
 			
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Scenario with name '{}' not found.", scenarioname);
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false);
+			return Response.status(Status.NO_CONTENT).entity("Scenario with given name does not exist.").build();
 		} finally {
 			dbCon.closeProvider();
 		}
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 
 	/**
-	 * Switch the activ scenario for a given user (via token).
+	 * Switch the activ scenario for a given user (via token).<br />
+	 * <br />
+	 * This method has not a real REST URL, because there exists two methods
+	 * for siwtching the scenario: One with the name as String and one with an
+	 * {@link ScenarioDefinition}. Both need to map to unique URLs and therefore
+	 * this one maps to switch/name?name="" and the other one to switch/definition.
 	 * 
 	 * @param scenarioname 	the scenario to switch to
 	 * @param usertoken 	the token to identify the user
-	 * @return				true, if the switch could be executed
+	 * @return				{@link Response} OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR or
+	 * 						NO_CONTENT<br />
+	 * 						NO_CONTENT is thrown, when the given name cannot be matched to
+	 * 						a scenario in the database
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
-			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH
+			+ "/" + ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> switchScenario(@QueryParam(TOKEN) String usertoken,
-								  				   @QueryParam(NAME) String scenarioname) {
+	public Response switchScenario(@QueryParam(NAME) String scenarioname,
+								   @QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
 		if (definition == null) {
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false);
+			return Response.status(Status.NO_CONTENT).entity("No scenario with given name").build();
 		}
 		
 		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
@@ -380,7 +396,7 @@ public class ScenarioService {
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection for user found.");
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
 		dbCon.store(sd);
@@ -388,41 +404,43 @@ public class ScenarioService {
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
-	 * Switches a scenario to another one given by the whole {@code ScenarioDefinition}.
+	 * Switches a scenario to another one given by the whole {@code ScenarioDefinition}.<br />
+	 * <br />
+	 * For URL name information see more information at the comment of 
+	 * {@link #switchScenario(String, String)}.
 	 * 
 	 * @param usertoken 			the token to identify the user
 	 * @param scenarioDefinition 	the new {@code ScenarioDefinition} to set
-	 * @return 						true, if the scenario could be switched to the given one
+	 * @return 						{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/"
-			+ ServiceConfiguration.SVC_SCENARIO_SWITCH_DEFINITION)
+	@Path(ServiceConfiguration.SVC_SCENARIO_SWITCH + "/" + ServiceConfiguration.SVC_SCENARIO_SWITCH_DEFINITION)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> switchScenario(@QueryParam(TOKEN) String usertoken,
-								  				   ScenarioDefinition scenarioDefinition) {
+	public Response switchScenario(@QueryParam(TOKEN) String usertoken,
+								   ScenarioDefinition scenarioDefinition) {
 		
 		if (scenarioDefinition == null) {
 			LOGGER.warn("Invalid scenario definition!");
-			return new ServiceResponse<Boolean>(Status.CONFLICT, null, "Invalid scenario definition!");
+			return Response.status(Status.CONFLICT).entity("Invalid scenario definition!").build();
 		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
-			LOGGER.warn("No database connection for user found.");
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, null, "No database connection found.");
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		u.setCurrentScenarioDefinitionBuilder(new ScenarioDefinitionBuilder(scenarioDefinition));
@@ -436,7 +454,7 @@ public class ScenarioService {
 		// store user information in the service database
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -444,26 +462,26 @@ public class ScenarioService {
 	 * account. The results are archived and stay in the database in an own table. 
 	 * 
 	 * @param usertoken the token to identify the user
-	 * @return 			true, if all current scenario instances could be stored
+	 * @return 			{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> storeScenario(@QueryParam(TOKEN) String usertoken) {
+	public Response storeScenario(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
-			LOGGER.warn("No database connection for user found.");
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, null, "No database connection found.");
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScenarioDefinition current = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
@@ -485,7 +503,7 @@ public class ScenarioService {
 			
 		} catch (DataNotFoundException e) {
 			LOGGER.warn("Problem loading available scenario instances!", usertoken);
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, null, "Problem loading available scenario instances!");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
 		dbCon.closeProvider();
@@ -493,7 +511,7 @@ public class ScenarioService {
 		// as the user has not changed, this store is not necessary
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -501,45 +519,47 @@ public class ScenarioService {
 	 * a String.
 	 * 
 	 * @param usertoken the token to identify the user
-	 * @return 			string in XML format of the scenario
+	 * @return 			{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
+	 * 					OK with {@link String} {@link Entity}, the scenario in XML
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_XML)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<String> getScenarioAsXML(@QueryParam(TOKEN) String usertoken) {
+	public Response getScenarioAsXML(@QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<String>(Status.UNAUTHORIZED, "");
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		ScenarioDefinition definition = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
 
 		if (definition == null) {
 			LOGGER.info("User has no scenario selected!");
-			return new ServiceResponse<String>(Status.CONFLICT, "", "User has no scenario selected!");
+			return Response.status(Status.CONFLICT).entity("User has no scenario selected!").build();
 		}
 		
 		ScenarioDefinitionWriter writer = new ScenarioDefinitionWriter(usertoken);
 		String xml = writer.convertToXMLString(definition);
 		
-		return new ServiceResponse<String>(Status.OK, xml);
+		return Response.ok(xml).build();
 	}
 	
 	/**
 	 * Returns the {@link ScenarioInstance} identified with the given name and url.
 	 * 
 	 * @param usertoken the token to identify the user
-	 * @param name		the name of the <code>ScenarioInstance</code>
-	 * @param url		the URL of the <code>ScenarioInstance</code>
-	 * @return			the <code>ScenarioInstance</code>
+	 * @param name		the name of the {@link ScenarioInstance}
+	 * @param url		the URL of the MeasurementEnvironmentController
+	 * @return			{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
+	 * 					OK with {@link ScenarioInstance} as {@link Entity} (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<ScenarioInstance> getScenarioInstance(@QueryParam(TOKEN) String usertoken,
+	public Response getScenarioInstance(@QueryParam(TOKEN) String usertoken,
 																 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
 																 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
 			
@@ -547,23 +567,25 @@ public class ScenarioService {
 		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<ScenarioInstance>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		try {
 			
 			ScenarioInstance tmpSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
-			return new ServiceResponse<ScenarioInstance>(Status.OK, tmpSI);
+			return Response.ok(tmpSI).build();
 			
 		} catch (DataNotFoundException e) {
 			
 			LOGGER.info("Cannot find a scenario definition with name '{}' and URL '{}'.", name, url);
-			return new ServiceResponse<ScenarioInstance>(Status.CONFLICT, null, "Cannot find a scenario definition with given name and URL.");
+			return Response.status(Status.CONFLICT).entity("Cannot find a scenario definition with given name and URL.").build();
 			
 		}
 	}
 	
-	/**************************************HELPER****************************************/
+	//////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////// HELPER /////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Load a Scenario definition with the given name and user (via token).

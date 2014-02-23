@@ -8,16 +8,6 @@ package org.sopeco.service.test.configuration;
 public abstract class TestConfiguration {
 
 	/**
-	 * The Jackson package for JSON converting on RESTful interfaces.
-	 */
-	public static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
-	
-	/**
-	 * The Jersey annotation for POJOMappingFeature.
-	 */
-	public static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
-	
-	/**
 	 * The package where all the RESTful services are in. Used to setup the {@link JerseyTest}
 	 * correctly.
 	 */

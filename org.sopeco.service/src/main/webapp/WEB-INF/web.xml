@@ -29,16 +29,20 @@
     
 	<servlet>
 		<servlet-name>sopeco-service</servlet-name>
-		<servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
+		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
-		     <param-name>com.sun.jersey.config.property.packages</param-name>
-		     <param-value>org.sopeco.service.rest;org.codehaus.jackson.jaxrs</param-value>
+		     <param-name>jersey.config.server.provider.packages</param-name>
+		     <param-value>org.sopeco.service.rest</param-value>
 		</init-param>
 		
+		<!-- This is maybe required when the package is a as a war file in a servlet container server
 		<init-param>
-		     <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
-		     <param-value>true</param-value>
+		    <param-name>jersey.config.server.provider.classnames</param-name>
+		    <param-value>
+		        org.sopeco.service.rest.json.CustomObjectWrapper
+		    </param-value>
 		</init-param>
+		-->
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 	

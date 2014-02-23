@@ -145,7 +145,7 @@ public class AccountService {
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response loginWithPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
-					 				 @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
+					 				  @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
 		
 		Account account = ServicePersistenceProvider.getInstance().loadAccount(accountname);
 
