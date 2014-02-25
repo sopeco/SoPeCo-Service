@@ -2,18 +2,22 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.ws.rs.client.Client;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.exchange.ServiceResponse;
+import org.sopeco.service.rest.json.CustomObjectMapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * The <code>InfoServiceTest</code> tests various features of the
@@ -30,24 +34,36 @@ public class InfoServiceTest extends JerseyTest {
 		super();
 	}
 	
+	/**
+	 * This method is called on the Grizzly container creation of a {@link JerseyTest}.
+	 * It's used to configure where the servlet container.<br />
+	 * In this case, the package is definied where the RESTful services are and
+	 * the {@link CustomObjectMapper} is registered.
+	 */
 	@Override
-	public WebAppDescriptor configure() {
-		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
-				.clientConfig(createClientConfig())
-				.build();
-	}
+    protected Application configure() {
+		ResourceConfig rc = new ResourceConfig();
+		rc.packages(TestConfiguration.PACKAGE_NAME_REST);
+		
+		// the CustomObjectMapper must be wrapped into a Jackson Json Provider
+		// otherwise Jersey does not recognize to use Jackson for JSON
+		// converting
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+		rc.register(provider);
+		
+		return rc;
+    }
 
 	/**
-	 * Sets the client config for the client. The method is only used
-	 * to give the possiblity to adjust the ClientConfig.
-	 * 
-	 * This method is called by {@link configure()}.
-	 * 
-	 * @return ClientConfig to work with JSON
+	 * The {@link Client} needs also the {@link CustomObjectMapper}, which
+	 * defines the mixin used when the objects were serialized.
 	 */
-	private static ClientConfig createClientConfig() {
-		ClientConfig config = new DefaultClientConfig();
-	    return config;
+	@Override
+	protected void configureClient(ClientConfig config) {
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+        config.register(provider);
 	}
 	
 	/**
@@ -56,12 +72,12 @@ public class InfoServiceTest extends JerseyTest {
 	 */
 	@Test
 	public void testServiceRunning() {
-		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_INFO)
-												  .path(ServiceConfiguration.SVC_INFO_RUNNING)
-												  .accept(MediaType.APPLICATION_JSON)
-												  .get(new GenericType<ServiceResponse<Boolean>>() { });
+		Response r = target().path(ServiceConfiguration.SVC_INFO)
+							 .path(ServiceConfiguration.SVC_INFO_RUNNING)
+							 .request(MediaType.APPLICATION_JSON)
+							 .get();
 
-		assertEquals(true, sr_b.getObject());
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 	}
 	
 }
