@@ -13,7 +13,6 @@ import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.Test;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 import org.sopeco.service.rest.json.CustomObjectMapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
