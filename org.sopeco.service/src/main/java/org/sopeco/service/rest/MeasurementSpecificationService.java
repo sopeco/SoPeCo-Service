@@ -191,7 +191,7 @@ public class MeasurementSpecificationService {
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response createSpecification(@QueryParam("token") String usertoken,
-									   @QueryParam("specname") String specificationName) {
+									    @QueryParam("specname") String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
