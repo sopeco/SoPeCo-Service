@@ -16,7 +16,7 @@ import org.sopeco.service.execute.ExecutionScheduler;
  * #onStartup(Container)} and once when shutting down {@link #onShutdown(Container)}.
  * <br />
  * <br />
- * One initialization is the ServerSocket startup for listening for MEControllers.
+ * One initialization is the ServerSocket startup for listening for MECs.
  * 
  * @author Peter Merkert
  */

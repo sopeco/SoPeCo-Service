@@ -8,7 +8,9 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -24,7 +26,6 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>MeasurementEnvironmentDefinitionService</code> class provides RESTful services
@@ -44,74 +45,84 @@ public class MeasurementEnvironmentDefinitionService {
 	 * 
 	 * @param usertoken the user identification
 	 * @param med		the MED
-	 * @return			true, if the MED could be set
+	 * @return			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_MED_SET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> setMEDefinition(@QueryParam(TOKEN) String usertoken,
-								   MeasurementEnvironmentDefinition med) {
+	public Response setMEDefinition(@QueryParam(TOKEN) String usertoken,
+								    MeasurementEnvironmentDefinition med) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		return setNewMEDefinition(med, u);
+		boolean b = setNewMEDefinition(med, u);
+		
+		if (!b) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
+		}
+
+		return Response.ok().build();
 	}
 	
 	/**
 	 * Sets and returns a blank {@link MeasurementEnvironmentDefinition} (MED). <b>Be aware</b>: This method does
 	 * also set the MED.
 	 * 
-	 * 
 	 * @param usertoken the user identification
-	 * @return			the MED of the given user
+	 * @return			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR<br />
+	 * 					OK with a blank {@link MeasurementEnvironmentDefinition} as {@link Entity}
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_SET + "/"
 		  + ServiceConfiguration.SVC_MED_SET_BLANK)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<MeasurementEnvironmentDefinition> getMEDefinitionFromBlank(@QueryParam(TOKEN) String usertoken) {
+	public Response getMEDefinitionFromBlank(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
-		setNewMEDefinition(med, u);
 		
-		ServiceResponse<MeasurementEnvironmentDefinition> m = new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, med);
+		boolean b = setNewMEDefinition(med, u);
 		
-		return m;
+		if (!b) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
+		}
+
+		return Response.ok(med).build();
 	}
 	
 	/**
 	 * Returns current selected {@link MeasurementEnvironmentDefinition} (MED) for the given user.
 	 * 
 	 * @param usertoken the user identification
-	 * @return 			current selected MED for the given user
+	 * @return 			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with {@link MeasurementEnvironmentDefinition} as {@link Entity}
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MED_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<MeasurementEnvironmentDefinition> getCurrentMEDefinition(@QueryParam(TOKEN) String usertoken) {
+	public Response getCurrentMEDefinition(@QueryParam(TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 	
 		MeasurementEnvironmentDefinition tmpMED = u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
-		
-		return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, tmpMED);
+
+		return Response.ok(tmpMED).build();
 	}
 	
 	/**
@@ -119,19 +130,19 @@ public class MeasurementEnvironmentDefinitionService {
 	 * 
 	 * @param usertoken the user identification
 	 * @param path		the namespace path
-	 * @return			true, if the namespace was added sccessfully
+	 * @return			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> addNamespace(@QueryParam(TOKEN) String usertoken,
-								@QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
+	public Response addNamespace(@QueryParam(TOKEN) String usertoken,
+								 @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -139,14 +150,14 @@ public class MeasurementEnvironmentDefinitionService {
 							 	 .addNamespaces(path);
 
 		if (ns == null) {
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -154,19 +165,19 @@ public class MeasurementEnvironmentDefinitionService {
 	 * 
 	 * @param usertoken the user identification
 	 * @param path		the namespace path
-	 * @return			true, if the namespace was removed successfuly
+	 * @return			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/" + ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeNamespace(@QueryParam(TOKEN) String usertoken,
+	public Response removeNamespace(@QueryParam(TOKEN) String usertoken,
 								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -175,16 +186,16 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.warn("Namespace with the path '{}' does not exist!", path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
+			return Response.status(Status.CONFLICT).entity("Namespace does not exist.").build();
 		}
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().removeNamespace(ns);
 		
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -193,21 +204,21 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param usertoken the user identification
 	 * @param path		the path to the namespace
 	 * @param newName	the new path to the namespace
-	 * @return			true, if the renaming was successful
+	 * @return			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_NAMESPACE + "/"
 			+ ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> renameNamespace(@QueryParam(TOKEN) String usertoken,
-								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
-								   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW) String newName) {
+	public Response renameNamespace(@QueryParam(TOKEN) String usertoken,
+								    @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
+								    @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE_NEW) String newName) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		ParameterNamespace ns = u.getCurrentScenarioDefinitionBuilder()
@@ -216,16 +227,16 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
+			return Response.status(Status.CONFLICT).entity("Namespace does not exist.").build();
 		}
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().renameNamespace(ns, newName);
 		
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -237,24 +248,23 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param paramName	the parameter name
 	 * @param paramType	the parameter type
 	 * @param role		the {@link ParameterRole}
-	 * @return			true, if the adding was successful
+	 * @return			{@link Response} OK, CONFLICT, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
-			+ ServiceConfiguration.SVC_MED_PARAM_ADD)
+	@Path(ServiceConfiguration.SVC_MED_PARAM + "/" + ServiceConfiguration.SVC_MED_PARAM_ADD)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> addParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
-			      				@QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
-			      				@QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
-			      				@QueryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP) String paramType,
-			      				ParameterRole role) {
+	public Response addParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+			      				 @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
+			      				 @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
+			      				 @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP) String paramType,
+			      				 ParameterRole role) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -265,7 +275,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
+			return Response.status(Status.CONFLICT).entity("Namespace does not exist.").build();
 		}
 
 		u.getCurrentScenarioDefinitionBuilder()
@@ -273,10 +283,10 @@ public class MeasurementEnvironmentDefinitionService {
 		 .addParameter(paramName, paramType, role, ns);
 
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -288,24 +298,24 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param paramNameNew	the new name of the parameter
 	 * @param paramType		the (new) parameter type
 	 * @param role			the (new) parameter role
-	 * @return				true, if the update was successful
+	 * @return				{@link Response} OK, CONFLICT, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/" + ServiceConfiguration.SVC_MED_PARAM_UPDATE)
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> updateParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME_NEW) String paramNameNew,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP) String paramType,
-			      				   ParameterRole role) {
+	public Response updateParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME_NEW) String paramNameNew,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_TYP) String paramType,
+			      				    ParameterRole role) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -316,7 +326,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
+			return Response.status(Status.CONFLICT).entity("Namespace does not exist.").build();
 		}
 
 		ParameterDefinition parameter = u.getCurrentScenarioDefinitionBuilder()
@@ -325,7 +335,7 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		if (parameter == null) {
 			LOGGER.info("Parameter '{}' does not exist in the namespace with path '{}'!", paramName, path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "parameter does not exist");
+			return Response.status(Status.CONFLICT).entity("Parameter does not exist.").build();
 		}
 		
 		parameter.setName(paramNameNew);
@@ -333,10 +343,10 @@ public class MeasurementEnvironmentDefinitionService {
 		parameter.setType(paramType);
 
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
 	/**
@@ -345,21 +355,21 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param usertoken the user identification
 	 * @param path		the path to the parameter
 	 * @param paramName	the name of the parameter
-	 * @return			true, if the parameter could be removed
+	 * @return			{@link Response} OK, CONFLICT, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@DELETE
 	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
 			+ ServiceConfiguration.SVC_MED_PARAM_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> removeParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
-			      				   @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName) {
+	public Response removeParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
+			      				    @QueryParam(ServiceConfiguration.SVCP_MED_PARAM_NAME) String paramName) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		LOGGER.debug("Try to add parameter with name '{}' to path '{}'", paramName, path);
@@ -370,7 +380,7 @@ public class MeasurementEnvironmentDefinitionService {
 
 		if (ns == null) {
 			LOGGER.info("Namespace with the path '{}' does not exist!", path);
-			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "namespace does not exist");
+			return Response.status(Status.CONFLICT).entity("Namespace does not exist.").build();
 		}
 		
 		boolean b = u.getCurrentScenarioDefinitionBuilder()
@@ -378,17 +388,21 @@ public class MeasurementEnvironmentDefinitionService {
 					 .removeNamespace(ns);
 
 		if (!b) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "namespace removal failed");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot remove namespace.").build();
 		}
 
 		if (!storeUserAndScenario(u)) {
-			return new ServiceResponse<Boolean>(Status.ACCEPTED, false, "cannot store results in database");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return Response.ok().build();
 	}
 	
-	/**************************************HELPER****************************************/
+
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////// HELPER /////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/**
 	 * Stores the current user state in the service database. The current scenario state for the given
@@ -426,7 +440,7 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @param u 			the user whose MED is to set
 	 * @return 				true, if the MED could be stored successfully
 	 */
-	protected static ServiceResponse<Boolean> setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
+	protected static boolean setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
 		
 		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
@@ -436,13 +450,13 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		if (dbCon == null) {
 			LOGGER.warn("Database connection to account database failed. Cancelling adding MED from MEC to database.");
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+			return false;
 		}
 		
 		dbCon.store(sd);
 		dbCon.closeProvider();
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return true;
 	}
 	
 }

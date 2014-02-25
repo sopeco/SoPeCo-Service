@@ -35,8 +35,6 @@ import javax.persistence.NamedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.config.Configuration;
-import org.sopeco.config.IConfiguration;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -144,8 +142,7 @@ public class Users {
 	public boolean isExpired() {
 		LOGGER.debug("Checking user with token '{}' for being expired.", this.toString());
 		
-		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
-		int userTimeout = config.getPropertyAsInteger(ServiceConfiguration.USER_TIMEOUT, 0);
+		long userTimeout = ServiceConfiguration.USER_TIMEOUT;
 		
 		if (userTimeout == 0 || System.currentTimeMillis() < lastRequestTime + userTimeout) {
 			

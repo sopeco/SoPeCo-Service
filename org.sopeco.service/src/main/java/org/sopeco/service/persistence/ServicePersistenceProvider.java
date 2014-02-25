@@ -14,10 +14,7 @@ import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.config.Configuration;
-import org.sopeco.config.IConfiguration;
 import org.sopeco.config.exception.ConfigurationException;
-import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
@@ -306,23 +303,15 @@ public final class ServicePersistenceProvider {
 	 */
 	private static String getServerUrl() throws ConfigurationException {
 		
-		PersistenceConfiguration.getSessionSingleton(Configuration.getGlobalSessionId());
-		// load the sopeco-service config file
-		IConfiguration config = Configuration.getSessionSingleton(Configuration.getGlobalSessionId());
-		// sets the root folder where to look for our config files
-		config.setAppRootDirectory(ServiceConfiguration.SERVICE_CONFIG_FOLDER);
-		config.loadConfiguration(ServiceConfiguration.CONFIGURATION_FILE);
-		
-		
-		if (config.getPropertyAsStr(ServiceConfiguration.DATABASE_HOST) == null) {
+		if (ServiceConfiguration.PERSISTENCE_HOST == null) {
 			throw new NullPointerException("No MetaDataHost defined.");
 		}
 		
-		String host = config.getPropertyAsStr(ServiceConfiguration.DATABASE_HOST);
-		String port = config.getPropertyAsStr(ServiceConfiguration.DATABASE_PORT);
-		String name = config.getPropertyAsStr(ServiceConfiguration.DATABASE_NAME);
-		String user = config.getPropertyAsStr(ServiceConfiguration.DATABASE_USER);
-		String password = config.getPropertyAsStr(ServiceConfiguration.DATABASE_PASSWORD);
+		String host = ServiceConfiguration.PERSISTENCE_HOST;
+		String port = String.valueOf(ServiceConfiguration.PERSISTENCE_PORT);
+		String name = ServiceConfiguration.PERSISTENCE_NAME;
+		String user = ServiceConfiguration.PERSISTENCE_USER;
+		String password = ServiceConfiguration.PERSISTENCE_PASSWORD;
 		
 		return SERVER_URL_PREFIX 	+ host + ":" + port
 									+ "/" + name

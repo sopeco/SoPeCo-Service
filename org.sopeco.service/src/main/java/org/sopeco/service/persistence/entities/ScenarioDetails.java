@@ -32,7 +32,11 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.sopeco.service.configuration.ServiceConfiguration;
+
 /**
+ * This class is a relict from the WebUI project. Information is just used, becasue the WebUI
+ * sometimes accesses this class and the WebUI should not be changed that much.
  * 
  * @author Peter Merkert
  */
@@ -45,20 +49,27 @@ public class ScenarioDetails implements Serializable {
 	@GeneratedValue
 	private long Id;
 	
-	private String scenarioName = "";
+	private String scenarioName 		= "";
 
-	private String controllerProtocol = "rmi://";
+	private String controllerProtocol 	= ServiceConfiguration.MEC_PROTOCOL;
 
-	private String controllerHost = "localhost";
+	private String controllerHost 		= ServiceConfiguration.MEC_SOCKET_HOST;
 
-	private int controllerPort = 1099;
+	private int controllerPort 			= ServiceConfiguration.MEC_SOCKET_PORT;
 
-	private String controllerName = "";
+	private String controllerName 		= "";
 
 	private String selectedSpecification;
 
 	private String selectedExperiment;
 
+	/**
+	 * Empty constructor for JSON converting.
+	 */
+	public ScenarioDetails() {
+		
+	}
+	
 	/**
 	 * @return the selectedExperiment
 	 */

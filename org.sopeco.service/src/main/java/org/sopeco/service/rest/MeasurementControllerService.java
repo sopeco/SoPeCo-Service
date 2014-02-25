@@ -12,7 +12,9 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
@@ -26,7 +28,6 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.MECStatus;
-import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
  * The <code>MeasurementControllerService</code> provides services to handle MeasurementEnvironemtControllers (MEC)
@@ -64,24 +65,25 @@ public class MeasurementControllerService {
 	 * 
 	 * @param usertoken authentification of the user
 	 * @param url 		the URL to the MEC
-	 * @return 			the MEC status of the controller, null if a connection issue happened
+	 * @return 			{@link Response} OK, UNAUTHORIZED, CONFLICT or INTERNAL_SERVER_ERROR<br />
+	 * 					OK with {@link MECStatus} as {@link Entity}
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<MECStatus> getMECStatus(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-								  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String url) {
+	public Response getMECStatus(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+								 @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String url) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<MECStatus>(Status.UNAUTHORIZED);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
 		if (!checkUrlIsValid(url) || url == null) {
 			LOGGER.debug("Controller-Status: NO_VALID_MEC_URL");
-			return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.NO_VALID_MEC_URL));
+			return Response.ok(new MECStatus(MECStatus.NO_VALID_MEC_URL)).build();
 		}
 		
 	
@@ -91,28 +93,28 @@ public class MeasurementControllerService {
 
 			if (mec == null) {
 				LOGGER.debug("Controller not reachable: NO_VALID_MEC_URL");
-				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.NO_VALID_MEC_URL));
+				return Response.ok(new MECStatus(MECStatus.NO_VALID_MEC_URL)).build();
 			}
 			
 			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
 
 			if (med == null) {
 				LOGGER.debug("Controller-Status: STATUS_ONLINE_NO_META");
-				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_ONLINE_NO_META));
+				return Response.ok(new MECStatus(MECStatus.STATUS_ONLINE_NO_META)).build();
 			} else {
 				LOGGER.debug("Controller-Status: STATUS_ONLINE");
-				return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_ONLINE));
+				return Response.ok(new MECStatus(MECStatus.STATUS_ONLINE)).build();
 			}
 
 		} catch (URISyntaxException e) {
 			LOGGER.error(e.getMessage());
-			return new ServiceResponse<MECStatus>(Status.CONFLICT, null, "invalid URI");
+			return Response.status(Status.CONFLICT).entity("Invalid URI.").build();
 		} catch (RemoteException e) {
 			LOGGER.error(e.getMessage());
-			return new ServiceResponse<MECStatus>(Status.INTERNAL_SERVER_ERROR, null, "connection establishing failed");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Connection establishing failed.").build();
 		} catch (IllegalStateException x) {
 			LOGGER.debug("Controller-Status: STATUS_OFFLINE");
-			return new ServiceResponse<MECStatus>(Status.OK, new MECStatus(MECStatus.STATUS_OFFLINE));
+			return Response.ok(new MECStatus(MECStatus.STATUS_OFFLINE)).build();
 		}
 	
 	}
@@ -122,39 +124,39 @@ public class MeasurementControllerService {
 	 * 
 	 * @param usertoken authentification of the user
 	 * @param id 		the MEC ID
-	 * @return 			list of all controllers currently connected to given MEC ID with given, null
-	 *  	   			if an error occured
+	 * @return 			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
+	 * 					OK with {@link Entity} List<String> of all controllers currently
+	 * 					connected to given MEC ID with given
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<List<String>> getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-			      				     	  @QueryParam(ServiceConfiguration.SVCP_MEC_ID) String id) {
+	public Response getControllerList(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+			      				      @QueryParam(ServiceConfiguration.SVCP_MEC_ID) String id) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<List<String>>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		SocketAppWrapper app = SocketManager.getSocketApp(id);
 		
 		if (app == null) {
 			LOGGER.info("SocketAppWrapper is in invalid state.");
-			return new ServiceResponse<List<String>>(Status.INTERNAL_SERVER_ERROR, null);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 			
 		List<String> tmpList = Arrays.asList(app.getAvailableController());
 
-		return new ServiceResponse<List<String>>(Status.OK, tmpList);
+		return Response.ok(tmpList).build();
 	}
 	
 	/**
 	 * Before: The MeasurementEnvironmentController should be connected to the service
-	 * ServerSocket. Otherwise the method is going to fail and return null.
-	 * <br />
+	 * ServerSocket. Otherwise the method is going to fail and return null.<br />
 	 * <br />
 	 * The MED is requested from the from the MEC connected to the given URL.
 	 * The MED is returned WITHOUT being stored in the database. This has to be done
@@ -163,19 +165,21 @@ public class MeasurementControllerService {
 	 * @param usertoken authentification of the user
 	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
 	 * 		  			ServerSocket of the service
-	 * @return 			the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI
+	 * @return 			{@link Response} OK, UNAUTHORIZED, ACCEPTED, CONFLICT or INTERNAL_SERVER_ERROR<br />
+	 * 					OK with the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI as {@link Entity}<br />
+	 * 					ACCEPTED indicates that the information from the MEC could not be fetched
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_MED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<MeasurementEnvironmentDefinition> getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-																   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
+	public Response getMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+									 	   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.UNAUTHORIZED, null);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		try {
@@ -185,38 +189,36 @@ public class MeasurementControllerService {
 			
 			if (mec == null) {
 				LOGGER.info("The connected MEC cannot be fetched correctly.");
-				return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.ACCEPTED, null, "The connected MEC cannot be fetched correctly.");
+				return Response.status(Status.ACCEPTED).entity("The connected MEC cannot be fetched correctly.").build();
 			}
 			
 			MeasurementEnvironmentDefinition med = mec.getMEDefinition();
 			
 			if (med == null) {
 				LOGGER.info("The connected med has no valid MeasurementEnvironmentDefinition.");
-				return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.CONFLICT, null, "The connected med has no valid MeasurementEnvironmentDefinition.");
+				return Response.status(Status.CONFLICT).entity("The connected med has no valid MeasurementEnvironmentDefinition.").build();
 			}
 			
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.OK, med);
+			return Response.ok(med).build();
 			
 		} catch (URISyntaxException e) {
 			LOGGER.error(e.getMessage());
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.CONFLICT, null, "URI invalid");
+			return Response.status(Status.CONFLICT).entity("URI invalid.").build();
 		} catch (RemoteException e) {
 			LOGGER.error(e.getMessage());
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.INTERNAL_SERVER_ERROR, null, "remote exception");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Remote exception.").build();
 		} catch (IllegalStateException x) {
 			LOGGER.error("Controller probably offline.");
-			return new ServiceResponse<MeasurementEnvironmentDefinition>(Status.INTERNAL_SERVER_ERROR, null, "controller probably offline");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Controller probably offline.").build();
 		}
 	}
 	
 	
 	/**
 	 * Before: The MeasurementEnvironmentController (MEC) should be connected to the service
-	 * ServerSocket. Otherwise the method is going to fail and return false.
-	 * <br />
+	 * ServerSocket. Otherwise the method is going to fail and return false.<br />
 	 * After getting the {@code MeasurementEnvironmentDefinition} (MED) from the MEC, the MED
-	 * is stored in the account database.
-	 * <br />
+	 * is stored in the account database.<br />
 	 * This method only uses the services at {@code getMEDefinitionFromMEC()} and
 	 * {@code MeasurementEnvironmentDefinitionService.setNewMEDefinition()}. See
 	 * their comments for more information.
@@ -224,27 +226,46 @@ public class MeasurementControllerService {
 	 * @param usertoken authentification of the user
 	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
 	 * 		  			ServerSocket of the service
-	 * @return 			true, if the MED from the MEC was saved successfully in the database
+	 * @return 			{@link Response} OK, UNAUTHORIZED, ACCEPTED, CONFLICT or INTERNAL_SERVER_ERROR<br />
+	 * 					ACCEPTED indicates that the information from the MEC could not be fetched
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_MEC_MED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
-										  @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
+	public Response setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+										   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ServiceResponse<MeasurementEnvironmentDefinition> sr_med = getMEDefinitionFromMEC(usertoken, uri);
-		return MeasurementEnvironmentDefinitionService.setNewMEDefinition(sr_med.getObject(), u);
+		Response r = getMEDefinitionFromMEC(usertoken, uri);
+		
+		if (r.getStatus() == Status.OK.getStatusCode()) {
+
+			MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
+			
+			boolean b = MeasurementEnvironmentDefinitionService.setNewMEDefinition(med, u);
+			
+			if (!b) {
+				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
+			}
+			
+			return Response.ok().build();
+		}
+		
+		return r;
 	}
 	
-	/**************************************HELPER****************************************/
-
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////// HELPER /////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	/**
 	 * Checks if the given URI is like a valid pattern.
 	 * 
