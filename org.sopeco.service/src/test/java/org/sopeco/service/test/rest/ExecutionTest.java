@@ -2,9 +2,17 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
+import javax.validation.constraints.Null;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -14,18 +22,12 @@ import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
-import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.exchange.ExperimentStatus;
-import org.sopeco.service.rest.exchange.ServiceResponse;
-import org.sopeco.service.rest.json.CustomObjectWrapper;
+import org.sopeco.service.rest.json.CustomObjectMapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.client.config.DefaultClientConfig;
-import com.sun.jersey.test.framework.JerseyTest;
-import com.sun.jersey.test.framework.WebAppDescriptor;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * The <code>ExecutionTest</code> tests a whole execution run. From login via scenario creation
@@ -43,34 +45,37 @@ public class ExecutionTest extends JerseyTest {
 	public ExecutionTest() {
 		super();
 	}
-
+	
 	/**
-	 * Configure is called on the object creation of a JerseyTest. It's used to
-	 * configure where the JerseyTest can find JSON, the REST service to test
-	 * and the JSON POJO.
-	 * 
-	 * @return the configuration
+	 * This method is called on the Grizzly container creation of a {@link JerseyTest}.
+	 * It's used to configure where the servlet container.<br />
+	 * In this case, the package is definied where the RESTful services are and
+	 * the {@link CustomObjectMapper} is registered.
 	 */
 	@Override
-	public WebAppDescriptor configure() {
-		return new WebAppDescriptor.Builder(TestConfiguration.PACKAGE_NAME_REST)
-				.contextListenerClass(StartUpService.class)
-				.clientConfig(createClientConfig())
-				.build();
-	}
+    protected Application configure() {
+		ResourceConfig rc = new ResourceConfig();
+		rc.packages(TestConfiguration.PACKAGE_NAME_REST);
+		
+		// the CustomObjectMapper must be wrapped into a Jackson Json Provider
+		// otherwise Jersey does not recognize to use Jackson for JSON
+		// converting
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+		rc.register(provider);
+		
+		return rc;
+    }
 
 	/**
-	 * Sets the client config for the client. The method is only used
-	 * to give the possiblity to adjust the ClientConfig.
-	 * 
-	 * This method is called by {@link configure()}.
-	 * 
-	 * @return ClientConfig to work with JSON
+	 * The {@link Client} needs also the {@link CustomObjectMapper}, which
+	 * defines the mixin used when the objects were serialized.
 	 */
-	private static ClientConfig createClientConfig() {
-		ClientConfig config = new DefaultClientConfig();
-	    config.getClasses().add(CustomObjectWrapper.class);
-	    return config;
+	@Override
+	protected void configureClient(ClientConfig config) {
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+        config.register(provider);
 	}
 	
 	/**
@@ -88,39 +93,46 @@ public class ExecutionTest extends JerseyTest {
 		String scenarioNameEmpty = TestConfiguration.TEST_CLEAN_SCENARIO_NAME;
 		String measSpecNameEmpty = TestConfiguration.TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME;
 		
-		// log into the account
-		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-											  .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-											  .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-											  .get(new GenericType<ServiceResponse<String>>() { });
-		
-		String token = sr.getObject();
+		Response r = target().path(ServiceConfiguration.SVC_ACCOUNT)
+						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+					      	 .request(MediaType.APPLICATION_JSON)
+						     .get();
+						
+		String token = r.readEntity(String.class);
 
+		// clean the scheduling list for the user
+		target().path(ServiceConfiguration.SVC_EXECUTE)
+				.path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				.request(MediaType.APPLICATION_JSON)
+				.delete();
+	
+		// now create empty scenario to delete the test scenario
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(scenarioNameEmpty)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .accept(MediaType.APPLICATION_JSON)
-				  .type(MediaType.APPLICATION_JSON)
-				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+				.path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				.path(scenarioNameEmpty)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecNameEmpty)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				.request(MediaType.APPLICATION_JSON)
+				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .accept(MediaType.APPLICATION_JSON)
-				  .put(new GenericType<ServiceResponse<Boolean>>() { });
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				.request(MediaType.APPLICATION_JSON)
+				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		// delete the example scenario
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_DELETE)
-			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			      .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
-			      .delete(new GenericType<ServiceResponse<Boolean>>() { });
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+				.path(TestConfiguration.TEST_SCENARIO_NAME)
+			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			    .request(MediaType.APPLICATION_JSON)
+			    .delete();
 	}
 	
 	/**
@@ -143,56 +155,67 @@ public class ExecutionTest extends JerseyTest {
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 		
-		ServiceResponse<String> sr = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-											   .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
-											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
-											   .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-											   .get(new GenericType<ServiceResponse<String>>() { });
-		
-		String token = sr.getObject();
+		Response r = target().path(ServiceConfiguration.SVC_ACCOUNT)
+						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
+					      	 .request(MediaType.APPLICATION_JSON)
+						     .get();
+						
+		String token = r.readEntity(String.class);
 
 		// account is needed for account id
-		ServiceResponse<Account> sr_account = resource().path(ServiceConfiguration.SVC_ACCOUNT)
-													    .path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
-													    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
-													    .accept(MediaType.APPLICATION_JSON)
-													    .get(new GenericType<ServiceResponse<Account>>() { });
+		r = target().path(ServiceConfiguration.SVC_ACCOUNT)
+				    .path(ServiceConfiguration.SVC_ACCOUNT_CONNECTED)
+				    .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
+			      	.request(MediaType.APPLICATION_JSON)
+				    .get();
+		
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		Account account = r.readEntity(Account.class);
+		
 		
 		// add scenario and switch to
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		esd.setName("experimentSeriesDefintion");
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(TestConfiguration.TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .accept(MediaType.APPLICATION_JSON)
-				  .type(MediaType.APPLICATION_JSON)
-				  .post(new GenericType<ServiceResponse<Boolean>>() { }, esd);
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+			    .path(ServiceConfiguration.SVC_SCENARIO_ADD)
+			    .path(TestConfiguration.TEST_SCENARIO_NAME)
+			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			    .request(MediaType.APPLICATION_JSON)
+			    .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
-		resource().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .accept(MediaType.APPLICATION_JSON)
-				  .put(new GenericType<ServiceResponse<Boolean>>() { });
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
+			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
+			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
+			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+		      	.request(MediaType.APPLICATION_JSON)
+		      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 
-		ServiceResponse<ScenarioDefinition> sr_sd = resource().path(ServiceConfiguration.SVC_SCENARIO)
-														  .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
-														  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-														  .type(MediaType.APPLICATION_JSON)
-														  .get(new GenericType<ServiceResponse<ScenarioDefinition>>() { });
+		r = target().path(ServiceConfiguration.SVC_SCENARIO)
+				    .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+				    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				    .request(MediaType.APPLICATION_JSON)
+				    .get();
 
-		assertEquals(true, sr_sd.getObject() != null); // the user must have a scenario now
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		ScenarioDefinition sd = r.readEntity(ScenarioDefinition.class);
+		
+		assertEquals(true, sd != null); // the user must have a scenario now
 		
 		//switch to created measurement specification
-		ServiceResponse<Boolean> sr_b = resource().path(ServiceConfiguration.SVC_MEASUREMENT)
-											      .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-											      .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-											      .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-											      .accept(MediaType.APPLICATION_JSON)
-											      .put(new GenericType<ServiceResponse<Boolean>>() { });
+		r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+			        .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
+			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+			      	.request(MediaType.APPLICATION_JSON)
+			      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();
@@ -200,12 +223,12 @@ public class ExecutionTest extends JerseyTest {
 		boolean repeating 		= false;
 		String controllerURL 	= "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
 		String label 			= "myScheduledExperiment";
-		long accountId 			= sr_account.getObject().getId();
+		long accountId 			= account.getId();
 		boolean scenarioActive 	= false;
 		long addedTime 			= System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
-		se.setScenarioDefinition(sr_sd.getObject());
+		se.setScenarioDefinition(sd);
 		se.setAccountId(accountId);
 		se.setControllerUrl(controllerURL);
 		se.setRepeating(repeating);
@@ -214,71 +237,77 @@ public class ExecutionTest extends JerseyTest {
 		se.setAddedTime(addedTime);
 		
 		// add to execution list
-		sr_b = resource().path(ServiceConfiguration.SVC_EXECUTE)
-					     .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
-					     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-					     .accept(MediaType.APPLICATION_JSON)
-					  	 .type(MediaType.APPLICATION_JSON)
-					  	 .post(new GenericType<ServiceResponse<Boolean>>() { }, se);
+		r = target().path(ServiceConfiguration.SVC_EXECUTE)
+			        .path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
+			        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      	.request(MediaType.APPLICATION_JSON)
+			      	.post(Entity.entity(se, MediaType.APPLICATION_JSON));
 
-		assertEquals(true, sr_b.getObject());
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		// get id for the added scenario
-		ServiceResponse<Long> tmpID = resource().path(ServiceConfiguration.SVC_EXECUTE)
-										        .path(ServiceConfiguration.SVC_EXECUTE_ID)
-											    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-											    .accept(MediaType.APPLICATION_JSON)
-											    .type(MediaType.APPLICATION_JSON)
-											    .put(new GenericType<ServiceResponse<Long>>() { }, se);
-		
-		String id = String.valueOf(tmpID.getObject());
+		r = target().path(ServiceConfiguration.SVC_EXECUTE)
+			        .path(ServiceConfiguration.SVC_EXECUTE_ID)
+				    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      	.request(MediaType.APPLICATION_JSON)
+			      	.put(Entity.entity(se, MediaType.APPLICATION_JSON));
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		String id = String.valueOf(r.readEntity(Long.class));
 
 		// now select experiments to execute
-		sr_b = resource().path(ServiceConfiguration.SVC_EXECUTE)
-						 .path(id)
-						 .path(ServiceConfiguration.SVC_EXECUTE_ESD)
-					     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-					     .queryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES, "experimentSeriesDefintion")
-					     .accept(MediaType.APPLICATION_JSON)
-					  	 .type(MediaType.APPLICATION_JSON)
-					  	 .put(new GenericType<ServiceResponse<Boolean>>() { });
-		
-		assertEquals(true, sr_b.getObject());
+		r = target().path(ServiceConfiguration.SVC_EXECUTE)
+					.path(id)
+					.path(ServiceConfiguration.SVC_EXECUTE_ESD)
+				    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				    .queryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES, "experimentSeriesDefintion")
+			      	.request(MediaType.APPLICATION_JSON)
+			      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		// now get the database entry for the ScheduledExperiment
-		ServiceResponse<ScheduledExperiment> sr_se = resource().path(ServiceConfiguration.SVC_EXECUTE)
-												       	       .path(id)
-												       	       .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-												       	       .accept(MediaType.APPLICATION_JSON)
-												       	       .type(MediaType.APPLICATION_JSON)
-												       	       .get(new GenericType<ServiceResponse<ScheduledExperiment>>() { });
+		r = target().path(ServiceConfiguration.SVC_EXECUTE)
+	       	        .path(id)
+	       	        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      	.request(MediaType.APPLICATION_JSON)
+	       	        .get();
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
-		assertEquals("experimentSeriesDefintion", sr_se.getObject().getSelectedExperiments().get(0));
+		ScheduledExperiment se2 = r.readEntity(ScheduledExperiment.class);
+		
+		assertEquals("experimentSeriesDefintion", se2.getSelectedExperiments().get(0));
 		
 		// then simply activate the execution
-		ServiceResponse<Integer> sr_key =  resource().path(ServiceConfiguration.SVC_EXECUTE)
-										       	     .path(id)
-										       	     .path(ServiceConfiguration.SVC_EXECUTE_ENABLE)
-										       	     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-										       	     .accept(MediaType.APPLICATION_JSON)
-										       	     .type(MediaType.APPLICATION_JSON)
-										       	     .put(new GenericType<ServiceResponse<Integer>>() { });
+		r =  target().path(ServiceConfiguration.SVC_EXECUTE)
+		       	     .path(id)
+		       	     .path(ServiceConfiguration.SVC_EXECUTE_ENABLE)
+		       	     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			      	 .request(MediaType.APPLICATION_JSON)
+			      	 .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
-		assertEquals(sr_se.getObject().getExperimentKey(), sr_key.getObject().intValue());
-		assertEquals(true, se.getExperimentKey() != sr_key.getObject().intValue());
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
-		String experimentKey = String.valueOf(sr_key.getObject());
+		int key = r.readEntity(Integer.class);
 		
-		ServiceResponse<ExperimentStatus> sr_status =  resource().path(ServiceConfiguration.SVC_EXECUTE)
-													       	     .path(ServiceConfiguration.SVC_EXECUTE_STATUS)
-													       	     .queryParam(ServiceConfiguration.SVCP_EXECUTE_KEY, experimentKey)
-													       	     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-													       	     .accept(MediaType.APPLICATION_JSON)
-													       	     .type(MediaType.APPLICATION_JSON)
-													       	     .get(new GenericType<ServiceResponse<ExperimentStatus>>() { });
+		assertEquals(se2.getExperimentKey(), key);
+		assertEquals(true, se.getExperimentKey() != key);
+		
+		String experimentKey = String.valueOf(key);
+		
+		r =  target().path(ServiceConfiguration.SVC_EXECUTE)
+		       	     .path(ServiceConfiguration.SVC_EXECUTE_STATUS)
+		       	     .queryParam(ServiceConfiguration.SVCP_EXECUTE_KEY, experimentKey)
+		       	     .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				     .request(MediaType.APPLICATION_JSON)
+		       	     .get();
 
-		assertEquals(Status.OK, sr_status.getStatus());
-		assertEquals(TestConfiguration.TEST_SCENARIO_NAME, sr_status.getObject().getScenarioName());
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		ExperimentStatus es = r.readEntity(ExperimentStatus.class);
+		
+		assertEquals(TestConfiguration.TEST_SCENARIO_NAME, es.getScenarioName());
 	}
 	
 }
