@@ -1,7 +1,12 @@
 package org.sopeco.service.rest;
 
+import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.UnknownHostException;
 import java.rmi.RemoteException;
 import java.util.Arrays;
 import java.util.List;
@@ -47,15 +52,45 @@ public class MeasurementControllerService {
 	private static final String[] CONTROLLER_URL_PATTERN = new String[] { "^socket://[a-zA-Z0-9\\.]+(:[0-9]{1,5})?/[a-zA-Z][a-zA-Z0-9]*$" };
 	
 	/**
+	 * Returns the status of the given host and port tupel. Tries to connect with a
+	 * {@link Socket}.
+	 * 
+	 * @return {@link Response} OK or INTERNAL_SERVER_ERROR
+	 * 						    
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_MEC_PORTREACHABLE)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response isPortReachable(@QueryParam(ServiceConfiguration.SVCP_MEC_HOST) String host,
+									@QueryParam(ServiceConfiguration.SVCP_MEC_PORT) int port) {
+		
+		try {
+			
+			SocketAddress socketAddress = new InetSocketAddress(host, port);
+			Socket socket = new Socket();
+			socket.connect(socketAddress, ServiceConfiguration.SOCKET_TIMEOUT);
+			socket.close();
+			return Response.ok().build();
+			
+		} catch (UnknownHostException e) {
+			LOGGER.info("Unknown host '" + host + ":" + port + "'");
+		} catch (IOException e) {
+			LOGGER.info("IOException at connection to '" + host + ":" + port + "'");
+		}
+		
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+	}
+	
+	/**
 	 * Returns the URI pattern for the socket connection URL.
 	 * 
-	 * @return the URI pattern for the socket connection URL
+	 * @return {@link Response} with the valid URL pattern as {@link Entity}the URI pattern for the socket connection URL
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_VALIDATE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public String[] getValidUrlPattern() {
-		return CONTROLLER_URL_PATTERN;
+	public Response getValidUrlPattern() {
+		return Response.ok(CONTROLLER_URL_PATTERN).build();
 	}
 	
 	/**

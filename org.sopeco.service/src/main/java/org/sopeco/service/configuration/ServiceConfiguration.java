@@ -27,6 +27,9 @@ public abstract class ServiceConfiguration {
 	// default user timeout
 	public static final long USER_TIMEOUT = 600000;
 
+	// timeout to try to connect to a socket
+	public static final int SOCKET_TIMEOUT = 10000;
+	
 	// timeunit for the scheduling times can be configured below them
 	public static final int SCHEDULING_REPEATE_INTERVAL = 5;
 	public static final int SCHEDULING_TIMEOUT_INTERVAL = 5; // waits for the experiment scheduler to finish
@@ -128,12 +131,13 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO 				= "scenario";
 	public static final String SVC_SCENARIO_ADD 			= "add";
 	public static final String SVC_SCENARIO_LIST	 		= "list";
+	public static final String SVC_SCENARIO_DEFINITON 		= "definition";
 	public static final String SVC_SCENARIO_DELETE 			= "delete";
 	public static final String SVC_SCENARIO_SWITCH 			= "switch";
 	public static final String SVC_SCENARIO_SWITCH_NAME 	= "name";
 	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
 	public static final String SVC_SCENARIO_CURRENT 		= "current";
-	public static final String SVC_SCENARIO_ARCHIVE 		= "archive";
+	public static final String SVC_SCENARIO_STORE 			= "archive";
 	public static final String SVC_SCENARIO_XML 			= "xml";
 	public static final String SVC_SCENARIO_INSTANCE	 	= "instance";
 	public static final String SVCP_SCENARIO_NAME 			= "name";
@@ -153,7 +157,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC 						= "mec";
 	public static final String SVC_MEC_STATUS 				= "status";
 	public static final String SVC_MEC_VALIDATE 			= "validate";
-	public static final String SVC_MEC_CHECK 				= "check";
+	public static final String SVC_MEC_PORTREACHABLE		= "reachable";
 	public static final String SVC_MEC_LIST 				= "list";
 	public static final String SVC_MEC_MED 					= "med";
 	public static final String SVCP_MEC_TOKEN 				= "token";
@@ -198,5 +202,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
+
+
 
 }

@@ -75,7 +75,7 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	@Consumes(MediaType.APPLICATION_JSON)
 	public Response addScenario(@PathParam(NAME) String scenarioName,
-							    @QueryParam("specname") String specificationName,
+							    @QueryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME) String specificationName,
 							    @QueryParam(TOKEN) String usertoken,
 							    ExperimentSeriesDefinition esd) {
 		
@@ -420,10 +420,11 @@ public class ScenarioService {
 	 * @return 			{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
+	@Path(ServiceConfiguration.SVC_SCENARIO_STORE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response storeScenario(@QueryParam(TOKEN) String usertoken) {
+	public Response storeScenario(@QueryParam(TOKEN) String usertoken,
+								  ScenarioDefinition definition) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -470,7 +471,7 @@ public class ScenarioService {
 	}
 	
 	/**
-	 * Returns  the current scenario written down in XML. Not the XML is passed back, but
+	 * Returns the current scenario written down in XML. Not the XML is passed back, but
 	 * a String.
 	 * 
 	 * @param usertoken the token to identify the user
@@ -515,8 +516,8 @@ public class ScenarioService {
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScenarioInstance(@QueryParam(TOKEN) String usertoken,
-																 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
-																 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
+										@QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
+										@QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
 			
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -536,6 +537,30 @@ public class ScenarioService {
 			return Response.status(Status.CONFLICT).entity("Cannot find a scenario definition with given name and URL.").build();
 			
 		}
+	}
+	
+	/**
+	 * Returns the {@link ScenarioDefinition} the current user has.
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @param name		the name of the {@link ScenarioInstance}
+	 * @param url		the URL of the MeasurementEnvironmentController
+	 * @return			{@link Response} OK or UNAUTHORIZED<br />
+	 * 					OK with {@link ScenarioDefinition} as {@link Entity} (null possible)
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getScenarioDefinition(@QueryParam(TOKEN) String usertoken) {
+			
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		return Response.ok(u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition()).build();
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////
