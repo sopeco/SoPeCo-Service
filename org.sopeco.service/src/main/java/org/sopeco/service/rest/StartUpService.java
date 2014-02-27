@@ -1,9 +1,11 @@
 package org.sopeco.service.rest;
 
+import java.net.ServerSocket;
+
 import javax.ws.rs.ext.Provider;
 
-import org.glassfish.jersey.server.spi.AbstractContainerLifecycleListener;
 import org.glassfish.jersey.server.spi.Container;
+import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAcception;
@@ -11,29 +13,29 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.ExecutionScheduler;
 
 /**
- * The <code>StartUpService</code> class is used to handle the initialization of Servlets.
- * This class is called once in the program lifetime for the initialization {@link
- * #onStartup(Container)} and once when shutting down {@link #onShutdown(Container)}.
+ * The {@link StartUpService} class is used to handle the initialization of (servlet-){@link Container}.
+ * This class is called once in the program lifetime of a <code>Container</code> for the {@link
+ * #onStartup(Container)} and once when the <code>Container</code> is {@link #onShutdown(Container)}.
  * <br />
  * <br />
- * One initialization is the ServerSocket startup for listening for MECs.
+ * The main initialization is the ServerSocket listening for MECs.
  * 
  * @author Peter Merkert
  */
 @Provider
-public final class StartUpService extends AbstractContainerLifecycleListener {
+public final class StartUpService implements ContainerLifecycleListener {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(StartUpService.class);
 		
 	/**
-	 * Starts a ServerSocket via the <code>SocketAcception</code> to wait for
-	 * <code>MeasurementEnvironmentController</code> connections.
+	 * Starts a ServerSocket via the {@link SocketAcception} to wait for
+	 * <code>MeasurementEnvironmentController</code>s to connect.
 	 * <br />
-	 * This is a non-blocking method, because the ServerSocket is handled
-	 * via the class <code>SocketAcception</code>.
+	 * This is a non-blocking method, because the {@link ServerSocket} is handled
+	 * via the class {@link SocketAcception}, which itself is calling a thread.
 	 */
 	@Override
-	public void onStartup(Container arg0) {
+	public void onStartup(Container container) {
 
 		LOGGER.debug("RESTful SoPeCo Service Layer starting up.");	
 		
@@ -50,10 +52,11 @@ public final class StartUpService extends AbstractContainerLifecycleListener {
 	}
 
 	/**
-	 * Stops the {@link ExecutionScheduler}, which was started in the beginning.
+	 * Stops the {@link ExecutionScheduler}, which was started in the {@link #onStartup(Container)} call
+	 * for this {@link Container}.
 	 */
 	@Override
-	public void onShutdown(Container arg0) {
+	public void onShutdown(Container container) {
 
 		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");
 		
@@ -62,6 +65,13 @@ public final class StartUpService extends AbstractContainerLifecycleListener {
 			LOGGER.info("Shutdown of experiment scheduler failed. Try again.");
 		}
 		
+	}
+
+	/**
+	 * This method is empty overwritten.
+	 */
+	@Override
+	public void onReload(Container container) {
 	}
 	
 }

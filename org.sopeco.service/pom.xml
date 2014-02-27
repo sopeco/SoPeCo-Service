@@ -73,6 +73,12 @@
 		    <artifactId>jersey-container-servlet</artifactId>
 		    <version>${jersey.version}</version>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-server</artifactId>
+			<version>${jersey.version}</version>
+		</dependency>
          
 		<!-- JSON data exchange - These lines automtically enable jackson in jersey -->
 		<dependency>
