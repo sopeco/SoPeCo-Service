@@ -2,8 +2,10 @@ package org.sopeco.service.rest;
 
 import java.util.UUID;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -91,22 +93,75 @@ public class AccountService {
 	
 	
 	/**
-	 * Access the account information for a given username.
+	 * Access the {@link AccountDetails} information for a given username.
 	 * 
-	 * @param accountname 	the accountname the information is requested to
+	 * @param usertoken 	the user identification
 	 * @return 				{@link Response} with {@link AccountDetails} (null possible)
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname) {
+	public Response getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
 		
-		Long accountID = ServicePersistenceProvider.getInstance().loadAccount(accountname).getId();
-		AccountDetails accountDetails = ServicePersistenceProvider.getInstance().loadAccountDetails(accountID);
-
-		return Response.ok(accountDetails).build();
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+				
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}	
+		
+		return Response.ok(u.getAccountDetails()).build();
 	}
 	
+	/**
+	 * Stores the given {@link AccountDetails} in the database. Existing information
+	 * will be overwritten. This method is privileged and need a correct token, to modify
+	 * the database.
+	 * 
+	 * @param usertoken			the user authentification
+	 * @param accountDetails	the {@link AccountDetails}
+	 * @return 					{@link Response} OK, CONFLICT or UNAUTHORIZED
+	 */
+	@PUT
+	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
+	@Produces(MediaType.APPLICATION_JSON)
+	@Consumes(MediaType.APPLICATION_JSON)
+	public Response setInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken,
+							AccountDetails accountDetails) {
+		
+		if (accountDetails == null) {
+			LOGGER.debug("AccountDetails invalid");
+			return Response.status(Status.CONFLICT).entity("AccountDetails invalid").build();
+		}
+		
+		Response r = getAccount(usertoken);
+		
+		if (r.getStatus() != Status.OK.getStatusCode()) {
+			LOGGER.debug("Invalid token");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		Account account = r.readEntity(Account.class);
+		
+		if (account == null) {
+			LOGGER.debug("Invalid token");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+	
+		// now check if account details correspond to the given token
+		if (accountDetails.getId() == account.getId() &&
+			accountDetails.getAccountName().equals(account.getName())) {
+
+			ServicePersistenceProvider.getInstance().storeAccountDetails(accountDetails);
+			return Response.ok().build();
+			
+		} else {
+			
+			LOGGER.debug("Token does not authorize to modify this account.");
+			return Response.status(Status.UNAUTHORIZED).build();
+			
+		}
+	}
 
 	/**
 	 * Access the account as such with the given user token.
@@ -124,7 +179,7 @@ public class AccountService {
 		
 		if (u == null) {
 			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return Response.status(Status.FORBIDDEN).build();
+			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
 		Account a = ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
@@ -132,6 +187,58 @@ public class AccountService {
 		return Response.ok(a).build();
 	}
 	
+	/**
+	 * Access the account as such with the given user token.
+	 * 
+	 * @param usertoken the user identification
+	 * @return 			{@link Response} the account the current user is related to
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CHECK + "/" + ServiceConfiguration.SVC_ACCOUNT_PASSWORD)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkPassword(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME) String accountname,
+			      								  @QueryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD) String password) {
+
+		Account account = ServicePersistenceProvider.getInstance().loadAccount(accountname);
+	
+		if (account == null) {
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		if (!account.getPasswordHash().equals(Crypto.sha256(password))) {
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+	
+		return Response.ok().build();
+	}
+	
+	/**
+	 * Access the account as such with the given user token. It's a GET method, but the last
+	 * request time for the user is refreshed. Actually a GET should not change anything at
+	 * the system. Otherwise this method might say, the token is valid, but in the next millisecond
+	 * the tokens get invalid. This is confusing for clients.
+	 * 
+	 * @param usertoken the user identification
+	 * @return 			{@link Response} OK or UNAUTHORIZED
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_ACCOUNT_CHECK + "/" + ServiceConfiguration.SVC_ACCOUNT_TOKEN)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response checkToken(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		// reset the timer for the token
+		u.setLastRequestTime(System.currentTimeMillis());
+		ServicePersistenceProvider.getInstance().storeUser(u);
+
+		return Response.ok().build();
+	}
 	
 	/**
 	 * The login method to authentificate that the current client has the permission to
@@ -183,6 +290,28 @@ public class AccountService {
 		return Response.ok(uuid).build();
 	}
 	
+	/**
+	 * Logout just means to remove the user with the given token in the database.
+	 * 
+	 * @param usertoken 	the user authentification
+	 * @return 				{@link Response} OK or UNAUTHORIZED
+	 */
+	@PUT
+	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGOUT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response logout(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
+		
+		Users u = AccountService.loadUserAndUpdateExpiration(usertoken);
+		
+		if (u == null) {
+			LOGGER.debug("Invalid token.");
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		ServicePersistenceProvider.getInstance().removeUser(u);
+
+		return Response.ok().build();
+	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////// HELPER /////////////////////////////////////////////////
@@ -232,4 +361,42 @@ public class AccountService {
 		return testIfExist != null;
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////// GLOBAL STATIC HELPER ///////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Loads the {@link Users} with the given token. First it's checked if the token
+	 * is still valid. When the token is expired the user (<b>NOT</b> the
+	 * account!) is removed from the database.<br />
+	 * With this test, the {@link Users} last request time is updated with the current
+	 * system time.
+	 * 
+	 * @param usertoken the unique user token
+	 * @return			the {@link Users} with the token, <code>null</code> if the token is
+	 * 					invalid or expired
+	 */
+	public static Users loadUserAndUpdateExpiration(String usertoken) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Token invalid.");
+			return null;
+		}
+		
+		if (u.isExpired()) {
+			
+			LOGGER.info("Token expired. Login again please.");
+			ServicePersistenceProvider.getInstance().removeUser(u);
+			return null;
+			
+		}
+		
+		u.setLastRequestTime(System.currentTimeMillis());
+		
+		ServicePersistenceProvider.getInstance().storeUser(u);
+
+		return u;
+	}
 }

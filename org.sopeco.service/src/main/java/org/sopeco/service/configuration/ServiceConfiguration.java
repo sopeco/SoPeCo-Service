@@ -95,9 +95,13 @@ public abstract class ServiceConfiguration {
 	 * 	 	- details
 	 */
 	public static final String SVC_ACCOUNT 					= "account";
+	public static final String SVC_ACCOUNT_CHECK 			= "check";
+	public static final String SVC_ACCOUNT_PASSWORD 		= "password";
 	public static final String SVC_ACCOUNT_CREATE 			= "create";
+	public static final String SVC_ACCOUNT_TOKEN 			= "token";
 	public static final String SVC_ACCOUNT_EXISTS 			= "exists";
 	public static final String SVC_ACCOUNT_LOGIN 			= "login";
+	public static final String SVC_ACCOUNT_LOGOUT 			= "logout";
 	public static final String SVC_ACCOUNT_INFO 			= "info";
 	public static final String SVC_ACCOUNT_CONNECTED 		= "connected";
 	public static final String SVC_ACCOUNT_CUSTOMIZE 		= "customize";
@@ -183,6 +187,5 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
-
 
 }

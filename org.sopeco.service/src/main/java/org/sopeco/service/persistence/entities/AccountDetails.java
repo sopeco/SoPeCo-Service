@@ -185,6 +185,15 @@ public class AccountDetails implements Serializable {
 	/**
 	 * @return the csvCommentSeparator
 	 */
+	public String getCsvCommentSeparator() {
+		return csvCommentSeparator;
+	}
+
+	/**
+	 * @return the csvCommentSeparator
+	 * @deprecated use {@link #getCsvCommentSeparator()}
+	 */
+	@Deprecated
 	public String getCsvQuoteChar() {
 		return csvCommentSeparator;
 	}
