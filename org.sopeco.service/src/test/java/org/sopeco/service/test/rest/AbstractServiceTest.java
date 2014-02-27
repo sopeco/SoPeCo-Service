@@ -47,10 +47,10 @@ public abstract class AbstractServiceTest extends JerseyTest {
 	@Override
     protected Application configure() {
 		ResourceConfig rc = new ResourceConfig();
-		rc.packages(TestConfiguration.PACKAGE_NAME_REST);
+		rc.packages(ServiceConfiguration.PACKAGE_NAME_REST);
 
 		// the ContainerLifeCycleListener is in the configuration package and need to be defined
-		rc.packages(TestConfiguration.PACKAGE_NAME_LIFECYCLELISTENER);
+		rc.packages(ServiceConfiguration.PACKAGE_NAME_LIFECYCLELISTENER);
 		
 		// the CustomObjectMapper must be wrapped into a Jackson Json Provider
 		// otherwise Jersey does not recognize to use Jackson for JSON

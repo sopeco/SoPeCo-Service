@@ -23,20 +23,16 @@
               http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 	version="2.5" xmlns="http://java.sun.com/xml/ns/javaee">
     
-    <listener>
-		<listener-class>org.sopeco.service.rest.StartUpService</listener-class>
-	</listener>
-    
 	<servlet>
 		<servlet-name>sopeco-service</servlet-name>
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
+		
+		<!-- REST classes are in the following packages -->
 		<init-param>
 		     <param-name>jersey.config.server.provider.packages</param-name>
-		     <param-value>
-		         org.sopeco.service.rest; 			<!-- contains the REST services -->
-		         org.sopeco.service.configuration 	<!-- contains the ContainerLifecycleListener -->
-		     </param-value>
+		     <param-value>org.sopeco.service.rest</param-value>
 		</init-param>
+		
 		<!-- Called when a servlet is created -->
 		<init-param>
 		    <param-name>javax.ws.rs.Application</param-name>

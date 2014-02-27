@@ -10,6 +10,17 @@ import java.util.concurrent.TimeUnit;
  */
 public abstract class ServiceConfiguration {
 
+	/**
+	 * The package where all the RESTful services are in. Used to setup the {@link JerseyTest}
+	 * correctly.
+	 */
+	public static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
+
+	/**
+	 * The class where the servlet lifecyclelistener is nested in.
+	 */
+	public static final String PACKAGE_NAME_LIFECYCLELISTENER = "org.sopeco.service.configuration";
+	
 	// the applications session ID, if needed
 	public static final String SESSION_ID = "sessionid";
 	
