@@ -243,7 +243,7 @@ public class ExecutionService {
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return Response.status(Status.CONFLICT).encoding("Invalid scheduling id.").build();
+			return Response.status(Status.CONFLICT).entity("Invalid scheduling id.").build();
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
