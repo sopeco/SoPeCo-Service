@@ -37,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  * @author Peter Merkert
  */
-public class AccountDetailsMixin {
+public class AccountDetailsMixIn {
 
 	@JsonIgnore
 	public String getCsvQuoteChar() {
