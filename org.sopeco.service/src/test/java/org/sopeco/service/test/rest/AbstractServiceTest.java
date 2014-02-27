@@ -105,6 +105,8 @@ public abstract class AbstractServiceTest extends JerseyTest {
 				.request(MediaType.APPLICATION_JSON)
 				.delete();
 
+		// TODO: delete all executed experiment details
+		
 		// now create empty scenario to delete the test scenario
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		target().path(ServiceConfiguration.SVC_SCENARIO)
