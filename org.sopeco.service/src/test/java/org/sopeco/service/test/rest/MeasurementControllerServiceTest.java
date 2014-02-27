@@ -13,15 +13,15 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.configuration.ServletContainerLifecycleListener;
 import org.sopeco.service.rest.MeasurementControllerService;
-import org.sopeco.service.rest.StartUpService;
 import org.sopeco.service.rest.exchange.MECStatus;
 import org.sopeco.service.test.configuration.TestConfiguration;
 import org.sopeco.service.test.rest.fake.TestMEC;
 
 /**
  * The {@link MeasurementControllerServiceTest} tests the {@link MeasurementControllerService} class.
- * The {@link ServletContextListener} of class {@link StartUpService} is connected to the test container
+ * The {@link ServletContextListener} of class {@link ServletContainerLifecycleListener} is connected to the test container
  * and starts the ServerSocket.
  * <br />
  * <br />

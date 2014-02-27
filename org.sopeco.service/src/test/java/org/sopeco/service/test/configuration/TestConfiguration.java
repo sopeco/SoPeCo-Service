@@ -14,6 +14,11 @@ public abstract class TestConfiguration {
 	public static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
 
 	/**
+	 * The class where the servlet lifecyclelistener is nested in.
+	 */
+	public static final String PACKAGE_NAME_LIFECYCLELISTENER = "org.sopeco.service.configuration";
+	
+	/**
 	 * The test account, which the test always wants to connect to.
 	 */
 	public static final String TESTACCOUNTNAME = "testaccount";

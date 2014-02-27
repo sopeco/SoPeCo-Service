@@ -32,11 +32,15 @@
 		<servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
 		<init-param>
 		     <param-name>jersey.config.server.provider.packages</param-name>
-		     <param-value>org.sopeco.service.rest</param-value>
+		     <param-value>
+		         org.sopeco.service.rest; 			<!-- contains the REST services -->
+		         org.sopeco.service.configuration 	<!-- contains the ContainerLifecycleListener -->
+		     </param-value>
 		</init-param>
+		<!-- Called when a servlet is created -->
 		<init-param>
 		    <param-name>javax.ws.rs.Application</param-name>
-		    <param-value>org.sopeco.service.rest.MyApplication</param-value>
+		    <param-value>org.sopeco.service.configuration.ServletContainerInitialization</param-value>
 		</init-param>
 		
 		<load-on-startup>1</load-on-startup>

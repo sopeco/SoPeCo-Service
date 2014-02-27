@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.configuration;
 
 import javax.ws.rs.core.Application;
 

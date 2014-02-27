@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.configuration;
 
 import java.net.ServerSocket;
 
@@ -9,11 +9,10 @@ import org.glassfish.jersey.server.spi.ContainerLifecycleListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAcception;
-import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.ExecutionScheduler;
 
 /**
- * The {@link StartUpService} class is used to handle the initialization of (servlet-){@link Container}.
+ * The {@link ServletContainerLifecycleListener} class is used to handle the initialization of (servlet-){@link Container}.
  * This class is called once in the program lifetime of a <code>Container</code> for the {@link
  * #onStartup(Container)} and once when the <code>Container</code> is {@link #onShutdown(Container)}.
  * <br />
@@ -23,9 +22,9 @@ import org.sopeco.service.execute.ExecutionScheduler;
  * @author Peter Merkert
  */
 @Provider
-public final class StartUpService implements ContainerLifecycleListener {
+public final class ServletContainerLifecycleListener implements ContainerLifecycleListener {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(StartUpService.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ServletContainerLifecycleListener.class);
 		
 	/**
 	 * Starts a ServerSocket via the {@link SocketAcception} to wait for
