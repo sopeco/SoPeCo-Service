@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 public abstract class ServiceConfiguration {
 	
 	public static final String USER_TIMEOUT = "sopeco.service.userTimeout";
-
+	
 	public static final String CONFIGURATION_FILE = "sopeco-service.conf";
 
 	public static final String SESSION_ID = "sessionid";
@@ -99,14 +99,20 @@ public abstract class ServiceConfiguration {
 	 * 	 	- details
 	 */
 	public static final String SVC_ACCOUNT = "account";
+	public static final String SVC_ACCOUNT_CHECK = "check";
 	public static final String SVC_ACCOUNT_CREATE = "create";
 	public static final String SVC_ACCOUNT_EXISTS = "exists";
 	public static final String SVC_ACCOUNT_LOGIN = "login";
+	public static final String SVC_ACCOUNT_LOGOUT = "logout";
 	public static final String SVC_ACCOUNT_INFO = "info";
+	public static final String SVC_ACCOUNT_TOKEN = "token";
 	public static final String SVC_ACCOUNT_CONNECTED = "connected";
+	public static final String SVC_ACCOUNT_CUSTOMIZE = "customize";
 	public static final String SVCP_ACCOUNT_NAME = "accountname";
 	public static final String SVCP_ACCOUNT_PASSWORD = "password";
 	public static final String SVCP_ACCOUNT_TOKEN = "token";
+	public static final String SVCP_ACCOUNT_DATABASENAME = "dbname";
+	public static final String SVCP_ACCOUNT_DATABASEPORT = "dbpw";
 
 	public static final String SVC_INFO = "info";
 	public static final String SVC_INFO_RUNNING = "running";
@@ -170,21 +176,19 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_MED_PARAM_TYP = "paramtype";
 
 	public static final String SVC_EXECUTE = "execution";
+	public static final String SVC_EXECUTE_ESD = "esd";
 	public static final String SVC_EXECUTE_SCHEDULE = "schedule";
 	public static final String SVC_EXECUTE_ENABLE = "enable";
 	public static final String SVC_EXECUTE_DISABLE = "disable";
 	public static final String SVC_EXECUTE_ID = "id";
-	public static final String SVC_EXECUTE_DELETE = "delete";
 	public static final String SVC_EXECUTE_DETAILS = "details";
 	public static final String SVC_EXECUTE_MECLOG = "meclog";
 	public static final String SVC_EXECUTE_EXECUTE = "execute";
+	public static final String SVC_EXECUTE_STATUS = "status";
 	public static final String SVCP_EXECUTE_TOKEN = "token";
 	public static final String SVCP_EXECUTE_ID = "id";
-	
-	/**
-	 * QueryParam name for the account name.
-	 */
-	public static final String SVC_ACCOUNT_ACCOUNTNAME = "accountname";
+	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
+	public static final String SVCP_EXECUTE_KEY = "key";
 	
 	/**
 	 * QueryParam name for the account password.
@@ -192,4 +196,10 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_PASSWORD = "password";
 	public static final String SVC_USER = "user";
 	public static final String SVC_DB_PREFIX = "SPC_SVC";
+
+
+
+
+
+
 }

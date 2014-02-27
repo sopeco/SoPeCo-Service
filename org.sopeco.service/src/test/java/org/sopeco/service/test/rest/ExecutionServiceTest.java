@@ -426,7 +426,7 @@ public class ExecutionServiceTest extends JerseyTest {
 		String controllerURL 	= "myCustomURL";
 		String label 			= "myScheduledExperiment";
 		long accountId 			= sr_account.getObject().getId();
-		boolean scenarioActive 	= true;
+		boolean scenarioActive 	= false; // must be false, otherwise will fail on scheduledExperiment integrity check when adding
 		long addedTime 			= System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
@@ -487,7 +487,7 @@ public class ExecutionServiceTest extends JerseyTest {
 					        .type(MediaType.APPLICATION_JSON)
 					        .get(new GenericType<ServiceResponse<ScheduledExperiment>>() { });
 
-		assertEquals(scenarioActive, sr_se2.getObject().isActive());
+		assertEquals(false, sr_se2.getObject().isActive());
 		
 		// now enable the scheulded experiment again
 		scenarioActive = true;
@@ -509,12 +509,12 @@ public class ExecutionServiceTest extends JerseyTest {
 					        .type(MediaType.APPLICATION_JSON)
 					        .get(new GenericType<ServiceResponse<ScheduledExperiment>>() { });
 
-		assertEquals(scenarioActive, sr_se2.getObject().isActive());
+		// be aware! as no ExperimentSeries have been selected, the scenario is not turned active!
+		assertEquals(false, sr_se2.getObject().isActive());
 		
 		// now delete the scheduled experiment
 		sr_b = resource().path(ServiceConfiguration.SVC_EXECUTE)
 				         .path(id)
-				         .path(ServiceConfiguration.SVC_EXECUTE_DELETE)
 				         .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				         .accept(MediaType.APPLICATION_JSON)
 				         .type(MediaType.APPLICATION_JSON)

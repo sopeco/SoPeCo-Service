@@ -27,11 +27,13 @@
 package org.sopeco.service.persistence.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -107,11 +109,12 @@ public class ScheduledExperiment implements Serializable {
 	private String repeatMinutes;
 
 	@Column(name = "durations")
-	private List<Long> durations;
+	private List<Long> durations = new ArrayList<Long>();
 
 	@Lob
+	@ElementCollection
 	@Column(name = "selectedExperiments")
-	private List<String> selectedExperiments;
+	private List<String> selectedExperiments = new ArrayList<String>();
 
 	public ScheduledExperiment() {
 	}
@@ -259,35 +262,101 @@ public class ScheduledExperiment implements Serializable {
 	}
 
 	/**
+	 * Calculates a unique the experiment key for this {@link ScheduledExperiment}.
+	 * At the moment only take the hash code of this object.
+	 * 
+	 * @return the experiment key
+	 */
+	public int getExperimentKey() {
+		return hashCode();
+	}
+	
+	/**
 	 * Hash function which append all the variables to a string and
 	 * creates the hash function via the string. String has a quite 
-	 * good hash function enabled. Of course, the execution times 
-	 * are ignored creating the hash code, as they change over time.<br />
+	 * good hash function enabled. <br />
+	 * Of course, the execution times are ignored creating the hash
+	 * code, as they change over time. In Addition the active state
+	 * is not taken into account, as it changes over time, too.<br />
+	 * To be honest, the properties are not inserted, too, as it is
+	 * too complex to flatten the map. HashCode() for the map cannot
+	 * be used as it is not the same value before and after persisting!
+	 * <br />
+	 * <br />
+	 * This method is absolut null-safe. There is no possiblity thath this
+	 * method fails, as it is a really important one.
+	 * <br />
 	 * <br />
 	 * If a better hash function is required, if can just be created here.
 	 */
 	@Override
 	public int hashCode() {
 		
-		String active = String.valueOf(this.active);
-		String addedTime = String.valueOf(this.addedTime);
-		String properties = String.valueOf(this.properties.hashCode());
-		String scenarioDefinition = this.scenarioDefinition.toString();
-		String account = String.valueOf(this.account);
-		String controllerUrl = this.controllerUrl;
-		String id = String.valueOf(this.id);
-		String isRepeating = String.valueOf(this.isRepeating);
-		String label = this.label;
-		String repeatDays = this.repeatDays;
-		String repeatHours = this.repeatHours;
-		String repeatMinutes = this.repeatMinutes;
-		String durations = String.valueOf(this.durations.hashCode());
-		String selectedExperiments = String.valueOf(this.selectedExperiments.hashCode());
+		String addedTime			= String.valueOf(this.addedTime);
+		String account				= String.valueOf(this.account);
+		String id					= String.valueOf(this.id);
+		String isRepeating			= String.valueOf(this.isRepeating);
+		String label				= "";
+		String repeatDays			= "";
+		String repeatHours			= "";
+		String repeatMinutes		= "";
+		String scenarioDefinition	= "";
+		String controllerUrl		= "";
+		String durations 			= "";
+		String selectedExperiments 	= "";
 		
-		return (active + addedTime + properties + scenarioDefinition
-				+ account + controllerUrl + id + isRepeating
-				+ label + repeatDays + repeatHours + repeatMinutes
-				+ durations + selectedExperiments).hashCode();
+		if (scenarioDefinition != null) {
+			scenarioDefinition = this.scenarioDefinition.toString();
+		}
+		
+		if (this.controllerUrl != null) {
+			controllerUrl = this.controllerUrl;
+		}
+		
+		if (this.label != null) {
+			label = this.label;
+		}
+		
+		if (this.repeatDays != null) {
+			repeatDays = this.repeatDays;
+		}
+		
+		if (this.repeatHours != null) {
+			repeatHours = this.repeatHours;
+		}
+		
+		if (this.repeatMinutes != null) {
+			repeatMinutes = this.repeatMinutes;
+		}
+		
+		if (this.durations != null) {
+			
+			for (long l : this.durations) {
+				durations += String.valueOf(l);
+			}
+			
+		}
+		
+		if (this.selectedExperiments != null) {
+			
+			for (String s : this.selectedExperiments) {
+				selectedExperiments += s;
+			}
+			
+		}
+		
+		return (addedTime
+				+ account
+				+ id
+				+ isRepeating
+				+ label
+				+ repeatDays
+				+ repeatHours
+				+ repeatMinutes
+				+ scenarioDefinition
+				+ controllerUrl
+				+ durations
+				+ selectedExperiments).hashCode();
 	}
 	
 	

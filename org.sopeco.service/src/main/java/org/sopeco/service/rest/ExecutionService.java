@@ -1,11 +1,7 @@
 package org.sopeco.service.rest;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -22,10 +18,12 @@ import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
-import org.sopeco.config.IConfiguration;
 import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.runner.SoPeCoRunner;
+import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.execute.ExecutionScheduler;
+import org.sopeco.service.execute.QueuedExperiment;
 import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
@@ -33,6 +31,7 @@ import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.exchange.ExperimentStatus;
 import org.sopeco.service.rest.exchange.ServiceResponse;
 
 /**
@@ -52,15 +51,17 @@ public class ExecutionService {
 	/**
 	 * Adds a {@link ScheduledExperiment} to the service.
 	 * The last execution time for the schedule is set to <i>-1</i> and the
-	 * properties are referenced from the Configuration with the given token.
+	 * properties are referenced from the Configuration with the given token.<br />
+	 * An integrity check is done for active scenarios: Their selected experiment
+	 * list if checked to be valid. If this test fails, the adding fails.
 	 * <br />
 	 * <br />
 	 * If the schedule is set reapeated, the next valid execution date is calculated. But even
 	 * if the ScheduledExperiment is not repeated, the execution time is set.
 	 * 
-	 * @param usertoken the user identification
-	 * @param scheduledExperiment the ScheduledExperiment object
-	 * @return true, if the ScheduledExperiement has be added
+	 * @param usertoken 			the user identification
+	 * @param scheduledExperiment 	the ScheduledExperiment object
+	 * @return 						true, if the ScheduledExperiement has be added
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -74,6 +75,12 @@ public class ExecutionService {
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+		
+		// test if the set scheduled experiments is valid for active scenarios
+		if (scheduledExperiment.isActive() && !experimentSeriesIsValid(scheduledExperiment)) {
+			LOGGER.info("The selected experiments are corrupt.");
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "The selected experiments are corrupt.");
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
@@ -233,42 +240,61 @@ public class ExecutionService {
 		return new ServiceResponse<ScheduledExperiment>(Status.OK, exp);
 	}
 	
+	
+	
 	/**
-	 * Enables the given <code>ScheduledExperiment</code> via it's ID.
+	 * Enables the given {@link ScheduledExperiment} via it's ID. The experiment is only
+	 * activated, if it has {@link ExperimentSeriesDefinition} selected.<br />
+	 * <br />
+	 * A background progress is running ({@link ExecutionScheduler}) and checks for
+	 * active experiments and adds them to the execution queue. Of course, the are only added
+	 * if the start time for the experiment is reached.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
+	 * @param id 		the ID of the {@link ScheduledExperiment}
 	 * @param usertoken the user identification
-	 * @return true, if the ScheduledExperiment could be enabled
+	 * @return 			true, if the {@link ScheduledExperiment} could be enabled
 	 */
 	@PUT
-	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_ENABLE)
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
+	      + "/" + ServiceConfiguration.SVC_EXECUTE_ENABLE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+	public ServiceResponse<Integer> setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												 				  @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-
+		
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return new ServiceResponse<Integer>(Status.UNAUTHORIZED, -1);
 		}
 		
 		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false);
+			return new ServiceResponse<Integer>(Status.CONFLICT, -1);
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
-			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+			return new ServiceResponse<Integer>(Status.UNAUTHORIZED, -1);
 		}
 		
+		// check if any experimentseriesdefinition have been selected
+		List<String> experiments = exp.getSelectedExperiments();
+		
+		if (experiments == null || experiments.isEmpty()) {
+			LOGGER.info("No ExperimentSeriesDefinition selected yet. Cannot start scenario.");
+			return new ServiceResponse<Integer>(Status.CONFLICT, -1);
+		}	
+		
+		// this is the crutual line. A thread analyses the scheduledexperiment for active one and they are added
+		// to the execution list
 		exp.setActive(true);
+		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 		
-		return new ServiceResponse<Boolean>(Status.OK, true);
+		return new ServiceResponse<Integer>(Status.OK, exp.getExperimentKey());
 	}
 	
 	/**
@@ -312,12 +338,12 @@ public class ExecutionService {
 	/**
 	 * Removes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
+	 * @param id 		the ID of the ScheduledExperiment
 	 * @param usertoken the user identification
-	 * @return true, if the ScheduledExperiment could be removed
+	 * @return 			true, if the ScheduledExperiment could be removed
 	 */
 	@DELETE
-	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_DELETE)
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public ServiceResponse<Boolean> removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     					  @QueryParam(TOKEN) String usertoken) {
@@ -347,22 +373,58 @@ public class ExecutionService {
 	}
 	
 	/**
-	 * Executes the <code>ScheduledExperiment</code>, which is identified via the ID in the URI.
-	 * This is the entrance method to start the real SoPeCo engine with the parameters given
-	 * in the ScheduledExperiment.
+	 * Returns the current status of the experiment with the given key. Both, the table for {@link ScheduledExperiment}s
+	 * and the one for {@link QueuedExperiment}s is searched for the given key. This implies, that this
+	 * method can be called for active and inactive {@link ScheduledExperiment}s.
 	 * 
-	 * @param id the ID of the ScheduledExperiment
-	 * @param usertoken the user identification
-	 * @return true, if the experiment was successful executed
+	 * @param id		the experiment key
+	 * @param usertoken	the user identification
+	 * @return			the {@link ExperimentStatus} of the experiment
 	 */
-	@PUT
-	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}" + "/" + ServiceConfiguration.SVC_EXECUTE_EXECUTE)
+	@GET
+	@Path(ServiceConfiguration.SVC_EXECUTE_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public ServiceResponse<Boolean> executeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
-									 	  					   @QueryParam(TOKEN) String usertoken) {
+	public ServiceResponse<ExperimentStatus> getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+									     					  			  @QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return new ServiceResponse<ExperimentStatus>(Status.UNAUTHORIZED, null);
+		}
 		
+		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(String.valueOf(key));
+		
+		// if the status is null, the key must be corrupt, because the table ScheduledExepriment
+		// and the QueuedExperiment is searched for the key.
+		if (status == null) {
+			LOGGER.info("The experiment key is corrupt.", usertoken);
+			return new ServiceResponse<ExperimentStatus>(Status.CONFLICT, null, "The experiment key is corrupt.");
+		}
+		
+		return new ServiceResponse<ExperimentStatus>(Status.OK, status);
+	}
+	
+	/**
+	 * Removes the {@link ExperimentSeriesDefinition} with the given name from the list
+	 * of selected experiments in the {@link ScheduledExperiment} with the given ID.
+	 * 
+	 * @param id					the ID of the {@link ScheduledExperiment}
+	 * @param experimentseriesname	the name of the {@link ExperimentSeriesDefinition}
+	 * @param usertoken				the user identification
+	 * @return						true, if the {@link ExperimentSeriesDefinition} is removed
+	 */
+	@DELETE
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
+		  + "/" + ServiceConfiguration.SVC_EXECUTE_ESD)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> removeSelectedExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+												  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
+											  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
 		if (u == null) {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
@@ -372,47 +434,90 @@ public class ExecutionService {
 		
 		if (exp == null) {
 			LOGGER.info("Invalid scheduling id '{}'.", id);
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false, "invalid scheduling id");
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "invalid scheduling id");
 		}
 		
 		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
-		
-		// prepare execution
-		Map<String, Object> executionProperties = exp.getProperties();
-		try {
+
+		// check for the name in the active ESD list	
+		for (String esdName : exp.getSelectedExperiments()) {
 			
-			LOGGER.debug("Experiement settings controller URL: '{}'", exp.getControllerUrl());
-			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_URI, new URI(exp.getControllerUrl()));
-			executionProperties.put(IConfiguration.CONF_MEASUREMENT_CONTROLLER_CLASS_NAME, null); // only if class name is null, URI is searched
-			executionProperties.put(IConfiguration.CONF_SCENARIO_DESCRIPTION, exp.getScenarioDefinition());
+			if (esdName.equals(experimentseriesname)) {
+				exp.getSelectedExperiments().remove(esdName);
+				break;
+			}
 			
-		} catch (URISyntaxException e) {
-			LOGGER.error("Invalid controller URL '{}'.", exp.getControllerUrl());
-			return new ServiceResponse<Boolean>(Status.NO_CONTENT, false, "invalid controller URL");
 		}
 		
-		// fetch example experiement to execute
-		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));
-		
-		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
-												executionProperties,
-												exp.getSelectedExperiments());
-		
-		Thread t = new Thread(runner);
-		
-		t.start();
-		
-		try {
-			
-			t.join();
-			
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-			return new ServiceResponse<Boolean>(Status.INTERNAL_SERVER_ERROR, false);
+		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
+
+		return new ServiceResponse<Boolean>(Status.OK, true);
+	}
+	
+	/**
+	 * Sets the {@link ExperimentSeriesDefinition} with the given name to the experiment which should be executed.
+	 * 
+	 * @param id					the experiment ID
+	 * @param experimentseriesname	the name of the {@link ExperimentSeriesDefinition}
+	 * @param usertoken				the user identification
+	 * @return						true, if the {@link ExperimentSeriesDefinition} was added
+	 */
+	@PUT
+	@Path("{" + ServiceConfiguration.SVCP_EXECUTE_ID + "}"
+		  + "/" + ServiceConfiguration.SVC_EXECUTE_ESD)
+	@Produces(MediaType.APPLICATION_JSON)
+	public ServiceResponse<Boolean> selectExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
+												  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
+										  	  				 		 @QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
 		}
+
+		ScheduledExperiment exp = ServicePersistenceProvider.getInstance().loadScheduledExperiment(id);
+		
+		if (exp == null) {
+			LOGGER.info("Invalid scheduling id '{}'.", id);
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false, "invalid scheduling id");
+		}
+
+		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
+			return new ServiceResponse<Boolean>(Status.UNAUTHORIZED, false);
+		}
+
+		// check if experiment series name is valid
+		boolean validName = false;
+
+		for (ExperimentSeriesDefinition esd : exp.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
+			
+			if (esd.getName().equals(experimentseriesname)) {
+				validName = true;
+				break;
+			}
+			
+		}
+
+		if (!validName) {
+			LOGGER.info("There is no ExperimentSeriesDefinition with the given name.");
+			return new ServiceResponse<Boolean>(Status.CONFLICT, false);
+		}
+
+		List<String> experimentList = exp.getSelectedExperiments();
+		
+		if (experimentList == null) {
+			experimentList = new ArrayList<String>();
+		}
+		
+		experimentList.add(experimentseriesname);
+		
+		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 
 		return new ServiceResponse<Boolean>(Status.OK, true);
 	}
@@ -468,5 +573,56 @@ public class ExecutionService {
 		
 		return new ServiceResponse<MECLog>(Status.OK, tmpMECLog);
 	}
+	
+	
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////// HELPER ///////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Returns whether the given {@link ScheduledExperiment} has a valid list of
+	 * scheduled experiments. The integrity test first tests if the list as such
+	 * is valid. If the list is valid, every entry in the list is checked to
+	 * maps to an existing {@link ExperimentSeriesDefinition} in the underlying
+	 * {@link ScenarioDefinition}.
+	 * 
+	 * @param experiment	the {@link ScheduledExperiment} to check
+	 * @return				true, if the scheduled experiment list is valid
+	 */
+	private boolean experimentSeriesIsValid(ScheduledExperiment experiment) {
+		
+		// first check for a valid selected experiment list
+		List<String> selectedExperiment = experiment.getSelectedExperiments();
+		
+		if (selectedExperiment == null || selectedExperiment.isEmpty()) {
+			return false;
+		}
+		
+		// second check for valid selected names
+		boolean validName = false;
+
+		for (String experimentName : selectedExperiment) {
+			
+			for (ExperimentSeriesDefinition esd : experiment.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
+				
+				if (esd.getName().equals(experimentName)) {
+					validName = true;
+				}
+				
+			}
+			
+			// only if no experimentSeries with the given name was found
+			if (!validName) {
+				return false;
+			}
+			
+			validName = false;
+			
+		}
+		
+		return true;
+	}
+	
 	
 }

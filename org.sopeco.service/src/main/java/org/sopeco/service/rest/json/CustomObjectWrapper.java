@@ -4,6 +4,7 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
 
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
+import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +40,7 @@ public class CustomObjectWrapper implements ContextResolver<ObjectMapper> {
 		// mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
 		om.addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 		om.addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
+		om.addMixInAnnotations(AccountDetails.class, AccountDetailsMixin.class);
 	 }
 
 	@Override
