@@ -71,6 +71,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 				  			 .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
 		assertEquals(Status.CONFLICT.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 
 	/**
@@ -111,6 +113,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		String[] list = r.readEntity(String[].class);
 		
 		assertEquals(true, list.length > 0);
+		
+		logout(token);
 	}
 
 	/**
@@ -149,6 +153,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		
 		// the deletion should be successful completed
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 
 	/**
@@ -188,6 +194,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		
 		// the switch should be succesful
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -276,5 +284,7 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		ScenarioDefinition sd = r.readEntity(ScenarioDefinition.class);
 		
 		assertEquals(true, sd.equals(scenarioDefinitionXML));
+		
+		logout(token);
 	}
 }

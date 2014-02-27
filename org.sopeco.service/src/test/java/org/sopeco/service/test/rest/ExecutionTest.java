@@ -192,6 +192,8 @@ public class ExecutionTest extends AbstractServiceTest {
 		ExperimentStatus es = r.readEntity(ExperimentStatus.class);
 		
 		assertEquals(TestConfiguration.TEST_SCENARIO_NAME, es.getScenarioName());
+		
+		logout(token);
 	}
 	
 }

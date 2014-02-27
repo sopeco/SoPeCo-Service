@@ -96,7 +96,7 @@ public abstract class AbstractServiceTest extends JerseyTest {
 						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
 						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-						     .request()
+			    	         .request(MediaType.APPLICATION_JSON)
 						     .get();
 						
 		String token = r.readEntity(String.class);
@@ -148,12 +148,27 @@ public abstract class AbstractServiceTest extends JerseyTest {
 						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGIN)
 						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname)
 						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password)
-						     .request()
+			    	         .request(MediaType.APPLICATION_JSON)
 						     .get();
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		return r.readEntity(String.class); // the token is in the Response object
+	}
+	
+	/**
+	 * Logs the given user out.
+	 * 
+	 * @param token	the token corresponding to the user, which wants to be logged out	
+	 */
+	protected void logout(String token) {
+		Response r = target().path(ServiceConfiguration.SVC_ACCOUNT)
+						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGOUT)
+						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
+			    	         .request(MediaType.APPLICATION_JSON)
+			 				 .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 	}
 	
 }

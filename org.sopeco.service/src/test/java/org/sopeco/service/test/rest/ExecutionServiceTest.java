@@ -133,6 +133,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 	
 		assertEquals(false, list == null);
 		assertEquals(true, list.isEmpty());
+		
+		logout(token);
 	}
 	
 	/**
@@ -255,6 +257,7 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 			
 		}
 		
+		logout(token);
 	}
 
 	/**
@@ -429,6 +432,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 		
 		// as the scenario does not exists with the given ID, a conflict is thrown!
 		assertEquals(Status.CONFLICT.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -490,6 +495,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 		
 		// TODO: delete ExecutedExperimentDetails in database first on cleanup
 		//assertEquals(true, eed.isEmpty());
+		
+		logout(token);
 	}
 	
 }

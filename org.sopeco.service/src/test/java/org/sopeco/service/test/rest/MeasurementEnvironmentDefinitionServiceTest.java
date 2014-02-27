@@ -72,6 +72,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// as the namespace is not set yet, it must be null
 		assertEquals("root", med.getRoot().getName());
+		
+		logout(token);
 	}
 	
 	/**
@@ -121,6 +123,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// as the namespace is not set yet, it must be null
 		assertEquals("root", med.getRoot().getName());
+		
+		logout(token);
 	}
 	
 	/**
@@ -185,6 +189,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		// as the namespace is not set yet, it must be null
 		assertEquals(mynamespace, med.getRoot().getChildren().get(0).getName());
 		assertEquals("root" + "." + mynamespace, med.getRoot().getChildren().get(0).getFullName());
+		
+		logout(token);
 	}
 	
 	/**
@@ -243,7 +249,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// removal must succeed
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
+	
+		logout(token);
 	}
 	
 	/**
@@ -355,6 +362,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			  	 	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 
 		assertEquals(false, Status.OK.getStatusCode() == r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -416,6 +425,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 						     .put(Entity.entity(paramRole, MediaType.APPLICATION_JSON));
 		
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -490,6 +501,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 						     .put(Entity.entity(paramRole, MediaType.APPLICATION_JSON));
 				
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 
 	/**
@@ -562,5 +575,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// deletion must have been succesful
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 }

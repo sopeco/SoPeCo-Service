@@ -113,6 +113,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 		assertEquals(true, list.size() >= measurementSpecCount);
 		assertEquals(true, list.contains(measurementSpecName2));
 		assertEquals(true, list.contains(measurementSpecName3));
+		
+		logout(token);
 	}
 
 	/**
@@ -179,6 +181,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 		
 		// the second addition must fail
 		assertEquals(Status.CONFLICT.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -259,6 +263,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 		assertEquals(true, list != null);
 		assertEquals(false, list.contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
 		assertEquals(true,  list.contains(newMeasurementSpecName));
+		
+		logout(token);
 	}
 	
 }

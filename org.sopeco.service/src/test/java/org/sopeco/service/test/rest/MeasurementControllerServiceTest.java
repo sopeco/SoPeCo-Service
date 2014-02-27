@@ -74,6 +74,8 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 		      	 	.get();
 
 		assertEquals(Status.UNAUTHORIZED.getStatusCode(), r.getStatus());
+		
+		logout(token);
 	}
 	
 	/**
@@ -111,6 +113,7 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 		assertEquals(true, mecstatus != null);
 		assertEquals(MECStatus.STATUS_ONLINE, mecstatus.getStatus());
 		
+		logout(token);
 	}
 	
 	/**
@@ -149,5 +152,6 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 		assertEquals(true, list.contains(TestMEC.MEC_SUB_ID_2));
 		assertEquals(true, list.contains(TestMEC.MEC_SUB_ID_3));
 		
+		logout(token);
 	}
 }
