@@ -159,9 +159,10 @@ public class MeasurementControllerService {
 	 * 
 	 * @param usertoken authentification of the user
 	 * @param id 		the MEC ID
-	 * @return 			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR
+	 * @return 			{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 * 					OK with {@link Entity} List<String> of all controllers currently
-	 * 					connected to given MEC ID with given
+	 * 					connected to given MEC ID with given<br />
+	 * 					CONFLICT indicates, that no MEC with given ID is connected
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_MEC_LIST)
@@ -181,7 +182,7 @@ public class MeasurementControllerService {
 		
 		if (app == null) {
 			LOGGER.info("SocketAppWrapper is in invalid state.");
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+			return Response.status(Status.CONFLICT).entity("No MEC with given ID connected.").build();
 		}
 			
 		List<String> tmpList = Arrays.asList(app.getAvailableController());
