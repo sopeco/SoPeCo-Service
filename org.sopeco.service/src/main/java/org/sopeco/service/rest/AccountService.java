@@ -141,7 +141,12 @@ public class AccountService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		Account account = r.readEntity(Account.class);
+		/*
+		 *  r.readEntity(Account.class) is not allowed here, as we have not the correct
+		 *  ObjectMapper injected. Anf furthermore Jersey throws and error, that this method is not allowed
+		 *  when it's called in the same class. r.readEntity() fixes the issue.
+		 */
+		Account account = (Account) r.getEntity();
 		
 		if (account == null) {
 			LOGGER.debug("Invalid token");
