@@ -469,6 +469,7 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
+		@SuppressWarnings("unused")
 		List<ExecutedExperimentDetails> eed = r.readEntity(new GenericType<List<ExecutedExperimentDetails>>() { });
 		
 		// TODO: delete ExecutedExperimentDetails in database first on cleanup
