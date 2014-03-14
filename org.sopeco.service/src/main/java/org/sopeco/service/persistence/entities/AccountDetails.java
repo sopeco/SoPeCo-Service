@@ -95,6 +95,37 @@ public class AccountDetails implements Serializable {
 
 		return url;
 	}
+	
+	/**
+	 * Sets the experiment key for the current selected scenario. The key is only set, when
+	 * the Account has a selected scenario.
+	 * 
+	 * @param experimentKey	the experiment key
+	 */
+	public void setExperimentKey(int experimentKey) {
+		
+		if (selectedScenario == null || selectedScenario.isEmpty()) {
+			return;
+		}
+
+		getScenarioDetail(selectedScenario).setExperimentKey(experimentKey);
+	}
+	
+	/**
+	 * Returns the experiment key of the current selected scenario.
+	 * 
+	 * @return the experiment key for the current selected scenario
+	 */
+	public int getExperimentKeyOfSelectedScenario() {
+		
+		for (ScenarioDetails detail : scenarioDetails) {
+			if (detail.getScenarioName().equals(selectedScenario)) {
+				return detail.getExperimentKey();
+			}
+		}
+
+		return -1;
+	}
 
 	/**
 	 * Creates a new ScenarioDetails object and adds that to the scenarioDetails
