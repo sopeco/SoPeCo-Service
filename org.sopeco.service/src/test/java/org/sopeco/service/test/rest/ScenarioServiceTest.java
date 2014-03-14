@@ -247,7 +247,7 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		// switch to the newly created measurmentspecification
 		target().path(ServiceConfiguration.SVC_MEASUREMENT)
 		  		.path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-		  		.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+		  		.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 		  		.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 		  		.request(MediaType.APPLICATION_JSON)
 		  		.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));

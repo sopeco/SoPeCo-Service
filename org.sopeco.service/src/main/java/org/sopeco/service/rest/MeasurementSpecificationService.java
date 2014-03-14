@@ -50,7 +50,7 @@ public class MeasurementSpecificationService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllSpecificationNames(@QueryParam("token") String usertoken) {
+	public Response getAllSpecificationNames(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -101,7 +101,7 @@ public class MeasurementSpecificationService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LISTSPECS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllSpecifications(@QueryParam("token") String usertoken) {
+	public Response getAllSpecifications(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -151,8 +151,8 @@ public class MeasurementSpecificationService {
 	@PUT
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setWorkingSpecification(@QueryParam("token") String usertoken,
-										    @QueryParam("specname") String specificationName) {
+	public Response setWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
+										    @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -190,8 +190,8 @@ public class MeasurementSpecificationService {
 	@POST
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response createSpecification(@QueryParam("token") String usertoken,
-									    @QueryParam("specname") String specificationName) {
+	public Response createSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
+									    @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -243,8 +243,8 @@ public class MeasurementSpecificationService {
 	@PUT
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response renameWorkingSpecification(@QueryParam("token") String usertoken,
-											  @QueryParam("specname") String specname) {
+	public Response renameWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
+											   @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specname) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
