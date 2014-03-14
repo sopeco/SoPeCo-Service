@@ -540,6 +540,41 @@ public class ScenarioService {
 	}
 	
 	/**
+	 * Returns all the {@link ScenarioInstance}s to the scenario with the given name, related to the account
+	 * with the given token.
+	 * 
+	 * @param usertoken the token to identify the user
+	 * @param name		the name of the {@link ScenarioInstance}
+	 * @return			{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
+	 * 					OK with List<{@link ScenarioInstance}s> as {@link Entity}
+	 */
+	@GET
+	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCES)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getScenarioInstances(@QueryParam(TOKEN) String usertoken,
+										 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name) {
+			
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		try {
+			
+			List<ScenarioInstance> listSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
+			return Response.ok(listSI).build();
+			
+		} catch (DataNotFoundException e) {
+			
+			LOGGER.info("Cannot find a scenario definition with name '{}'.", name);
+			return Response.status(Status.CONFLICT).entity("Cannot find a scenario definition with given name.").build();
+			
+		}
+	}
+	
+	/**
 	 * Returns the {@link ScenarioDefinition} the current user has.
 	 * 
 	 * @param usertoken the token to identify the user

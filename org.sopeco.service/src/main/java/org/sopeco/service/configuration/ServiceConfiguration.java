@@ -140,6 +140,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_STORE 			= "archive";
 	public static final String SVC_SCENARIO_XML 			= "xml";
 	public static final String SVC_SCENARIO_INSTANCE	 	= "instance";
+	public static final String SVC_SCENARIO_INSTANCES 		= "instances";
 	public static final String SVCP_SCENARIO_NAME 			= "name";
 	public static final String SVCP_SCENARIO_SPECNAME	 	= "specname";
 	public static final String SVCP_SCENARIO_TOKEN 			= "token";
@@ -203,7 +204,5 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
-
-
 
 }
