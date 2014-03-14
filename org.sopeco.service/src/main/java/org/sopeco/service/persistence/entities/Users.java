@@ -140,7 +140,7 @@ public class Users {
 	 * @return true, if the user token has times out
 	 */
 	public boolean isExpired() {
-		LOGGER.debug("Checking user with token '{}' for being expired.", this.toString());
+		LOGGER.debug("Checking user with token '{}' for being expired.");
 		
 		long userTimeout = ServiceConfiguration.USER_TIMEOUT;
 		
