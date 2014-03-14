@@ -195,10 +195,10 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * Abots the current experiment in execution.
 	 */
-	public void abortExperiment() {
+	public void abortExperiment(String experimentKey) {
 		
 		if (isExecuting()) {
-			Configuration.getSessionSingleton(experimentHashCode)
+			Configuration.getSessionSingleton(experimentKey)
 						 .setProperty(IConfiguration.EXPERIMENT_RUN_ABORT, new Boolean(true));
 		}
 

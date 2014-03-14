@@ -152,7 +152,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT_CREATE 		= "create";
 	public static final String SVC_MEASUREMENT_RENAME 		= "rename";
 	public static final String SVCP_MEASUREMENT_TOKEN 		= "token";
-	public static final String SVCP_MEASUREMENT_NAME 		= "specname";
+	public static final String SVCP_MEASUREMENT_SPECNAME 	= "specname";
 	
 	public static final String SVC_MEC 						= "mec";
 	public static final String SVC_MEC_STATUS 				= "status";
@@ -193,6 +193,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_EXECUTE_ENABLE 			= "enable";
 	public static final String SVC_EXECUTE_DISABLE 			= "disable";
 	public static final String SVC_EXECUTE_ID 				= "id";
+	public static final String SVC_EXECUTE_ABORT 			= "abort";
 	public static final String SVC_EXECUTE_DETAILS 			= "details";
 	public static final String SVC_EXECUTE_MECLOG 			= "meclog";
 	public static final String SVC_EXECUTE_EXECUTE 			= "execute";
