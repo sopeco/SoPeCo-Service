@@ -12,6 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -22,6 +23,7 @@ import org.sopeco.config.Configuration;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.runner.SoPeCoRunner;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.ExecutionScheduler;
 import org.sopeco.service.execute.QueuedExperiment;
@@ -64,7 +66,8 @@ public class ExecutionService {
 	 * @param usertoken 			the user identification
 	 * @param scheduledExperiment 	the ScheduledExperiment object
 	 * @return 						{@link Response} with status OK, UNAUTHORIZED, CONFLICT or
-	 * 								INTERNAL_SERVER_ERROR
+	 * 								INTERNAL_SERVER_ERROR<br />
+	 * 								OK has the experiment ID as {@link Long} in the {@link Entity}
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -88,6 +91,7 @@ public class ExecutionService {
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
+		scheduledExperiment.setAddedTime(System.currentTimeMillis());
 		scheduledExperiment.setProperties(Configuration.getSessionSingleton(usertoken));
 
 		long nextExecution = scheduledExperiment.getStartTime();
@@ -113,7 +117,19 @@ public class ExecutionService {
 		// update the AccountDetails
 		updateAccountDetails(usertoken, scheduledExperiment);
 
-		return Response.ok().build();
+		// now get the scheduled experiment id, to return it
+		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
+													.loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
+
+		for (ScheduledExperiment se : list) {
+
+			if (se.equals(scheduledExperiment)) {
+				return Response.ok(se.getId()).build();
+			}
+
+		}
+
+		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
 	
 	/**
@@ -140,49 +156,6 @@ public class ExecutionService {
 		List<ScheduledExperiment> tmpList =	ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
 		
 		return Response.ok(tmpList).build();
-	}
-	
-	/**
-	 * Returns the database ID of the given {@link ScheduledExperiment}. When there is no
-	 * matching {@link ScheduledExperiment} found, NO_CONTENT is returned.
-	 * 
-	 * This method is PUT rather than GET, because we need to pass a complex object to this
-	 * method. This is not possible, when the method is GET.
-	 * 
-	 * @param usertoken 			authentification for the user
-	 * @param scheduledExperiment 	the {@code ScheduledExperiment} the ID is searched to
-	 * @return 						{@link Response} OK (+ experiment id as {@link Long}),
-	 * 								UNAUTHORIZED or NO_CONTENT<br />
-	 * 								experiment id is >= 0 if a match was found in the
-	 * 								database, < 0 if not
-	 */
-	@PUT
-	@Path(ServiceConfiguration.SVC_EXECUTE_ID)
-	@Consumes(MediaType.APPLICATION_JSON)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScheduledExperimentID(@QueryParam(TOKEN) String usertoken,
-							 				 ScheduledExperiment scheduledExperiment) {
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-
-		if (u == null) {
-			LOGGER.info("Invalid token '{}'!", usertoken);
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
-	
-		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
-													.loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
-		
-		for (ScheduledExperiment se : list) {
-			
-			if (se.equals(scheduledExperiment)) {
-				return Response.ok(se.getId()).build();
-			}
-			
-		}
-
-		LOGGER.info("No scheduled experiement matching to the given one was found in the dabatase.");
-		return Response.status(Status.NO_CONTENT).build();
 	}
 	
 	/**
@@ -427,6 +400,33 @@ public class ExecutionService {
 		}
 
 		return Response.ok(status).build();
+	}
+	
+	/**
+	 * Sets the status of the experiment with the given key to abort. The feature may take up a while,
+	 * as it's set via a configuration property, which is read in the {@link SoPeCoRunner}.
+	 * Be aware, that the experiment might not be in execution yet, but the status can change anyway.
+	 * 
+	 * @param key		the experiment key
+	 * @param usertoken	the user identification
+	 * @return			{@link Response} OK or UNAUTHORIZED
+	 */
+	@PUT
+	@Path(ServiceConfiguration.SVC_EXECUTE_ABORT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+									     	 @QueryParam(TOKEN) String usertoken) {
+
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ExecutionScheduler.getInstance().setExperimentAborting(String.valueOf(key));
+
+		return Response.ok().build();
 	}
 	
 	/**
@@ -738,6 +738,10 @@ public class ExecutionService {
 		}
 		
 		sd.setControllerName(controllername);
+		
+		if (scheduledExperiment.isActive()) {
+			ad.setExperimentKey(scheduledExperiment.getExperimentKey());
+		}
 
 		// store the updated AccountDetail in the database
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);

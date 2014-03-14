@@ -216,16 +216,6 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				    .post(Entity.entity(se, MediaType.APPLICATION_JSON));
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-
-		// get the id of the schedulede experiment
-		r = target().path(ServiceConfiguration.SVC_EXECUTE)
-			        .path(ServiceConfiguration.SVC_EXECUTE_ID)
-			        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				    .request(MediaType.APPLICATION_JSON)
-				    .put(Entity.entity(se, MediaType.APPLICATION_JSON));
-
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
 		long id = r.readEntity(Long.class);
 		
 		// now try to get the scheduled experiment
@@ -328,7 +318,6 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 		String label 			= "myScheduledExperiment";
 		long accountId 			= account.getId();
 		boolean scenarioActive 	= false; // must be false, otherwise will fail on scheduledExperiment integrity check when adding
-		long addedTime 			= System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
 		se.setScenarioDefinition(sd);
@@ -337,7 +326,6 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 		se.setRepeating(repeating);
 		se.setLabel(label);
 		se.setActive(scenarioActive);
-		se.setAddedTime(addedTime);
 		
 		// add to execution list
 		r = target().path(ServiceConfiguration.SVC_EXECUTE)
@@ -347,16 +335,6 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				    .post(Entity.entity(se, MediaType.APPLICATION_JSON));
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
-		// get the id of the schedulede experiment
-		r = target().path(ServiceConfiguration.SVC_EXECUTE)
-			        .path(ServiceConfiguration.SVC_EXECUTE_ID)
-			        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				    .request(MediaType.APPLICATION_JSON)
-				    .put(Entity.entity(se, MediaType.APPLICATION_JSON));
-
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
 		long id = r.readEntity(Long.class);
 		
 		r =  target().path(ServiceConfiguration.SVC_EXECUTE)

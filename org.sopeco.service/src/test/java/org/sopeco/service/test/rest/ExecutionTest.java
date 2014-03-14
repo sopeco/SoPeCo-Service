@@ -94,7 +94,7 @@ public class ExecutionTest extends AbstractServiceTest {
 		//switch to created measurement specification
 		r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
 			        .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_NAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
 			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
 			      	.request(MediaType.APPLICATION_JSON)
 			      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
@@ -109,7 +109,6 @@ public class ExecutionTest extends AbstractServiceTest {
 		String label 			= "myScheduledExperiment";
 		long accountId 			= account.getId();
 		boolean scenarioActive 	= false;
-		long addedTime 			= System.currentTimeMillis();
 		
 		ScheduledExperiment se = new ScheduledExperiment();
 		se.setScenarioDefinition(sd);
@@ -118,7 +117,6 @@ public class ExecutionTest extends AbstractServiceTest {
 		se.setRepeating(repeating);
 		se.setLabel(label);
 		se.setActive(scenarioActive);
-		se.setAddedTime(addedTime);
 		
 		// add to execution list
 		r = target().path(ServiceConfiguration.SVC_EXECUTE)
@@ -126,15 +124,6 @@ public class ExecutionTest extends AbstractServiceTest {
 			        .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 			      	.request(MediaType.APPLICATION_JSON)
 			      	.post(Entity.entity(se, MediaType.APPLICATION_JSON));
-
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
-		// get id for the added scenario
-		r = target().path(ServiceConfiguration.SVC_EXECUTE)
-			        .path(ServiceConfiguration.SVC_EXECUTE_ID)
-				    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			      	.request(MediaType.APPLICATION_JSON)
-			      	.put(Entity.entity(se, MediaType.APPLICATION_JSON));
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		String id = String.valueOf(r.readEntity(Long.class));
