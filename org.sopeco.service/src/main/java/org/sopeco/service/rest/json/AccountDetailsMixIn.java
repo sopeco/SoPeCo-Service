@@ -53,4 +53,9 @@ public class AccountDetailsMixIn {
 	public String[] getScenarioNames() {
 		return null;
 	}
+	
+	@JsonIgnore
+	public int getExperimentKeyOfSelectedScenario() {
+		return 0;
+	}
 }
