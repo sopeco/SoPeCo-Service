@@ -13,6 +13,11 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class ParameterDefinitionMixIn {
 
 	@JsonIgnore
+	public String getFullName() {
+		return "";
+	}
+	
+	@JsonIgnore
 	public boolean isNumeric() {
 		return false;
 	}
