@@ -338,6 +338,23 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.CONFLICT).entity("Parameter does not exist.").build();
 		}
 		
+		/*ConstantValueAssignment initialAssignmentParameter = null;
+		for (ConstantValueAssignment cva : u.getCurrentScenarioDefinitionBuilder()
+											.getMeasurementSpecificationBuilder()
+											.getBuiltSpecification()
+											.getInitializationAssignemts()) {
+			
+			if (cva.getParameter().getFullName().equals(parameter.getFullName())) {
+				initialAssignmentParameter = cva;
+			}
+			
+		}
+
+		if (initialAssignmentParameter != null) {
+			initialAssignmentParameter.setParameter(parameter);
+			MainLayoutPanel.get().getController(SpecificationController.class).addExistingAssignments();
+		}*/
+		
 		parameter.setName(paramNameNew);
 		parameter.setRole(role);
 		parameter.setType(paramType);
