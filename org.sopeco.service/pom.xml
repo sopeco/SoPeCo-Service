@@ -16,6 +16,7 @@
 		<jackson.version>2.3.0</jackson.version>
 		<qos-logback.version>1.0.13</qos-logback.version>
 		<org.apache.maven.jar-plugins.version>2.4</org.apache.maven.jar-plugins.version>
+		<org.apache.maven.source-plugin.version>2.2.1</org.apache.maven.source-plugin.version>
 		<org.apache.maven.war-plugins.version>2.4</org.apache.maven.war-plugins.version>
 		<org.apache.maven.compiler-plugins.version>3.1</org.apache.maven.compiler-plugins.version>
 		<org.apache.maven.install-plugins.version>2.5.1</org.apache.maven.install-plugins.version>
@@ -112,6 +113,21 @@
 	<!-- ================BUILD OPTIONS================= -->
 	<build>
     	
+    	<!-- The class files are put anyway into the final jar. But in addition
+    		 the .java files and the gwt.xml files are included, too. Both are needed 
+    		 in GWT project. And the WebUI is a GWT project. 
+    		 The source files are needed for GWT to compile them into javascript. -->
+    	<resources>
+	    	<resource>
+				<directory>src/main/java</directory>
+				<includes>
+					<include>**/*.java</include>
+					<include>**/*.gwt.xml</include>
+				</includes>
+	    	</resource>
+		</resources>
+    	
+    	<!-- define all the outputs -->
     	<plugins>
 	        
     	    <!-- used to set the Java version Maven compiles with -->
@@ -190,7 +206,7 @@
 			</plugin>
 			
 		</plugins>
-    
+  
 	</build>
   
 </project>
