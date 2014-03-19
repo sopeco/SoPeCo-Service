@@ -44,8 +44,8 @@ import org.sopeco.persistence.entities.definition.ScenarioDefinition;
  */
 public class ScenarioDefinitionBuilder implements Serializable {
 
-	private static final long serialVersionUID = -5845272212303839119L;
-	
+	private static final long serialVersionUID = 1L;
+
 	/**
 	 * The {@code ScenarioDefinition}
 	 */

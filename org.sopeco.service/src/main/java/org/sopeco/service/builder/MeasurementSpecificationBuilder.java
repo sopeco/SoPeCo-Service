@@ -27,9 +27,8 @@
 package org.sopeco.service.builder;
 
 import java.io.Serializable;
+import java.util.logging.Logger;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ConstantValueAssignment;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
@@ -44,9 +43,9 @@ import org.sopeco.service.configuration.ServiceConfiguration;
  */
 public class MeasurementSpecificationBuilder implements Serializable {
 
-	private static final long serialVersionUID = -564030537820840352L;
-	
-	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementSpecificationBuilder.class.getName());
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOGGER = Logger.getLogger(MeasurementSpecificationBuilder.class.getName());
 	
 	/**
 	 * The {@code MeasurementSpecification} this builder manipulates.
@@ -76,7 +75,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	 */
 	public MeasurementSpecificationBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder,
 										   String measurementSpecificationName) {
-		LOGGER.debug("Creating MeasurementSpecificationBuilder with name '" + measurementSpecificationName + "'");
+		LOGGER.finer("Creating MeasurementSpecificationBuilder with name '" + measurementSpecificationName + "'");
 
 		this.scenarioDefinitionBuilder = scenarioDefinitionBuilder;
 		measurementSpecification = SimpleEntityFactory.createMeasurementSpecification(measurementSpecificationName);
@@ -122,7 +121,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 
 		for (ConstantValueAssignment assignment : measurementSpecification.getInitializationAssignemts()) {
 			if (assignment.getParameter().getFullName().equals(cva.getParameter().getFullName())) {
-				LOGGER.warn("parameter '" + cva.getParameter().getFullName() + "' already in init assignments list!");
+				LOGGER.warning("parameter '" + cva.getParameter().getFullName() + "' already in init assignments list!");
 				return false;
 			}
 		}
@@ -210,7 +209,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 
 		for (ExperimentSeriesDefinition expDefinition : measurementSpecification.getExperimentSeriesDefinitions()) {
 			if (expDefinition.getName().equals(experiment.getName())) {
-				LOGGER.warn("adding failed. there is already a experiementSeriesDefinition called '"
+				LOGGER.warning("adding failed. there is already a experiementSeriesDefinition called '"
 						+ experiment.getName() + " in specification '" + measurementSpecification.getName() + "'");
 
 				return false;
@@ -237,7 +236,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 			}
 		}
 
-		LOGGER.warn("specification '" + measurementSpecification.getName() + "' has no experiment called '" + name + "'");
+		LOGGER.warning("specification '" + measurementSpecification.getName() + "' has no experiment called '" + name + "'");
 
 		return null;
 	}
@@ -267,7 +266,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 			}
 		}
 
-		LOGGER.warn("can't remove exp. '" + name + "' because nothing was found in spec. '"
+		LOGGER.warning("can't remove exp. '" + name + "' because nothing was found in spec. '"
 				+ measurementSpecification.getName() + "'");
 
 		return false;

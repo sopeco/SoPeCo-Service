@@ -28,8 +28,7 @@ package org.sopeco.service.builder;
 
 import java.io.Serializable;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
@@ -46,9 +45,9 @@ import org.sopeco.service.configuration.ServiceConfiguration;
  */
 public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MeasurementEnvironmentDefinitionBuilder.class.getName());
-	
-	private static final long serialVersionUID = 5821222469291371560L;
+	private static final long serialVersionUID = 1L;
+
+	private static final Logger LOGGER = Logger.getLogger(MeasurementEnvironmentDefinitionBuilder.class.getName());
 
 	/**
 	 * The {@code ScenarioDefinitionBuilder} this builder is connected to.
@@ -128,7 +127,7 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 		String[] nodes = path.split(ServiceConfiguration.MEASUREMENTENVIRONMENT_DELIMITER);
 
 		if (nodes.length == 0) {
-			LOGGER.warn("no namespaces given");
+			LOGGER.warning("no namespaces given");
 			return null;
 		}
 
@@ -170,7 +169,7 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	 */
 	public ParameterDefinition addParameter(String name, String type, ParameterRole role, ParameterNamespace namespace) {
 		if (namespace == null) {
-			LOGGER.warn("The given namespace is NULL.");
+			LOGGER.warning("The given namespace is NULL.");
 			return null;
 		}
 		
@@ -228,14 +227,14 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 		String[] nodes = path.split(delimiter);
 
 		if (nodes.length <= 0) {
-			LOGGER.warn("No nodes in path array.");
+			LOGGER.warning("No nodes in path array.");
 			return null;
 		}
 
 		int startIndex;
 
 		if (nodes.length == 1 && nodes[0].equals(getRootNamespace().getName())) {
-			LOGGER.debug("Namespace is the root namespace!");
+			LOGGER.finer("Namespace is the root namespace!");
 			return scenarioDefinitionBuilder.getMeasurementEnvironmentDefinition().getRoot();
 		} else if (nodes[0].equals(getRootNamespace().getName())) {
 			startIndex = 1;
@@ -336,11 +335,11 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	 * @return true, if the removal was succesful
 	 */
 	public boolean removeNamespace(ParameterNamespace namespace, boolean appendChildrenToParent) {
-		LOGGER.debug("removing namespace '" + namespace.getFullName() + "'"
+		LOGGER.finer("removing namespace '" + namespace.getFullName() + "'"
 				     + "// appendChildrenToParent: " + appendChildrenToParent);
 
 		if (namespace.getName().equals(ServiceConfiguration.MEASUREMENTENVIRONMENT_ROOTNAME) || namespace.getParent() == null) {
-			LOGGER.warn("Operation forbidden: Root namespace can not be removed.");
+			LOGGER.warning("Operation forbidden: Root namespace can not be removed.");
 			return false;
 		}
 
