@@ -282,4 +282,13 @@ public class AccountDetails implements Serializable {
 		}
 		return names;
 	}
+	
+	@Override
+	public String toString() {
+		return "====      AccountDetails     ====" + "\n"
+				+ "ID: " + id  + "\n"
+				+ "Name: " + accountName  + "\n"
+				+ "SelectedScenario: " + selectedScenario  + "\n"
+				+ "#ScenarioDetails: " + scenarioDetails.size();
+	}
 }
