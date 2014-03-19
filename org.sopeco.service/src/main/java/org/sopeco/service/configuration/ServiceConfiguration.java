@@ -205,4 +205,5 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
 
+
 }

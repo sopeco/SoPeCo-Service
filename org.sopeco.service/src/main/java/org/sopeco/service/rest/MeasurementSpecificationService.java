@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -291,6 +292,67 @@ public class MeasurementSpecificationService {
 		return Response.ok().build();
 	}
 	
+	/**
+	 * Removes the {@link MeasurementSpecification} with the given name.
+	 * 
+	 * @param usertoken the user identification
+	 * @param specname 	the new MS name
+	 * @return 			{@link Response} OK, UNAUTHORIZED, CONFLICT or INTERNAL_SERVER_ERROR<br />
+	 * 					CONFLICT can occur, when the {@link MeasurementSpecification} with the passed
+	 * 					name has been selected
+	 */
+	@DELETE
+	@Path(ServiceConfiguration.SVC_MEASUREMENT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removeWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
+											   @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specname) {
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		if (existSpecification(specname, u)) {
+			LOGGER.warn("Can't rename, because specification with the name '{}' already exists.", specname);
+			return Response.status(Status.CONFLICT).entity("Can't rename, because specification with the given name already exists.").build();
+		}
+		
+		MeasurementSpecification msss = u.getCurrentScenarioDefinitionBuilder().getMeasurementSpecification(u.getMeasurementSpecification());
+		
+		if (msss != null) {
+			
+			if (msss.getName().equals(specname)) {
+				LOGGER.warn("User has the MeasurementSpecifiation selected, which should be delected. Stopping operation.");
+				return Response.status(Status.CONFLICT).entity("User has the MeasurementSpecifiation selected, which should be delected.").build();
+			}
+			
+		}
+		
+		// now remove the element (if it's not in the list, the list is not modified)
+		u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getMeasurementSpecifications().remove(specname);
+		
+		// store the scenario definition in the databse of the current user
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		
+		if (dbCon == null) {
+			LOGGER.warn("No database connection found for the user with the token '{}'.", usertoken);
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("No database connection found.").build();
+		}
+		
+		// store the scenario definiton with the new measurementspecification in the database
+		ScenarioDefinition scenarioDef = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		dbCon.store(scenarioDef);
+
+		// store the new user data in it's database
+		ServicePersistenceProvider.getInstance().storeUser(u);
+
+		// update the AccountDetails
+		updateAccountDetails(usertoken, specname);
+
+		return Response.ok().build();
+	}
 	
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////
