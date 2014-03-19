@@ -13,7 +13,17 @@
  -->
 <module>
 	<inherits name='com.google.gwt.user.User'/>
+	
+	<!-- execute path has MECLogEntry -->
   	<source path="execute" /> <!-- execute path has MECLogEntry -->
-  	<source path="builder" /> <!-- all the builder to build a scenario are in there -->
-  	<source path="persistence.entities" /> <!-- all the database elements -->
+  	
+  	<!-- all the builder to build a scenario are in there -->
+  	<source path="builder" />
+  	
+  	<!--
+  		All the database elements are referenced.
+  	 	More specially, the used files are in the subdirectory persistence/entities.
+  		However, GWT automatically analyses subdirectories and finds the needed classes.
+  	-->
+  	<source path="persistence" />
 </module>
