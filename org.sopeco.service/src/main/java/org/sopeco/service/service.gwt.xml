@@ -1,5 +1,19 @@
+<!-- 
+	The GWT file allows GWT projects to use the SoPeCo Service layer. For example the SoPeCo
+	WebUI is a GWT projects.
+	GWT projects depends on projects to provide information about files, which are used in the
+	GWT project to have perfect cooperation between the GWT project and this project.
+	This module file references to packages, where all the files are, which needs to be translated
+	into JavaScript by GWT, because they are mostly dependencies in the GWT project.
+	
+	Be aware, that in addition all source files of the project (pure .java files) are provided
+	in the packed jar, which is in the maven repository afterwards. So dependent GWT project
+	does NOT need to include this service layer into their Java build path and only need the
+	maven dependency to this project.
+ -->
 <module>
 	<inherits name='com.google.gwt.user.User'/>
   	<source path="execute" /> <!-- execute path has MECLogEntry -->
   	<source path="builder" /> <!-- all the builder to build a scenario are in there -->
+  	<source path="persistence.entities" /> <!-- all the database elements -->
 </module>
