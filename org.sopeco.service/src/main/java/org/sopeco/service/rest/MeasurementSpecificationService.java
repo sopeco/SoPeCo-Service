@@ -25,8 +25,6 @@ import org.sopeco.service.builder.MeasurementSpecificationBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
-import org.sopeco.service.persistence.entities.AccountDetails;
-import org.sopeco.service.persistence.entities.ScenarioDetails;
 import org.sopeco.service.persistence.entities.Users;
 
 /**
@@ -173,8 +171,8 @@ public class MeasurementSpecificationService {
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
-		// update the AccountDetails
-		updateAccountDetails(usertoken, specificationName);
+		// update the AccountDetails#
+		ServiceStorageModul.updateAccountDetailsSelectedSpecification(usertoken, specificationName);
 		
 		return Response.ok().build();
 	}
@@ -287,7 +285,7 @@ public class MeasurementSpecificationService {
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
 		// update the AccountDetails
-		updateAccountDetails(usertoken, specname);
+		ServiceStorageModul.updateAccountDetailsSelectedSpecification(usertoken, specname);
 
 		return Response.ok().build();
 	}
@@ -349,7 +347,7 @@ public class MeasurementSpecificationService {
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
 		// update the AccountDetails
-		updateAccountDetails(usertoken, specname);
+		ServiceStorageModul.updateAccountDetailsSelectedSpecification(usertoken, specname);
 
 		return Response.ok().build();
 	}
@@ -376,49 +374,6 @@ public class MeasurementSpecificationService {
 		}
 		
 		return false;
-	}
-	
-	/**
-	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
-	 * token.<br />
-	 * Check: Before the account must have selected a scenario!<br />
-	 * Afterwards the {@link AccountDetails} will be stored in the database.<br />
-	 * <br />
-	 * Only error outputs are created, because here must be no error!
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param specificationName		the name of the selected {@link MeasurementSpecification}
-	 */
-	private void updateAccountDetails(String usertoken, String specificationname) {
-
-		LOGGER.debug("Trying to update the AccountDetails with a MeasurementSpecification name.");
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		if (u == null) {
-			LOGGER.error("The given token is invalid.");
-			return;
-		}
-
-		AccountDetails ad = u.getAccountDetails();
-		
-		if (ad == null) {
-			LOGGER.error("The user should have selected a scenario before setting the MeasurementSpecification!");
-			return;
-		}
-
-		String scenarioname = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getScenarioName();
-		
-		ScenarioDetails sd = ad.getScenarioDetail(scenarioname);
-		
-		if (sd == null) {
-			LOGGER.error("There must be already a ScenarioDetails object in the AccountDetails list with the given scenario name!");
-			return;
-		}
-		
-		sd.setSelectedSpecification(specificationname);
-		
-		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
 	}
 	
 }

@@ -138,6 +138,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
 	public static final String SVC_SCENARIO_CURRENT 		= "current";
 	public static final String SVC_SCENARIO_STORE 			= "archive";
+	public static final String SVC_SCENARIO_UPDATE 			= "update";
 	public static final String SVC_SCENARIO_XML 			= "xml";
 	public static final String SVC_SCENARIO_INSTANCE	 	= "instance";
 	public static final String SVC_SCENARIO_INSTANCES 		= "instances";

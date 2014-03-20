@@ -284,7 +284,7 @@ public class MeasurementControllerService {
 
 			MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
 			
-			boolean b = MeasurementEnvironmentDefinitionService.setNewMEDefinition(med, u);
+			boolean b = ServiceStorageModul.setNewMeasurementEnvironmentDefinition(med, u);
 			
 			if (!b) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();

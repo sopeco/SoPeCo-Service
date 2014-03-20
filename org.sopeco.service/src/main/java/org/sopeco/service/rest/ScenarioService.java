@@ -31,13 +31,11 @@ import org.sopeco.persistence.entities.definition.ExplorationStrategy;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
+import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
-import org.sopeco.service.persistence.entities.AccountDetails;
-import org.sopeco.service.persistence.entities.ScenarioDetails;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 
 /**
  * The <code>ScenarioService</code> class provides RESTful services to handle scenarios in SoPeCo.
@@ -405,7 +403,7 @@ public class ScenarioService {
 		dbCon.closeProvider();
 		
 		// update the account details of the account
-		setAccountDetails(usertoken, sd);
+		ServiceStorageModul.updateAccountDetails(usertoken, sd);
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
@@ -466,6 +464,38 @@ public class ScenarioService {
 		
 		// as the user has not changed, this store is not necessary
 		ServicePersistenceProvider.getInstance().storeUser(u);
+		
+		return Response.ok().build();
+	}
+	
+	/**
+	 * 
+	 * 
+	 * @param usertoken
+	 * @param definition
+	 * @return
+	 */
+	@POST
+	@Path(ServiceConfiguration.SVC_SCENARIO_UPDATE)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response updateScenario(@QueryParam(TOKEN) String usertoken,
+								  ScenarioDefinition definition) {
+		if (definition == null) {
+			LOGGER.info("Invalid ScenarioDefinition!");
+			return Response.status(Status.CONFLICT).entity("Invalid ScenarioDefinition!").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.info("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		u.setCurrentScenarioDefinitionBuilder(new ScenarioDefinitionBuilder(definition));
+		
+		ServiceStorageModul.storeUserAndScenario(u);
 		
 		return Response.ok().build();
 	}
@@ -623,51 +653,6 @@ public class ScenarioService {
 			LOGGER.warn("Scenario '{}' not found.", scenarioname);
 			return null;
 		}
-	}
-	
-	/**
-	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
-	 * token. The given {@link ScenarioDefinition} is actually only needed for the scenario name.<br />
-	 * The {@link AccountDetails} will have the scenario name as selected scenario name.<br />
-	 * Afterwards the {@link AccountDetails} will be in the database.
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scenarioDefinition	the {@link ScenarioDefinition}
-	 */
-	private void setAccountDetails(String usertoken, ScenarioDefinition scenarioDefinition) {
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		if (u == null) {
-			LOGGER.warn("Given token '{}' is invalid.", usertoken);
-			return;
-		}
-		
-		String scenarioname = scenarioDefinition.getScenarioName();
-		AccountDetails ad 	= u.getAccountDetails();
-		
-		// check if scenario is already in account scenario detail list
-		boolean scenarioExists = false;
-		for (ScenarioDetails scenarioDetail : ad.getScenarioDetails()) {
-			
-			if (scenarioDetail.getScenarioName().equals(scenarioname)) {
-				// scenario detail is already in list and don't need to be created
-				scenarioExists = true;
-			}
-			
-		}
-		
-		if (!scenarioExists) {
-			// must create the ScenarioDetails now
-			ScenarioDetails scenarioDetail = new ScenarioDetails();
-			scenarioDetail.setScenarioName(scenarioname);
-			scenarioDetail.setSelectedSpecification("");
-			scenarioDetail.setSelectedExperiment("");
-			ad.getScenarioDetails().add(scenarioDetail);
-		}
-
-		ad.setSelectedScenario(scenarioname);
-		
-		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
 	}
 	
 	/**

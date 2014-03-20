@@ -15,7 +15,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
@@ -24,7 +23,6 @@ import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.builder.MeasurementEnvironmentDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 
 /**
@@ -60,7 +58,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		boolean b = setNewMEDefinition(med, u);
+		boolean b = ServiceStorageModul.setNewMeasurementEnvironmentDefinition(med, u);
 		
 		if (!b) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
@@ -92,7 +90,7 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
 		
-		boolean b = setNewMEDefinition(med, u);
+		boolean b = ServiceStorageModul.setNewMeasurementEnvironmentDefinition(med, u);
 		
 		if (!b) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
@@ -153,7 +151,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 		
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database").build();
 		}
 
@@ -191,7 +189,7 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().removeNamespace(ns);
 		
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
@@ -232,7 +230,7 @@ public class MeasurementEnvironmentDefinitionService {
 		
 		u.getCurrentScenarioDefinitionBuilder().getMeasurementEnvironmentBuilder().renameNamespace(ns, newName);
 		
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
@@ -282,7 +280,7 @@ public class MeasurementEnvironmentDefinitionService {
 		 .getMeasurementEnvironmentBuilder()
 		 .addParameter(paramName, paramType, role, ns);
 
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
@@ -359,7 +357,7 @@ public class MeasurementEnvironmentDefinitionService {
 		parameter.setRole(role);
 		parameter.setType(paramType);
 
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
@@ -408,72 +406,11 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot remove namespace.").build();
 		}
 
-		if (!storeUserAndScenario(u)) {
+		if (!ServiceStorageModul.storeUserAndScenario(u)) {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store results in database.").build();
 		}
 
 		return Response.ok().build();
-	}
-	
-
-	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	////////////////////////////////////////////// HELPER /////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Stores the current user state in the service database. The current scenario state for the given
-	 * user is stored in the connected account database.
-	 * 
-	 * @param u 	the user whose information should be stored
-	 * @return 		true, if the user and the scenario was stored in the databases
-	 */
-	private boolean storeUserAndScenario(Users u) {
-		// store scenario in account database
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
-		
-		if (dbCon == null) {
-			LOGGER.warn("Cannot open the account database. Given token is '{}'", u.getToken());
-			return false;
-		}
-		
-		dbCon.store(sd);
-		dbCon.closeProvider();
-
-		// store user information in Service-database
-		ServicePersistenceProvider.getInstance().storeUser(u);
-		
-		return true;
-	}
-	
-	/**
-	 * Sets the measurement environment defitinion for the current {@code ScenarioDefinitionBuilder}.
-	 * <br />
-	 * This method is protected and static as it's called from
-	 * {@code MeasurementControllerService.setMEDefinitionFromMEC()}.
-	 * 
-	 * @param definition 	the MED
-	 * @param u 			the user whose MED is to set
-	 * @return 				true, if the MED could be stored successfully
-	 */
-	protected static boolean setNewMEDefinition(MeasurementEnvironmentDefinition definition, Users u) {
-		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
-		
-		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
-		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
-		
-		if (dbCon == null) {
-			LOGGER.warn("Database connection to account database failed. Cancelling adding MED from MEC to database.");
-			return false;
-		}
-		
-		dbCon.store(sd);
-		dbCon.closeProvider();
-		
-		return true;
 	}
 	
 }
