@@ -20,7 +20,7 @@ import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
-import org.sopeco.service.builder.MeasurementEnvironmentDefinitionBuilder;
+import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
@@ -88,7 +88,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		MeasurementEnvironmentDefinition med = MeasurementEnvironmentDefinitionBuilder.createBlankEnvironmentDefinition();
+		MeasurementEnvironmentDefinition med = new ScenarioDefinitionBuilder().getMeasurementEnvironmentDefinition();
 		
 		boolean b = ServiceStorageModul.setNewMeasurementEnvironmentDefinition(med, u);
 		

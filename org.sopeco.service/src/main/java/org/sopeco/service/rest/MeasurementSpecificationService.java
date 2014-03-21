@@ -205,7 +205,7 @@ public class MeasurementSpecificationService {
 		}
 
 		MeasurementSpecificationBuilder msb = u.getCurrentScenarioDefinitionBuilder()
-													  .getNewMeasurementSpecification();
+													  .getNewMeasurementSpecificationBuilder();
 		if (msb == null) {
 			LOGGER.warn("Error creating new specification.");
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error creating new specification.").build();

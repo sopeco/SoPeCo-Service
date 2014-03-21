@@ -33,11 +33,11 @@ import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 
 /**
- * Builds a {@code ScenarioDefinition}. This class handles the two {@code ScenarioDefinition}
- * properties: {@code MeasurementEnvironmentDefinition} and {@code List<MeasurementSpecification>}.
+ * Builds a {@link ScenarioDefinition}. This class handles the two {@link ScenarioDefinition}
+ * properties: {@link MeasurementEnvironmentDefinition} and  List<{@link MeasurementSpecification}>.
  * <br />
- * Both properties are updates via so called builder classes ({@code MeasurementEnvironmentDefinitionBuilder}
- * and {@code MeasurementSpecificationBuilder}).
+ * Both properties are updates via so called builder classes ({@link MeasurementEnvironmentDefinitionBuilder}
+ * and {@link MeasurementSpecificationBuilder}).
  * 
  * @author Marius Oehler
  * @author Peter Merkert
@@ -47,24 +47,25 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * The {@code ScenarioDefinition}
+	 * The {@link ScenarioDefinition}
 	 */
 	private ScenarioDefinition scenarioDefinition;
 	
 	/**
-	 * The {@code MeasurementEnvironmentDefinitionBuilder} to handle the {@code MeasurementEnvironmentDefinition}
-	 * of the connected {@code ScenarioDefinition}.
+	 * The {@link MeasurementEnvironmentDefinitionBuilder} to handle the {@link MeasurementEnvironmentDefinition}
+	 * of the connected {@link ScenarioDefinition}.
 	 */
 	private MeasurementEnvironmentDefinitionBuilder meBuilder;
 	
 	/**
-	 * The {@code MeasurementSpecificationBuilder} to handle an {@code MeasurementSpecification}
-	 * in the connected {@code ScenarioDefinition}.
+	 * The {@link MeasurementSpecificationBuilder} to handle (the user's active selected)
+	 * {@link MeasurementSpecification} in the connected {@link ScenarioDefinition}.
 	 */
 	private MeasurementSpecificationBuilder msBuilder;
 
 	/**
-	 * Creates an empty {@code ScenarioDefinition}.
+	 * Creates an empty {@link ScenarioDefinition} and initializes the two sub-builders:
+	 * {@link MeasurementEnvironmentDefinitionBuilder} and {@link MeasurementSpecificationBuilder}.
 	 */
 	public ScenarioDefinitionBuilder() {
 		scenarioDefinition = new ScenarioDefinition();
@@ -73,9 +74,10 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
-	 * Creates an empty {@code ScenarioDefinition} with the given name.
+	 * Creates an empty {@link ScenarioDefinition} with the given nameand initializes the two sub-builders:
+	 * {@link MeasurementEnvironmentDefinitionBuilder} and {@link MeasurementSpecificationBuilder}.
 	 * 
-	 * @param name name of the new {@code ScenarioDefinition}
+	 * @param name 	name of the new {@link ScenarioDefinition}
 	 */
 	public ScenarioDefinitionBuilder(String name) {
 		scenarioDefinition = new ScenarioDefinition();
@@ -86,10 +88,11 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
-	 * Creates a new {@code ScenarioDefinitionBuilder} with the given
-	 * {@code ScenarioDefinition}. 
+	 * Connects the {@link ScenarioDefinition} of this class with the given one.<br />
+	 * Initializes the two sub-builders: {@link MeasurementEnvironmentDefinitionBuilder}
+	 * and {@link MeasurementSpecificationBuilder}.
 	 * 
-	 * @param definition the {@code ScenarioDefinition}
+	 * @param definition the {@link ScenarioDefinition}
 	 */
 	public ScenarioDefinitionBuilder(ScenarioDefinition definition) {
 		scenarioDefinition = definition;
@@ -98,7 +101,7 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
-	 * Sets the name of the {@code ScenarioDefinition}.
+	 * Sets the name of the {@link ScenarioDefinition}.
 	 * 
 	 * @param name new scenario name
 	 */
@@ -128,7 +131,7 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	/**
 	 * @param meDefinition the MeasurementEnvironmentDefinition
 	 * 
-	 * @deprecated Use setMeasurementEnvironmentDefinition().
+	 * @deprecated Use {@link #setMeasurementEnvironmentDefinition(MeasurementEnvironmentDefinition)}
 	 */
 	@Deprecated
 	public void setMEDefinition(MeasurementEnvironmentDefinition meDefinition) {
@@ -136,9 +139,10 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
-	 * Sets the MeasurementEnvironmentDefiniton for the Scenario.
+	 * Sets the {@link MeasurementEnvironmentDefinition} for the connected {@link ScenarioDefinition}
+	 * of this builder.
 	 * 
-	 * @param meDefinition the new MeasurementEnvironmentDefinition
+	 * @param meDefinition the new {@link MeasurementEnvironmentDefinition}
 	 */
 	public void setMeasurementEnvironmentDefinition(MeasurementEnvironmentDefinition meDefinition) {
 		scenarioDefinition.setMeasurementEnvironmentDefinition(meDefinition);
@@ -155,9 +159,9 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 
 	/**
-	 * Returns the current MeasurementEnvironmentDefinition.
+	 * Returns the current {@link MeasurementEnvironmentDefinition}.
 	 * 
-	 * @return the current MeasurementEnvironmentDefinition
+	 * @return the current {@link MeasurementEnvironmentDefinition}
 	 */
 	public MeasurementEnvironmentDefinition getMeasurementEnvironmentDefinition() {
 		return scenarioDefinition.getMeasurementEnvironmentDefinition();
@@ -166,32 +170,28 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	/**
 	 * @return a MeasurementSpecificationBuilder
 	 * 
-	 * @Deprecated Use getNewMeasurementSpecification()
+	 * @Deprecated use {@link #getNewMeasurementSpecificationBuilder()}
 	 */
 	@Deprecated
 	public MeasurementSpecificationBuilder addNewMeasurementSpecification() {
-		return getNewMeasurementSpecification();
+		return getNewMeasurementSpecificationBuilder();
 	}
 
 	/**
-	 * Returns an empty fresh created MeasurementSpecification.
-	 * New feature: This ScenarioDefinitionBuilder can only have
-	 * one MeasurementSpecificationBuilder.
+	 * Returns an empty fresh created {@link MeasurementSpecificationBuilder}.
 	 * 
 	 * @return empty created MeasurementSpecification
 	 */
-	public MeasurementSpecificationBuilder getNewMeasurementSpecification() {
+	public MeasurementSpecificationBuilder getNewMeasurementSpecificationBuilder() {
 		MeasurementSpecificationBuilder msb = new MeasurementSpecificationBuilder(this);
-		// the MSB is the new one for this ScenarioDefinition
-		setMeasurementSpecificationBuilder(msb);
 		return msb;
 	}
-	
+
 	/**
-	 * Returns the {@code MeasurementSpecification} with the given name.
+	 * Returns the {@link MeasurementSpecification} with the given name.
 	 * 
-	 * @param name name of the specification
-	 * @return MeasurementSpecification for the given name
+	 * @param name 	name of the specification
+	 * @return 		{@link MeasurementSpecification} for the given name (<code>null</code> when not found)
 	 */
 	public MeasurementSpecification getMeasurementSpecification(String name) {
 		for (MeasurementSpecification ms : getScenarioDefinition().getMeasurementSpecifications()) {
@@ -214,10 +214,10 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
-	 * Replaces the current {@Code MeasurementSpecificationBuilder} with the given
+	 * Replaces the current {@link MeasurementSpecificationBuilder} with the given
 	 * new one.
 	 * 
-	 * @param builder the new {@Code MeasurementSpecificationBuilder}
+	 * @param builder the new {@link MeasurementSpecificationBuilder}
 	 */
 	public void setMeasurementSpecificationBuilder(MeasurementSpecificationBuilder builder) {
 		msBuilder = builder;
@@ -253,10 +253,10 @@ public class ScenarioDefinitionBuilder implements Serializable {
 	}
 	
 	/**
-	 * Returns the {@code ScenarioDefinition} which this ScenarioDefinitionBuilder
+	 * Returns the {@link ScenarioDefinition} which this {@link ScenarioDefinitionBuilder}
 	 * is handling.
 	 * 
-	 * @return the {@code ScenarioDefinition}
+	 * @return the {@link ScenarioDefinition}
 	 */
 	public ScenarioDefinition getScenarioDefinition() {
 		return scenarioDefinition;

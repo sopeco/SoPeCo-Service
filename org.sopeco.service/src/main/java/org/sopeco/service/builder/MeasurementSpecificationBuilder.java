@@ -27,16 +27,18 @@
 package org.sopeco.service.builder;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.sopeco.persistence.entities.definition.ConstantValueAssignment;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 /**
- * Builder for a {@code MeasurementSpecification} from SoPeCo Core.
+ * Builder for a {@link MeasurementSpecification} from SoPeCo Core.
  * 
  * @author Marius Oehler
  * @author Peter Merkert
@@ -48,17 +50,20 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger(MeasurementSpecificationBuilder.class.getName());
 	
 	/**
-	 * The {@code MeasurementSpecification} this builder manipulates.
+	 * The {@link MeasurementSpecification} this builder manipulates. It's the {@link MeasurementSpecification}, which
+	 * the user has currently selected.
 	 */
 	private MeasurementSpecification measurementSpecification;
 
 	/**
-	 * The {@code ScenarioDefinitionBuilder} this builder is connected to.
+	 * The {@link ScenarioDefinitionBuilder} this builder is connected to.
 	 */
 	private ScenarioDefinitionBuilder scenarioDefinitionBuilder;
 	
 	/**
-	 * Creates a new MeasurementSpecificationBuilder with the given {@code ScenarioDefinitionBuilder}.
+	 * Creates a new MeasurementSpecificationBuilder with the given {@code ScenarioDefinitionBuilder}. This constructor automatically
+	 * calls {@link #MeasurementSpecificationBuilder(ScenarioDefinitionBuilder, String)} with the default {@link MeasurementSpecification}
+	 * name. This implies, that there is always at least one {@link MeasurementSpecification} in the {@link ScenarioDefinition}.
 	 * 
 	 * @param scenarioDefinitionBuilder the connected {@code ScenarioDefinitionBuilder}
 	 */
@@ -75,27 +80,52 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	 */
 	public MeasurementSpecificationBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder,
 										   String measurementSpecificationName) {
-		LOGGER.finer("Creating MeasurementSpecificationBuilder with name '" + measurementSpecificationName + "'");
+		if (scenarioDefinitionBuilder == null) {
+			throw new IllegalArgumentException("ScenarioDefinitionBuilder is null.");
+		}
+		
+		if (measurementSpecificationName.equals("")) {
+			throw new IllegalArgumentException("Name must not be empty.");
+		}
+		
+		LOGGER.finer("Creating MeasurementSpecificationBuilder for the MS called '" + measurementSpecificationName + "'");
 
 		this.scenarioDefinitionBuilder = scenarioDefinitionBuilder;
-		measurementSpecification = SimpleEntityFactory.createMeasurementSpecification(measurementSpecificationName);
-		// add the MS to the ScenarioDefinition
-		this.scenarioDefinitionBuilder.getScenarioDefinition().getMeasurementSpecifications().add(measurementSpecification);
+		measurementSpecification = null;
+		
+		// Check if a MS with the given name is already in the SDB. Then select it.
+		for (MeasurementSpecification ms : this.scenarioDefinitionBuilder.getScenarioDefinition().getMeasurementSpecifications()) {
+			
+			if (measurementSpecificationName.equals(ms.getName())) {
+				measurementSpecification = ms;
+			}
+			
+		}
+		
+		// if no MeasurementSpeficiation was found, we can create a new empty one with the given name
+		if (measurementSpecification == null) {
+
+			measurementSpecification = SimpleEntityFactory.createMeasurementSpecification(measurementSpecificationName);
+			this.scenarioDefinitionBuilder.getScenarioDefinition().getMeasurementSpecifications().add(measurementSpecification);
+			
+		}
 	}
 
 	/**
+	 * TODO: this should not be possible, because there should ALWAYS be a ScenarioDefinitionBuilder.
+	 * 
 	 * Creates a new MeasurementSpecificationBuilder with the given {@link MeasurementSpecification}.
 	 * 
 	 * @param measurementSpecification the <code>MeasurementSpecification</code>
 	 */
-	public MeasurementSpecificationBuilder(MeasurementSpecification measurementSpecification) {
+	/*public MeasurementSpecificationBuilder(MeasurementSpecification measurementSpecification) {
 		LOGGER.info("Creating MeasurementSpecificationBuilder for the "
 					+ "MeasurementSpecification with name "
 					+ "'" + measurementSpecification.getName() + "'");
 
 		this.measurementSpecification = measurementSpecification;
 		scenarioDefinitionBuilder = null;
-	}
+	}*/
 
 	/**
 	 * Adding a parameter as initial assignment.
@@ -145,6 +175,15 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
+	 * Returns the initial assignments.
+	 * 
+	 * @return the initial assignments
+	 */
+	public List<ConstantValueAssignment> getInitialAssignment(ConstantValueAssignment cva) {
+		return measurementSpecification.getInitializationAssignemts();
+	}
+	
+	/**
 	 * Removes the given assignment.
 	 * 
 	 * @param cva	ConstantValueAssignment being removed
@@ -156,7 +195,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 
 		return measurementSpecification.getInitializationAssignemts().remove(cva);
 	}
-
+	
 	/**
 	 * Removes the given assignment.
 	 * 
@@ -284,11 +323,12 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
-	 * Returns the built measurement specification.
+	 * TODO: nobody should be able to access it
+	 * Returns the built {@link MeasurementSpecification}.
 	 * 
 	 * @return the built specification
 	 */
-	public MeasurementSpecification getBuiltSpecification() {
+	/*public MeasurementSpecification getBuiltSpecification() {
 		return measurementSpecification;
-	}
+	}*/
 }

@@ -37,8 +37,8 @@ import org.sopeco.persistence.entities.definition.ParameterRole;
 import org.sopeco.service.configuration.ServiceConfiguration;
 
 /**
- * Builder for the {@code MeasurementEnvironmentDefinition}. <br />
- * For a better reading, MeasurementEnvironmentDefinition is shorten MED.
+ * Builder for the {@link MeasurementEnvironmentDefinition}. <br />
+ * For a better reading, MeasurementEnvironmentDefinition is shorten <code>MED</code>.
  * 
  * @author Marius Oehler
  * @author Peter Merkert
@@ -50,20 +50,20 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger(MeasurementEnvironmentDefinitionBuilder.class.getName());
 
 	/**
-	 * The {@code ScenarioDefinitionBuilder} this builder is connected to.
+	 * The {@link ScenarioDefinitionBuilder} this builder is connected to.
 	 */
 	private ScenarioDefinitionBuilder scenarioDefinitionBuilder;
 	
 	/**
-	 * Creates a new {@code MeasurementEnvironmentDefinitionBuilder} with the given {@code ScenarioDefinitionBuilder}. <br />
-	 * A new {@code MeasurementEnvironmentDefinition} is created and added to the
-	 * given {@code ScenarioDefinitionBuilder}. As well as a new {@code ParameterNamespace} is created and
-	 * appended to the {@code ScenarioDefinitionBuilder}.
+	 * Creates a new {@link MeasurementEnvironmentDefinitionBuilder} with the given {@link ScenarioDefinitionBuilder}. <br />
+	 * A new {@link MeasurementEnvironmentDefinition} is created and added to the
+	 * given {@link ScenarioDefinitionBuilder}. As well as a new {@link ParameterNamespace} is created and
+	 * appended to the {@link ScenarioDefinitionBuilder}.
 	 * 
-	 * @param scenarioDefinitionBuilder the {@code ScenarioDefinitionBuilder} for this builder
+	 * @param scenarioDefinitionBuilder the {@link ScenarioDefinitionBuilder} for this builder
 	 */
 	public MeasurementEnvironmentDefinitionBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder) {
-		LOGGER.info("Creating a new MeasurementEnvironmentDefinitionBuilder");
+		LOGGER.info("Creating a new MeasurementEnvironmentDefinitionBuilder.");
 
 		this.scenarioDefinitionBuilder = scenarioDefinitionBuilder;
 		MeasurementEnvironmentDefinition med = new MeasurementEnvironmentDefinition();
@@ -75,14 +75,15 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	}
 	
 	/**
+	 * TODO: This method should not be possible, because it makes no sense.
 	 * Creates an empty MED.
 	 * 
 	 * @return an empty MED
 	 */
-	public static MeasurementEnvironmentDefinition createBlankEnvironmentDefinition() {
+	/*public static MeasurementEnvironmentDefinition createBlankEnvironmentDefinition() {
 		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder();
 		return builder.getMeasurementEnvironmentDefinition();
-	}
+	}*/
 
 	/**
 	 * Adds a new namespace to the root namespace.
@@ -118,8 +119,8 @@ public class MeasurementEnvironmentDefinitionBuilder implements Serializable {
 	 * root! So the root must be given in the path. E.g.: "/first/second/third"
 	 * will be afterwards "root/first/second/third".
 	 * 
-	 * @param path nodes that will be added
-	 * @return The last namespace created with the path
+	 * @param 	path nodes that will be added
+	 * @return 	the last namespace created with the path
 	 */
 	public ParameterNamespace addNamespaces(String path) {
 		LOGGER.info("adding new namespaces '" + path + "'");
