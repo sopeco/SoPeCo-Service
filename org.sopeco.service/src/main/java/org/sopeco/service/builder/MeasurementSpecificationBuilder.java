@@ -323,12 +323,11 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	}
 
 	/**
-	 * TODO: nobody should be able to access it
 	 * Returns the built {@link MeasurementSpecification}.
 	 * 
 	 * @return the built specification
 	 */
-	/*public MeasurementSpecification getBuiltSpecification() {
+	public MeasurementSpecification getBuiltSpecification() {
 		return measurementSpecification;
-	}*/
+	}
 }
