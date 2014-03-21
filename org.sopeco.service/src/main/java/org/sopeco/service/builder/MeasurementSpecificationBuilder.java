@@ -316,7 +316,7 @@ public class MeasurementSpecificationBuilder implements Serializable {
 	 * 
 	 * @param name	the new spec. name
 	 */
-	public void setName(String name) {
+	public void renameSelectedMeasurementSpecification(String name) {
 		LOGGER.info("Setting new specification name: '" + measurementSpecification.getName() + "' -> '" + name + "'");
 
 		measurementSpecification.setName(name);

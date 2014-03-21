@@ -10,6 +10,7 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.AccountDetails;
@@ -55,7 +56,8 @@ public final class ServiceStorageModul {
 	}
 	
 	/**
-	 * Sets the measurement environment defitinion for the current {@code ScenarioDefinitionBuilder}.
+	 * Sets the measurement environment defitinion for the current {@link ScenarioDefinitionBuilder}. The {@link Users} is stored
+	 * in the database.
 	 * <br />
 	 * 
 	 * @param definition 	the MED
@@ -66,31 +68,24 @@ public final class ServiceStorageModul {
 		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
 		
 		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
-		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
-		
-		if (dbCon == null) {
-			LOGGER.warn("Database connection to account database failed. Cancelling adding MED from MEC to database.");
-			return false;
-		}
-		
-		dbCon.store(sd);
-		dbCon.closeProvider();
+
+		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		return true;
 	}
 	
 	/**
 	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
-	 * token.<br />
+	 * token. The selected specification is changed to the one with the given name.<br />
 	 * Check: Before the account must have selected a scenario!<br />
 	 * Afterwards the {@link AccountDetails} will be stored in the database.<br />
 	 * <br />
 	 * Only error outputs are created, because here must be no error!
 	 * 
 	 * @param usertoken				the token to identify the user
-	 * @param specificationName		the name of the selected {@link MeasurementSpecification}
+	 * @param specificationName		the name of the selected {@link MeasurementSpecification}. This specification
+	 * 								is <b>not</b> checked for logical correctness and should match to an
+	 * 								available {@link MeasurementSpecification}
 	 */
 	protected static void updateAccountDetailsSelectedSpecification(String usertoken, String specificationname) {
 
@@ -203,10 +198,11 @@ public final class ServiceStorageModul {
 	 * The {@link AccountDetails} will have the scenario name as selected scenario name.<br />
 	 * Afterwards the {@link AccountDetails} will be stored in the database.
 	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scenarioDefinition	the {@link ScenarioDefinition}
+	 * @param usertoken							the token to identify the user
+	 * @param scenarioDefinition				the {@link ScenarioDefinition}
+	 * @param selectedMeasurementSpecification	the name of the selected {@link MeasurementSpecification}
 	 */
-	protected static void updateAccountDetails(String usertoken, ScenarioDefinition scenarioDefinition) {
+	protected static void updateAccountDetails(String usertoken, ScenarioDefinition scenarioDefinition, String selectedMeasurementSpecification) {
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -232,7 +228,7 @@ public final class ServiceStorageModul {
 			// must create the ScenarioDetails now
 			ScenarioDetails scenarioDetail = new ScenarioDetails();
 			scenarioDetail.setScenarioName(scenarioname);
-			scenarioDetail.setSelectedSpecification("");
+			scenarioDetail.setSelectedSpecification(selectedMeasurementSpecification);
 			scenarioDetail.setSelectedExperiment("");
 			ad.getScenarioDetails().add(scenarioDetail);
 		}

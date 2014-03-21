@@ -31,6 +31,7 @@ import org.sopeco.persistence.entities.definition.ExplorationStrategy;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
+import org.sopeco.service.builder.MeasurementSpecificationBuilder;
 import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
@@ -64,8 +65,7 @@ public class ScenarioService {
 	 * @param specificationName the measurment specification name
 	 * @param usertoken	 		the user identification
 	 * @param esd 				the {@link ExperimentSeriesDefinition}
-	 * @return 					{@link Response} OK, CONFLICT, UNAUTHORIZED or
-	 * 							INTERNAL_SERVER_ERROR<br />
+	 * @return 					{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
 	 * 							OK if scenario was added succesfully
 	 */
 	@POST
@@ -87,33 +87,41 @@ public class ScenarioService {
 			return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
 		}
 		
-		ScenarioDefinitionBuilder sdb = new ScenarioDefinitionBuilder(scenarioName);
-		//sdb.getMeasurementSpecificationBuilder().addExperimentSeries(esd);
-		ScenarioDefinition emptyScenario = sdb.getScenarioDefinition();
-
+		LOGGER.debug("Scenario has unusued name.");
+		
 		if (specificationName == null || specificationName.equals("")) {
 			LOGGER.info("Specification name is invalid.");
 			return Response.status(Status.CONFLICT).entity("Specification name is invalid.").build();
 		}
+
+		LOGGER.debug("MeasurementSpecifiation name is valid.");
 		
 		if (esd == null) {
 			LOGGER.info("ExperimentSeriesDefinition is invalid.");
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition is invalid.").build();
 		}
+
+		LOGGER.debug("ExperimentSeriesDefinition is valid.");
+		
+		// adjust the builder for the new scenario
+		ScenarioDefinitionBuilder sdb = new ScenarioDefinitionBuilder(scenarioName);
 		
 		// check if ExperimentSeriesDefinitions has an ExplorationStrategy added
 		if (esd.getExplorationStrategy() == null) {
 			esd.setExplorationStrategy(new ExplorationStrategy());
 		}
 		
-		// now replace the default created MeasurementSpecification with the custom one
+		ScenarioDefinition emptyScenario = sdb.getScenarioDefinition();
+		
+		// now replace the default values with the custom one
 		int defaultIndexMS = 0;
-		int defaultIndexESD = 0;
 		MeasurementSpecification ms = new MeasurementSpecification();
 		ms.getExperimentSeriesDefinitions().add(esd);
 		ms.setName(specificationName);
-		emptyScenario.getMeasurementSpecifications().set(defaultIndexMS, ms);
-		emptyScenario.getMeasurementSpecifications().get(defaultIndexMS).getExperimentSeriesDefinitions().set(defaultIndexESD, esd);
+		
+		emptyScenario.getMeasurementSpecifications().set(defaultIndexMS, ms); // replace default MeasurementSpecification
+		
+		LOGGER.debug("Scenario configured.");
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
@@ -123,19 +131,6 @@ public class ScenarioService {
 		}
 
 		LOGGER.debug("Adding scenario with name '{}' to database.", scenarioName);
-		
-		try {
-			
-			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
-				if (sd.getScenarioName().equals(scenarioName)) {
-					LOGGER.info("Scenario with the given name already exists. Aborting database adding.");
-					return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
-				}
-			}
-	
-		} catch (DataNotFoundException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
-		}
 		
 		dbCon.store(emptyScenario);
 		
@@ -165,6 +160,11 @@ public class ScenarioService {
 	public Response addScenario(@QueryParam(TOKEN) String usertoken,
 							   	ScenarioDefinition scenario) {
 		
+		if (scenario == null) {
+			LOGGER.warn("Given ScenarioDefinition is null.");
+			return Response.status(Status.CONFLICT).build();
+		}
+		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		String scenarioname = scenario.getScenarioName();
 		
@@ -174,7 +174,23 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
+		if (scenarioname.equals("")) {
+			LOGGER.info("Invalid scenario name. The name must be not empty.");
+			return Response.status(Status.CONFLICT).entity("Invalid scenario name. The name must be not empty.").build();
+		}
+		
+		// check if a scenario with the given name already exsists
+		if (loadScenarioDefinition(scenario.getScenarioName(), usertoken) != null) {
+			LOGGER.info("A scenario with the given name '{}' already exsits!", scenario.getScenarioName());
+			return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
+		}
+		
 		// test the scenario for non-null values (only in first entry)
+		if (scenario.getMeasurementSpecifications() == null) {
+			LOGGER.info("List of MeasurementSpecification is invalid.");
+			return Response.status(Status.CONFLICT).entity("List of MeasurementSpecification is invalid.").build();
+		}
+		
 		if (scenario.getAllExperimentSeriesDefinitions() == null) {
 			LOGGER.info("ExperimentSeriesDefinition list is invalid.");
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition list is invalid.").build();
@@ -185,27 +201,13 @@ public class ScenarioService {
 			if (esd == null) {
 				LOGGER.info("An ExperimentSeriesDefinition in list is invalid.");
 				return Response.status(Status.CONFLICT).entity("An ExperimentSeriesDefinition in list is invalid.").build();
-			} 
+			}
 			
 			if (esd.getExplorationStrategy() == null) {
 				LOGGER.info("ExplorationStrategy is invalid.");
 				return Response.status(Status.CONFLICT).entity("ExplorationStrategy is invalid.").build();
 			}
 			
-		}
-		
-		// now check if there is already a scenario with the given name
-		try {
-			
-			for (ScenarioDefinition sd : dbCon.loadAllScenarioDefinitions()) {
-				if (sd.getScenarioName().equals(scenarioname)) {
-					LOGGER.info("Scenario with the given name '{}' alaready exists", scenarioname);
-					return Response.status(Status.CONFLICT).entity("Scenario with given name already exists.").build();
-				}
-			}
-			
-		} catch (DataNotFoundException e) {
-			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 		}
 
 		dbCon.store(scenario);
@@ -255,7 +257,7 @@ public class ScenarioService {
 	}
 	
 	/**
-	 * Returns the current selected {@code ScenarioDefinition} for the user.
+	 * Returns the current selected {@link ScenarioDefinition} for the user.
 	 * 
 	 * @param usertoken the user identification
 	 * @return 			{@link Response} OK, UNAUTHORIZED or INTERNAL_SERVER_ERROR<br />
@@ -264,7 +266,7 @@ public class ScenarioService {
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getCurrentScenario(@QueryParam(TOKEN) String usertoken) {
+	public Response getCurrentSelectedScenarioDefinition(@QueryParam(TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -354,18 +356,17 @@ public class ScenarioService {
 	}
 
 	/**
-	 * Switch the activ scenario for a given user (via token).<br />
-	 * <br />
-	 * This method has not a real REST URL, because there exists two methods
-	 * for siwtching the scenario: One with the name as String and one with an
-	 * {@link ScenarioDefinition}. Both need to map to unique URLs and therefore
-	 * this one maps to switch/name?name="" and the other one to switch/definition.
+	 * Switches the activ scenario for a given user (via token). There must be already 
+	 * a scenario with the provided name in the database, otherwise CONFLICT is returned.<br />
+	 * Be aware, afterwards, the {@link MeasurementSpecification} should be selected, as here is only
+	 * a dummy for safetly selected (always the first one in the {@link ScenarioDefinition}'s list of
+	 * {@link MeasurementSpecification}s).
 	 * 
 	 * @param scenarioname 	the scenario to switch to
 	 * @param usertoken 	the token to identify the user
 	 * @return				{@link Response} OK, UNAUTHORIZED, INTERNAL_SERVER_ERROR or
-	 * 						NO_CONTENT<br />
-	 * 						NO_CONTENT is thrown, when the given name cannot be matched to
+	 * 						CONFLICT<br />
+	 * 						CONFLICT is thrown, when the given name cannot be matched to
 	 * 						a scenario in the database
 	 */
 	@PUT
@@ -384,13 +385,19 @@ public class ScenarioService {
 		
 		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
 		if (definition == null) {
-			return Response.status(Status.NO_CONTENT).entity("No scenario with given name exists.").build();
+			return Response.status(Status.CONFLICT).entity("No scenario with the given name exists.").build();
 		}
 		
 		ScenarioDefinitionBuilder builder = new ScenarioDefinitionBuilder(definition);
-		
 		u.setCurrentScenarioDefinitionBuilder(builder);
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
+		ScenarioDefinition sd = builder.getScenarioDefinition();
+		
+		// this is a safetly selection, that nothign afterwards ends in a nullpointer
+		// the user should change the MeasurementSpecification afterwads manually
+		int defaultMSIndex = 0;
+		String msName = definition.getMeasurementSpecifications().get(defaultMSIndex).toString();
+		MeasurementSpecificationBuilder msb = new MeasurementSpecificationBuilder(builder, msName); // default set to a MS
+		builder.setMeasurementSpecificationBuilder(msb);
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
@@ -402,8 +409,8 @@ public class ScenarioService {
 		dbCon.store(sd);
 		dbCon.closeProvider();
 		
-		// update the account details of the account
-		ServiceStorageModul.updateAccountDetails(usertoken, sd);
+		// update the account details of the account, because the selected scenario and measurementspecification has changed
+		ServiceStorageModul.updateAccountDetails(usertoken, sd, msName);
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
@@ -411,7 +418,7 @@ public class ScenarioService {
 	}
 
 	/**
-	 * Stores all results of the {@code ScenarioInstance}s of the current connected
+	 * Archives all results of the {@link ScenarioInstance}s of the current connected
 	 * account. The results are archived and stay in the database in an own table. 
 	 * 
 	 * @param usertoken the token to identify the user
@@ -423,6 +430,11 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response storeScenario(@QueryParam(TOKEN) String usertoken,
 								  ScenarioDefinition definition) {
+		
+		if (definition == null) {
+			LOGGER.info("ScenarioDefinition is null and therefor invalid.");
+			return Response.status(Status.CONFLICT).entity("ScenarioDefinition is null and therefor invalid.").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
@@ -469,11 +481,12 @@ public class ScenarioService {
 	}
 	
 	/**
+	 * Stores the {@link ScenarioDefinition} in the database. This overwrites the database entity
+	 * of a {@link ScenarioDefinition} with the same name.
 	 * 
-	 * 
-	 * @param usertoken
-	 * @param definition
-	 * @return
+	 * @param usertoken		the token to identify the user
+	 * @param definition	the {@link ScenarioDefinition}
+	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_SCENARIO_UPDATE)
@@ -493,9 +506,17 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		u.setCurrentScenarioDefinitionBuilder(new ScenarioDefinitionBuilder(definition));
+		//u.setCurrentScenarioDefinitionBuilder(new ScenarioDefinitionBuilder(definition));
 		
-		ServiceStorageModul.storeUserAndScenario(u);
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		
+		if (dbCon == null) {
+			LOGGER.warn("Cannot open the account database. Given token is '{}'", u.getToken());
+			return Response.status(Status.INTERNAL_SERVER_ERROR).build();
+		}
+		
+		dbCon.store(definition);
+		dbCon.closeProvider();
 		
 		return Response.ok().build();
 	}

@@ -49,7 +49,7 @@ public class MeasurementSpecificationService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllSpecificationNames(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
+	public Response getAllMeasurementSpecificationNames(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -100,7 +100,7 @@ public class MeasurementSpecificationService {
 	@GET
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_LISTSPECS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getAllSpecifications(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
+	public Response getAllMeasurementSpecifications(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -150,7 +150,7 @@ public class MeasurementSpecificationService {
 	@PUT
 	@Path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
+	public Response switchWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
 										    @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specificationName) {
 
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
@@ -160,7 +160,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		LOGGER.debug("Set working specification on: " + specificationName);
+		LOGGER.debug("Set working specification to: " + specificationName);
 
 		if (!existSpecification(specificationName, u)) {
 			LOGGER.debug("Can't set working specification to '{}' because it doesn't exists. ", specificationName);
@@ -168,6 +168,10 @@ public class MeasurementSpecificationService {
 		}
 		
 		u.setMeasurementSpecification(specificationName);
+		
+		// update the builder
+		MeasurementSpecificationBuilder msb = new MeasurementSpecificationBuilder(u.getCurrentScenarioDefinitionBuilder(), specificationName);
+		u.getCurrentScenarioDefinitionBuilder().setMeasurementSpecificationBuilder(msb);
 		
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
@@ -204,14 +208,9 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.CONFLICT).entity("Specification with the given name already exists.").build();
 		}
 
-		MeasurementSpecificationBuilder msb = u.getCurrentScenarioDefinitionBuilder()
-													  .getNewMeasurementSpecificationBuilder();
-		if (msb == null) {
-			LOGGER.warn("Error creating new specification.");
-			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Error creating new specification.").build();
-		}
-
-		msb.setName(specificationName);
+		MeasurementSpecification ms = new MeasurementSpecification();
+		ms.setName(specificationName);
+		u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition().getMeasurementSpecifications().add(ms);
 		
 		// store the scenario definition in the databse of the current user
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
@@ -232,7 +231,7 @@ public class MeasurementSpecificationService {
 	
 	/**
 	 * Renames the current selected MS. Fails if the user has not MS currently selected.
-	 * Changes the selected MS of the user to the new name, too.
+	 * Changes the name of the user's selected {@link MeasurementSpecification}, too.
 	 * 
 	 * @param usertoken the user identification
 	 * @param specname 	the new MS name

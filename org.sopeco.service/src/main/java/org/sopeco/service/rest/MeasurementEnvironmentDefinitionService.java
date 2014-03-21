@@ -48,7 +48,7 @@ public class MeasurementEnvironmentDefinitionService {
 	@POST
 	@Path(ServiceConfiguration.SVC_MED_SET)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setMEDefinition(@QueryParam(TOKEN) String usertoken,
+	public Response setMeasurementEnvironmentDefinition(@QueryParam(TOKEN) String usertoken,
 								    MeasurementEnvironmentDefinition med) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
@@ -197,7 +197,7 @@ public class MeasurementEnvironmentDefinitionService {
 	}
 	
 	/**
-	 * Renames a namespace at the given path to the new path.
+	 * Renames a {@link ParameterNamespace} at the given path to the new path.
 	 * 
 	 * @param usertoken the user identification
 	 * @param path		the path to the namespace
@@ -238,7 +238,7 @@ public class MeasurementEnvironmentDefinitionService {
 	}
 	
 	/**
-	 * Adds a parameter to the namespace with the given path.
+	 * Adds a parameter to the {@link ParameterNamespace} with the given path.
 	 * <b>Attention</b>: The parameter type is stored uppercase!
 	 * 
 	 * @param usertoken the user identification
@@ -373,8 +373,7 @@ public class MeasurementEnvironmentDefinitionService {
 	 * @return			{@link Response} OK, CONFLICT, UNAUTHORIZED or INTERNAL_SERVER_ERROR
 	 */
 	@DELETE
-	@Path(ServiceConfiguration.SVC_MED_PARAM + "/"
-			+ ServiceConfiguration.SVC_MED_PARAM_REMOVE)
+	@Path(ServiceConfiguration.SVC_MED_PARAM + "/" + ServiceConfiguration.SVC_MED_PARAM_REMOVE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeParameter(@QueryParam(ServiceConfiguration.SVCP_MED_TOKEN) String usertoken,
 			      				    @QueryParam(ServiceConfiguration.SVCP_MED_NAMESPACE) String path,
