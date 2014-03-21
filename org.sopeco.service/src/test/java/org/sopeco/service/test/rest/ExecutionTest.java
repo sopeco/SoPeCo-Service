@@ -63,7 +63,7 @@ public class ExecutionTest extends AbstractServiceTest {
 		// add scenario and switch to
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		esd.setName("experimentSeriesDefintion");
-		target().path(ServiceConfiguration.SVC_SCENARIO)
+		r = target().path(ServiceConfiguration.SVC_SCENARIO)
 			    .path(ServiceConfiguration.SVC_SCENARIO_ADD)
 			    .path(TestConfiguration.TEST_SCENARIO_NAME)
 			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
@@ -71,6 +71,8 @@ public class ExecutionTest extends AbstractServiceTest {
 			    .request(MediaType.APPLICATION_JSON)
 			    .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
 		target().path(ServiceConfiguration.SVC_SCENARIO)
 			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
 			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
