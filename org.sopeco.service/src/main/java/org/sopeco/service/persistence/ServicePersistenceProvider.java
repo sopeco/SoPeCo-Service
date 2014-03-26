@@ -201,6 +201,30 @@ public final class ServicePersistenceProvider {
 			em.close();
 		}
 	}
+	
+	/*private void remove(Users user) {
+
+		EntityManager em = emf.createEntityManager();
+		try {
+
+			em.getTransaction().begin();
+
+			Users u = em.find(Users.class, user.getToken());
+
+			em.remove(u);
+
+			em.getTransaction().commit();
+		} catch (Exception e) {
+
+
+		} finally {
+			if (em.getTransaction().isActive()) {
+				em.getTransaction().rollback();
+			}
+			em.close();
+		}
+
+	}*/
 
 	private <T> T loadSingleById(Class<T> returnClazz, Object primaryKey) {
 		EntityManager em = emf.createEntityManager();

@@ -59,9 +59,6 @@ public class AccountDetails implements Serializable {
 	@Column(name = "scenarioDetails")
 	private List<ScenarioDetails> scenarioDetails;
 
-	@Column(name = "selectedScenario")
-	private String selectedScenario;
-
 	@Column(name = "csvValueSeparator")
 	private String csvValueSeparator = ";";
 
@@ -76,58 +73,6 @@ public class AccountDetails implements Serializable {
 	}
 
 	/**
-	 * Returns the controller URL of the active controller.
-	 * 
-	 * @return
-	 */
-	public String getControllerUrl() {
-		if (selectedScenario == null || selectedScenario.isEmpty()) {
-			return null;
-		}
-
-		String url = getScenarioDetail(selectedScenario).getControllerProtocol()
-				+ getScenarioDetail(selectedScenario).getControllerHost();
-
-		if (getScenarioDetail(selectedScenario).getControllerPort() > 0) {
-			url += ":" + getScenarioDetail(selectedScenario).getControllerPort();
-		}
-		url += "/" + getScenarioDetail(selectedScenario).getControllerName();
-
-		return url;
-	}
-	
-	/**
-	 * Sets the experiment key for the current selected scenario. The key is only set, when
-	 * the Account has a selected scenario.
-	 * 
-	 * @param experimentKey	the experiment key
-	 */
-	public void setExperimentKey(int experimentKey) {
-		
-		if (selectedScenario == null || selectedScenario.isEmpty()) {
-			return;
-		}
-
-		getScenarioDetail(selectedScenario).setExperimentKey(experimentKey);
-	}
-	
-	/**
-	 * Returns the experiment key of the current selected scenario.
-	 * 
-	 * @return the experiment key for the current selected scenario
-	 */
-	public int getExperimentKeyOfSelectedScenario() {
-		
-		for (ScenarioDetails detail : scenarioDetails) {
-			if (detail.getScenarioName().equals(selectedScenario)) {
-				return detail.getExperimentKey();
-			}
-		}
-
-		return -1;
-	}
-
-	/**
 	 * Creates a new ScenarioDetails object and adds that to the scenarioDetails
 	 * List.
 	 */
@@ -136,21 +81,6 @@ public class AccountDetails implements Serializable {
 		detail.setScenarioName(scenarioName);
 
 		scenarioDetails.add(detail);
-	}
-
-	/**
-	 * @return the selectedScenario
-	 */
-	public String getSelectedScenario() {
-		return selectedScenario;
-	}
-
-	/**
-	 * @param pSelectedScenario
-	 *            the selectedScenario to set
-	 */
-	public void setSelectedScenario(String pSelectedScenario) {
-		this.selectedScenario = pSelectedScenario;
 	}
 
 	/**
@@ -288,7 +218,6 @@ public class AccountDetails implements Serializable {
 		return "====      AccountDetails     ====" + "\n"
 				+ "ID: " + id  + "\n"
 				+ "Name: " + accountName  + "\n"
-				+ "SelectedScenario: " + selectedScenario  + "\n"
 				+ "#ScenarioDetails: " + scenarioDetails.size();
 	}
 }

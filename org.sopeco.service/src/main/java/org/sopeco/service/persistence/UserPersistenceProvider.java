@@ -29,7 +29,7 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 			return null;
 		}
 		
-		Account account = u.getCurrentAccount();
+		Account account = ServicePersistenceProvider.getInstance().loadAccount(u.getAccountID());
 		
 		return createPersistenceProvider(account);
 	}
@@ -88,7 +88,7 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 			return;
 		}
 
-		Account account = u.getCurrentAccount();
+		Account account = ServicePersistenceProvider.getInstance().loadAccount(u.getAccountID());
 		
 		String dbPassword  = account.getDbPassword();
 		String host 	   = account.getDbHost();

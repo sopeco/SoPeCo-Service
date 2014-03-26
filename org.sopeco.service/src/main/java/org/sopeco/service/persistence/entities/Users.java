@@ -26,17 +26,14 @@
  */
 package org.sopeco.service.persistence.entities;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 /**
  * The {@link Users} class stores all important information for one user in the database.
@@ -58,12 +55,8 @@ public class Users {
 	@Column(name = "token")
 	private String token;
 	
-	@Lob
-	@Column(name = "account")
-	private Account currentAccount;
-	
-	@Column(name = "currentMeasurementSpecification")
-	private String currentMeasurementSpecification;
+	@Column(name = "accountID")
+	private long accountID;
 	
 	@Column(name = "lastRequestTime")
 	private long lastRequestTime;
@@ -73,15 +66,15 @@ public class Users {
 	
 	/**
 	 * Creates a user with the given data. The last reuqeust time is automatically
-	 * initialized with the currentTimeMillis(). A new account blank account is created to avoid
-	 * NULL pointers. The user gets a a default ScenarioDefinitionBuilder.
+	 * initialized with the currentTimeMillis().
 	 * 
-	 * @param token the user unique token
+	 * @param token 	the user unique token
+	 * @param accountID the account ID this user is connected to
 	 */
-	public Users(String token) {
+	public Users(String token, long accountID) {
 		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
-		currentAccount = new Account();
+		this.accountID = accountID;
 	}
 	
 	// ******************************* Setter & Getter ************************************
@@ -90,12 +83,12 @@ public class Users {
 		return token;
 	}
 	
-	public void setCurrentAccount(Account currentAccount) {
-		this.currentAccount = currentAccount;
+	public void setAccountID(long accountID) {
+		this.accountID = accountID;
 	}
 
-	public Account getCurrentAccount() {
-		return currentAccount;
+	public long getAccountID() {
+		return accountID;
 	}
 	
 	public long getLastRequestTime() {
@@ -106,19 +99,7 @@ public class Users {
 		this.lastRequestTime = pLastRequestTime;
 	}
 	
-	public String getMeasurementSpecification() {
-		return currentMeasurementSpecification;
-	}
-
-	public void setMeasurementSpecification(String measurementSpecification) {
-		this.currentMeasurementSpecification = measurementSpecification;
-	}
-	
 	// ******************************* Custom methods ************************************
-
-	public AccountDetails getAccountDetails() {
-		return ServicePersistenceProvider.getInstance().loadAccountDetails(currentAccount.getId());
-	}
 	
 	/**
 	 * Returns whether the user token has timed out.
@@ -145,8 +126,7 @@ public class Users {
 	public String toString() {
 		return 	"_persisted user information_" + "\n"
 				+ "token: " + token + "\n"
-				+ "last action: " + lastRequestTime + "\n"
-				+ "connected to account: " + currentAccount.getName() + "\n";
+				+ "last action: " + lastRequestTime + "\n";
 	}
 	
 }

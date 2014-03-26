@@ -2,7 +2,6 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.validation.constraints.Null;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.Application;
@@ -158,7 +157,7 @@ public abstract class AbstractServiceTest extends JerseyTest {
 						     .path(ServiceConfiguration.SVC_ACCOUNT_LOGOUT)
 						     .queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token)
 			    	         .request(MediaType.APPLICATION_JSON)
-			 				 .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
+			 				 .delete();
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 	}

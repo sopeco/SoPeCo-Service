@@ -3,6 +3,7 @@ package org.sopeco.service.rest;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -110,7 +111,9 @@ public class AccountService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}	
 		
-		return Response.ok(u.getAccountDetails()).build();
+		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
+		
+		return Response.ok(ad).build();
 	}
 	
 	/**
@@ -187,7 +190,7 @@ public class AccountService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		Account a = ServicePersistenceProvider.getInstance().loadAccount(u.getCurrentAccount().getId());
+		Account a = ServicePersistenceProvider.getInstance().loadAccount(u.getAccountID());
 		
 		return Response.ok(a).build();
 	}
@@ -276,8 +279,7 @@ public class AccountService {
 		String uuid = UUID.randomUUID().toString();
 		
 		// save the current user
-		Users u = new Users(uuid);
-		u.setCurrentAccount(account);
+		Users u = new Users(uuid, account.getId());
 		ServicePersistenceProvider.getInstance().storeUser(u);
 
 		// update the account details for a user
@@ -296,12 +298,13 @@ public class AccountService {
 	}
 	
 	/**
-	 * Logout just means to remove the user with the given token in the database.
+	 * Logouts the user with the given token. The user will be deleted afterwards from
+	 * the database.
 	 * 
 	 * @param usertoken 	the user authentification
 	 * @return 				{@link Response} OK or UNAUTHORIZED
 	 */
-	@PUT
+	@DELETE
 	@Path(ServiceConfiguration.SVC_ACCOUNT_LOGOUT)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response logout(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {

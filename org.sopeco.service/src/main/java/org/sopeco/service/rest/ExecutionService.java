@@ -119,7 +119,7 @@ public class ExecutionService {
 
 		// now get the scheduled experiment id, to return it
 		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
-													.loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
+													.loadScheduledExperimentsByAccount(u.getAccountID());
 
 		for (ScheduledExperiment se : list) {
 
@@ -153,7 +153,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		List<ScheduledExperiment> tmpList =	ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
+		List<ScheduledExperiment> tmpList =	ServicePersistenceProvider.getInstance().loadScheduledExperimentsByAccount(u.getAccountID());
 		
 		return Response.ok(tmpList).build();
 	}
@@ -177,7 +177,7 @@ public class ExecutionService {
 		}
 		
 		List<ScheduledExperiment> scheduledExperiments = ServicePersistenceProvider.getInstance()
-																				   .loadScheduledExperimentsByAccount(u.getCurrentAccount().getId());
+																				   .loadScheduledExperimentsByAccount(u.getAccountID());
 		
 		for (ScheduledExperiment exp : scheduledExperiments) {
 			
@@ -219,7 +219,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("Invalid scheduling id.").build();
 		}
 		
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -263,7 +263,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("Invalid scheduling id.").build();
 		}
 		
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -316,7 +316,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("Invalid scheduling id").build();
 		}
 		
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -354,7 +354,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("Invalid scheduling id").build();
 		}
 		
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -459,7 +459,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("invalid scheduling id").build();
 		}
 		
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -523,7 +523,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("invalid scheduling id").build();
 		}
 
-		if (exp.getAccountId() != u.getCurrentAccount().getId()) {
+		if (exp.getAccountId() != u.getAccountID()) {
 			LOGGER.info("The scheduled experiment is not from the account, this user relates to. Perimission denied.");
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
@@ -591,7 +591,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		long accountId = u.getCurrentAccount().getId();
+		long accountId = u.getAccountID();
 		
 		List<ExecutedExperimentDetails> tmpList = ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(accountId, scenarioname);
 	
@@ -703,7 +703,7 @@ public class ExecutionService {
 			return;
 		}
 
-		AccountDetails ad = u.getAccountDetails();
+		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
 		
 		if (ad == null) {
 			LOGGER.error("The user should have selected a scenario before setting the MeasurementSpecification!");
@@ -738,10 +738,6 @@ public class ExecutionService {
 		}
 		
 		sd.setControllerName(controllername);
-		
-		if (scheduledExperiment.isActive()) {
-			ad.setExperimentKey(scheduledExperiment.getExperimentKey());
-		}
 
 		// store the updated AccountDetail in the database
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);

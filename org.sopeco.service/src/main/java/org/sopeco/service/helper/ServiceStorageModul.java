@@ -99,7 +99,7 @@ public final class ServiceStorageModul {
 			return;
 		}
 
-		AccountDetails ad = u.getAccountDetails();
+		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
 		
 		if (ad == null) {
 			LOGGER.error("The user should have selected a scenario before setting the MeasurementSpecification!");
@@ -134,10 +134,6 @@ public final class ServiceStorageModul {
 		}
 		
 		sd.setControllerName(controllername);
-		
-		if (scheduledExperiment.isActive()) {
-			ad.setExperimentKey(scheduledExperiment.getExperimentKey());
-		}
 
 		// store the updated AccountDetail in the database
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
@@ -162,7 +158,7 @@ public final class ServiceStorageModul {
 		}
 		
 		String scenarioname = scenarioDefinition.getScenarioName();
-		AccountDetails ad 	= u.getAccountDetails();
+		AccountDetails ad 	= ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
 		
 		// check if scenario is already in account scenario detail list
 		boolean scenarioExists = false;
@@ -183,8 +179,6 @@ public final class ServiceStorageModul {
 			scenarioDetail.setSelectedExperiment("");
 			ad.getScenarioDetails().add(scenarioDetail);
 		}
-
-		ad.setSelectedScenario(scenarioname);
 		
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
 	}
