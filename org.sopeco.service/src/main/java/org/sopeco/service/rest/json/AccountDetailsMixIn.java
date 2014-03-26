@@ -37,7 +37,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  * 
  * @author Peter Merkert
  */
-public class AccountDetailsMixin {
+public class AccountDetailsMixIn {
 
 	@JsonIgnore
 	public String getCsvQuoteChar() {
@@ -52,5 +52,10 @@ public class AccountDetailsMixin {
 	@JsonIgnore
 	public String[] getScenarioNames() {
 		return null;
+	}
+	
+	@JsonIgnore
+	public int getExperimentKeyOfSelectedScenario() {
+		return 0;
 	}
 }

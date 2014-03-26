@@ -217,6 +217,28 @@ public final class ExecutionScheduler implements Runnable {
 	}
 	
 	/**
+	 * Sets the status of the experiment with the given key to abort. The information
+	 * is passed via a configuration property. Therfor the aborting may take a little time
+	 * to be processed.
+	 * 
+	 * @param experimentKey	the experiment key of the experiment to abort
+	 */
+	public void setExperimentAborting(String experimentKey) {
+		
+		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
+			
+			ExperimentStatus status = queue.getExperimentStatus(experimentKey);
+
+			if (status != null) {
+				
+				queue.abortExperiment(experimentKey);
+				
+			}
+			
+		}
+	}
+	
+	/**
 	 * Updates the experiments times for repeating experiments. The execution time
 	 * for the experiment is calculacted and stored in the database.
 	 * 

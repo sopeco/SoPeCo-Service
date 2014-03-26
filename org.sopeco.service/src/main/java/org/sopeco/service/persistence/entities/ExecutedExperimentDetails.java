@@ -27,17 +27,13 @@
 package org.sopeco.service.persistence.entities;
 
 import java.io.Serializable;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-
-import org.sopeco.service.execute.MECLogEntry;
 
 /**
  * 
@@ -64,10 +60,6 @@ public class ExecutedExperimentDetails implements Serializable {
 
 	@Column(name = "timeFinished")
 	private long timeFinished;
-
-	/*@Lob
-	@Column(name = "eventLog")
-	private List<MECLogEntry> eventLog;*/
 
 	@Column(name = "successful")
 	private boolean successful;

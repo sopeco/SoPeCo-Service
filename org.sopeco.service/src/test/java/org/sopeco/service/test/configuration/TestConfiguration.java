@@ -6,23 +6,7 @@ package org.sopeco.service.test.configuration;
  * @author Peter Merkert
  */
 public abstract class TestConfiguration {
-
-	/**
-	 * The Jackson package for JSON converting on RESTful interfaces.
-	 */
-	public static final String PACKAGE_NAME_JSON = "org.codehaus.jackson.jaxrs";
 	
-	/**
-	 * The Jersey annotation for POJOMappingFeature.
-	 */
-	public static final String PACKAGE_NAME_POJO = "com.sun.jersey.api.json.POJOMappingFeature";
-	
-	/**
-	 * The package where all the RESTful services are in. Used to setup the {@link JerseyTest}
-	 * correctly.
-	 */
-	public static final String PACKAGE_NAME_REST = "org.sopeco.service.rest";
-
 	/**
 	 * The test account, which the test always wants to connect to.
 	 */
@@ -47,11 +31,11 @@ public abstract class TestConfiguration {
 	 * The "clearup" scenario is always needed in the database: It's needed to switch to this scenario and
 	 * delete the example scenario everytime.
 	 */
-	public static final String TEST_CLEAN_SCENARIO_NAME = "emptyScenarioName";
+	public static final String TEST_CLEAN_SCENARIO_NAME = "cleanupScenarioName";
 	
 	/**
 	 * The TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME defines the name for the measurement
 	 * specification for the "cleanup" scenario.
 	 */
-	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "emptyMeasurementSpecficiationName";
+	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "cleanupMeasurementSpecficiationName";
 }

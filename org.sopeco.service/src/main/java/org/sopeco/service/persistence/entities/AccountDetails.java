@@ -59,9 +59,6 @@ public class AccountDetails implements Serializable {
 	@Column(name = "scenarioDetails")
 	private List<ScenarioDetails> scenarioDetails;
 
-	@Column(name = "selectedScenario")
-	private String selectedScenario;
-
 	@Column(name = "csvValueSeparator")
 	private String csvValueSeparator = ";";
 
@@ -76,27 +73,6 @@ public class AccountDetails implements Serializable {
 	}
 
 	/**
-	 * Returns the controller URL of the active controller.
-	 * 
-	 * @return
-	 */
-	public String getControllerUrl() {
-		if (selectedScenario == null || selectedScenario.isEmpty()) {
-			return null;
-		}
-
-		String url = getScenarioDetail(selectedScenario).getControllerProtocol()
-				+ getScenarioDetail(selectedScenario).getControllerHost();
-
-		if (getScenarioDetail(selectedScenario).getControllerPort() > 0) {
-			url += ":" + getScenarioDetail(selectedScenario).getControllerPort();
-		}
-		url += "/" + getScenarioDetail(selectedScenario).getControllerName();
-
-		return url;
-	}
-
-	/**
 	 * Creates a new ScenarioDetails object and adds that to the scenarioDetails
 	 * List.
 	 */
@@ -105,21 +81,6 @@ public class AccountDetails implements Serializable {
 		detail.setScenarioName(scenarioName);
 
 		scenarioDetails.add(detail);
-	}
-
-	/**
-	 * @return the selectedScenario
-	 */
-	public String getSelectedScenario() {
-		return selectedScenario;
-	}
-
-	/**
-	 * @param pSelectedScenario
-	 *            the selectedScenario to set
-	 */
-	public void setSelectedScenario(String pSelectedScenario) {
-		this.selectedScenario = pSelectedScenario;
 	}
 
 	/**
@@ -197,7 +158,7 @@ public class AccountDetails implements Serializable {
 	public String getCsvQuoteChar() {
 		return csvCommentSeparator;
 	}
-	
+
 	/**
 	 * @param pCsvCommentSeparator
 	 *            the csvCommentSeparator to set
@@ -250,5 +211,13 @@ public class AccountDetails implements Serializable {
 			names[i] = scenarioDetails.get(i).getScenarioName();
 		}
 		return names;
+	}
+	
+	@Override
+	public String toString() {
+		return "====      AccountDetails     ====" + "\n"
+				+ "ID: " + id  + "\n"
+				+ "Name: " + accountName  + "\n"
+				+ "#ScenarioDetails: " + scenarioDetails.size();
 	}
 }

@@ -18,10 +18,10 @@
 	<!-- ================DEPENDENCIES================= -->
 	<dependencies>
 	    
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-client</artifactId>
-			<version>${com.jersey.client.version}</version>
+	    <dependency>
+		    <groupId>org.glassfish.jersey.core</groupId>
+		    <artifactId>jersey-client</artifactId>
+		    <version>2.7</version>
 		</dependency>
 	
 		<dependency>

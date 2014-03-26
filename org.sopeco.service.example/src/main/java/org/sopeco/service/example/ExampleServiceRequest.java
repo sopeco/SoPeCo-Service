@@ -1,14 +1,26 @@
 package org.sopeco.service.example;
 
+import java.util.List;
+
+import javax.validation.constraints.Null;
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.client.ClientConfig;
+import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.MeasurementSpecification;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
-import org.sopeco.service.rest.exchange.ServiceResponse;
+import org.sopeco.service.persistence.entities.AccountDetails;
+import org.sopeco.service.rest.json.CustomObjectMapper;
 
-import com.sun.jersey.api.client.Client;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
+import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * This is an example class to request the SoPeCo Service Layer and interact with it.<br />
@@ -26,13 +38,20 @@ public final class ExampleServiceRequest {
 	/**
 	 * TODO: choose a unique acccount name
 	 */
-	private static final String accountname 	= "myAccount";	
+	private static final String accountname 	= "test";	
 	
 	/**
 	 * TODO: choose a password
 	 */
-	private static final String password 		= "myPassword";
+	private static final String password 		= "test";
 	
+	/**
+	 * TODO: choose the URL where the SoPeCo SL is running
+	 */
+	private static final String serviceUrl 		= "http://localhost:8080/";
+	
+	private static Client client;
+	private static String token = "50098139-1e8c-4e1c-bf7f-e9090fa19da5";
 	/**
 	 * As this is only an example program, everything is done in the main
 	 * method.
@@ -40,93 +59,124 @@ public final class ExampleServiceRequest {
 	 * @param args the args
 	 */
     public static void main(String[] args) {
-
-    	Client client = Client.create();
+    	init();
     	
-    	// set values to try service
-		String serviceUrl 	= "http://localhost:8080/";
-		
-		///////////////////////////////////// ACCOUNT CREATION ////////////////////////////////////////////
-		
-		// define the request to query
-		WebResource webResource = client.resource(serviceUrl
-												+ ServiceConfiguration.SVC_ACCOUNT + "/"
-												+ ServiceConfiguration.SVC_ACCOUNT_CREATE);
-		
-		// define parameters to pass to the REST call (can be queryParam and pathParam)
-		webResource = webResource.queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname);
-		webResource = webResource.queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password);
-		
-		ServiceResponse<Boolean> sr_b = new ServiceResponse<Boolean>();
-		
-		try {
-			
-			// do the REST call
-			sr_b = webResource.accept(MediaType.APPLICATION_JSON)
-							  .post(new GenericType<ServiceResponse<Boolean>>() { });
-		 
-		} catch (Exception e) {
-		 
-			e.printStackTrace();
-			System.out.println("Error occured calling web service!");
-			return;
-			
-		}
-		
-		// check HTTP status of request
-		if (sr_b.getStatus() == Status.OK) {
-			
-			System.out.println("Account created succesfully.");
-			
-		} else {
-			
-			System.out.println("Error in account creation.");
-			return;
-			
-		}
-		
-		
-		///////////////////////////////////// LOGGING IN ////////////////////////////////////////////
-    	
-    	// define the request to query
-		webResource = client.resource(serviceUrl
-								    + ServiceConfiguration.SVC_ACCOUNT + "/"
-									+ ServiceConfiguration.SVC_ACCOUNT_LOGIN);
-		
-		// define parameters to pass to the REST call (can be queryParam and pathParam)
-		webResource = webResource.queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname);
-		webResource = webResource.queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password);
-    	
-		ServiceResponse<String> sr_s = new ServiceResponse<String>();
-		
-		try {
-			
-			// do the REST call
-			sr_s = webResource.accept(MediaType.APPLICATION_JSON)
-							  .get(new GenericType<ServiceResponse<String>>() { });
-		 
-		} catch (Exception e) {
-		 
-			e.printStackTrace();
-			System.out.println("Error occured calling web service!");
-			return;
-			
-		}
+    	WebTarget webTarget = client.target(serviceUrl
+				+ ServiceConfiguration.SVC_ACCOUNT + "/"
+				+ ServiceConfiguration.SVC_ACCOUNT_INFO);
 
-		// check HTTP status of request
-		if (sr_s.getStatus() == Status.OK) {
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN, token);
+    	Response r = webTarget.request(MediaType.APPLICATION_JSON).get();
+		AccountDetails accountDetails = r.readEntity(AccountDetails.class);
+		System.out.println(accountDetails.toString());
 
-			// when the call was successful, we got a token
-			System.out.println("Token got for logging in and authentificate: " + sr_s.getObject());
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++");
+		
+		for (String s : accountDetails.getScenarioNames()) {
+			System.out.println("Szenarioname: " + s);
+		}
+		
+		webTarget = client.target(serviceUrl
+				+ ServiceConfiguration.SVC_SCENARIO + "/"
+				+ ServiceConfiguration.SVC_SCENARIO_DEFINITON);
+		
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token);
+		
+		ScenarioDefinition sd = webTarget.request(MediaType.APPLICATION_JSON).get().readEntity(ScenarioDefinition.class);
+	
+		System.out.println("Derzeitig ausgewählte ScenarioDeifinition (via REST): " + sd.getScenarioName());
+    	
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++");
+		
+    	webTarget = client.target(serviceUrl
+				+ ServiceConfiguration.SVC_MEASUREMENT + "/"
+				+ ServiceConfiguration.SVC_MEASUREMENT_LISTSPECS);
+
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token);
+    	
+    	r = webTarget.request(MediaType.APPLICATION_JSON).get();
+    	
+		List<MeasurementSpecification> list = r.readEntity(new GenericType<List<MeasurementSpecification>>() { });
+		
+		for (MeasurementSpecification ms : list) {
+
+			System.out.println("MS name: " + ms.getName());
 			
-		} else {
+			List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
 			
-			System.out.println("Error in account creation.");
-			return;
+			for (ExperimentSeriesDefinition esd : listESD) {
+				
+				System.out.println("ESD name: " + esd.getName());
+				
+			}
 			
 		}
-	  
+		
+		System.out.println("++++++++++++++++++++++++++++++++++++++++++++++");
+		
+		webTarget = client.target(serviceUrl
+				+ ServiceConfiguration.SVC_MEC + "/"
+				+ ServiceConfiguration.SVC_MEC_MED);
+
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_MEC_TOKEN, token);
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_MEC_URL, "socket://MatrixMultiplicationMECId/Testcontroller");
+    	
+    	r = webTarget.request(MediaType.APPLICATION_JSON).get();
+    	
+    	MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
+    	
+    	System.out.println(med.getRoot().getAllParameters().get(0).getFullName());
+    	System.out.println(med.getRoot().getAllParameters().get(1).getFullName());
+    	System.out.println(med.getRoot().getAllParameters().get(2).getFullName());
+    	System.out.println(med.getRoot().getAllParameters().get(3).getFullName());
     }
+	
+	private static void init() {
+		client = ClientBuilder.newClient(createClientConfig());
+		//createAccount();
+		//login();
+	}
+
+	private static void login() {
+		WebTarget webTarget = client.target(serviceUrl
+											+ ServiceConfiguration.SVC_ACCOUNT + "/"
+											+ ServiceConfiguration.SVC_ACCOUNT_LOGIN);
+	
+		// define parameters to pass to the REST call (can be queryParam and pathParam)
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname);
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password);
+		
+		token = webTarget.request(MediaType.APPLICATION_JSON).get().readEntity(String.class);
+		System.out.println("Token: " + token);
+	}
+
+	private static void createAccount() {
+		// define the request to query
+    	WebTarget webTarget = client.target(serviceUrl
+											+ ServiceConfiguration.SVC_ACCOUNT + "/"
+											+ ServiceConfiguration.SVC_ACCOUNT_CREATE);
+		
+		// define parameters to pass to the REST call (can be queryParam and pathParam)
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_ACCOUNT_NAME, accountname);
+    	webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_ACCOUNT_PASSWORD, password);
+    	
+    	// Null.class, cause Jersey expects an object passed with HTTP POST
+		webTarget.request(MediaType.APPLICATION_JSON).post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
+	}
+
+	/**
+	 * Sets the client config for the client. The method adds a special {@link CustomObjectWrapper}
+	 * to the normal Jackson wrapper for JSON.<br />
+	 * 
+	 * @return ClientConfig to work with JSON
+	 */
+	private static ClientConfig createClientConfig() {
+		ClientConfig config = new ClientConfig();
+		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
+        provider.setMapper(new CustomObjectMapper());
+        config.register(provider);
+	    return config;
+	}
     
     
 }
