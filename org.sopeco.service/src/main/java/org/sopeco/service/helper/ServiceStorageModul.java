@@ -1,4 +1,4 @@
-package org.sopeco.service.rest;
+package org.sopeco.service.helper;
 
 import java.util.List;
 
@@ -83,7 +83,7 @@ public final class ServiceStorageModul {
 	 * @param usertoken				the token to identify the user
 	 * @param scheduledExperiment	the {@link ScheduledExperiment} with all necessary information
 	 */
-	protected static void updateAccountDetails(String usertoken, ScheduledExperiment scheduledExperiment) {
+	public static void updateAccountDetails(String usertoken, ScheduledExperiment scheduledExperiment) {
 		
 		if (scheduledExperiment == null) {
 			LOGGER.error("The given ScheduledExperiment is null.");
@@ -153,7 +153,7 @@ public final class ServiceStorageModul {
 	 * @param scenarioDefinition				the {@link ScenarioDefinition}
 	 * @param selectedMeasurementSpecification	the name of the selected {@link MeasurementSpecification}
 	 */
-	protected static void updateAccountDetails(String usertoken, ScenarioDefinition scenarioDefinition, String selectedMeasurementSpecification) {
+	public static void updateAccountDetails(String usertoken, ScenarioDefinition scenarioDefinition, String selectedMeasurementSpecification) {
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -198,7 +198,7 @@ public final class ServiceStorageModul {
 	 * @param scenarioDefintion 	the {@link ScenarioDefinition} to store
 	 * @return 						true, if the scenario was stored successfully in the database
 	 */
-	protected static boolean storeScenarioDefition(String usertoken, ScenarioDefinition scenarioDefintion) {
+	public static boolean storeScenarioDefition(String usertoken, ScenarioDefinition scenarioDefintion) {
 		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		

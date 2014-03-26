@@ -32,6 +32,7 @@ import org.sopeco.engine.measurementenvironment.socket.SocketManager;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.helper.ServiceStorageModul;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.MECStatus;
