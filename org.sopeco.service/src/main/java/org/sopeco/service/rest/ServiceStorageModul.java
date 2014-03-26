@@ -1,16 +1,12 @@
 package org.sopeco.service.rest;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
-import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
-import org.sopeco.persistence.util.ScenarioDefinitionBuilder;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.AccountDetails;
