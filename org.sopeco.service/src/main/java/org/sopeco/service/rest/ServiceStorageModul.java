@@ -10,7 +10,7 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
-import org.sopeco.service.builder.ScenarioDefinitionBuilder;
+import org.sopeco.persistence.util.ScenarioDefinitionBuilder;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.AccountDetails;
@@ -30,51 +30,6 @@ public final class ServiceStorageModul {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ServiceStorageModul.class);
 	
 	/**
-	 * Stores the current {@link Users} state in the service database. The current scenario state for
-	 * the given user is stored in the connected account database.
-	 * 
-	 * @param u 	the user whose information should be stored
-	 * @return 		true, if the user and the scenario was stored in the databases
-	 */
-	protected static boolean storeUserAndScenario(Users u) {
-		// store scenario in account database
-		ScenarioDefinition sd = u.getCurrentScenarioDefinitionBuilder().getScenarioDefinition();
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
-		
-		if (dbCon == null) {
-			LOGGER.warn("Cannot open the account database. Given token is '{}'", u.getToken());
-			return false;
-		}
-		
-		dbCon.store(sd);
-		dbCon.closeProvider();
-
-		// store user information in Service-database
-		ServicePersistenceProvider.getInstance().storeUser(u);
-		
-		return true;
-	}
-	
-	/**
-	 * Sets the measurement environment defitinion for the current {@link ScenarioDefinitionBuilder}. The {@link Users} is stored
-	 * in the database.
-	 * <br />
-	 * 
-	 * @param definition 	the MED
-	 * @param u 			the user whose MED is to set
-	 * @return 				true, if the MED could be stored successfully
-	 */
-	protected static boolean setNewMeasurementEnvironmentDefinition(MeasurementEnvironmentDefinition definition, Users u) {
-		LOGGER.debug("Set a new measurement environment definition for the user with token '{}'.", u.getToken());
-		
-		u.getCurrentScenarioDefinitionBuilder().setMeasurementEnvironmentDefinition(definition);
-
-		ServicePersistenceProvider.getInstance().storeUser(u);
-		
-		return true;
-	}
-	
-	/**
 	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
 	 * token. The selected specification is changed to the one with the given name.<br />
 	 * Check: Before the account must have selected a scenario!<br />
@@ -87,7 +42,7 @@ public final class ServiceStorageModul {
 	 * 								is <b>not</b> checked for logical correctness and should match to an
 	 * 								available {@link MeasurementSpecification}
 	 */
-	protected static void updateAccountDetailsSelectedSpecification(String usertoken, String specificationname) {
+	/*protected static void updateAccountDetailsSelectedSpecification(String usertoken, String specificationname) {
 
 		LOGGER.debug("Trying to update the AccountDetails with a MeasurementSpecification name.");
 		
@@ -117,7 +72,7 @@ public final class ServiceStorageModul {
 		sd.setSelectedSpecification(specificationname);
 		
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
-	}
+	}*/
 	
 	/**
 	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
@@ -237,27 +192,28 @@ public final class ServiceStorageModul {
 		
 		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
 	}
-	
+
 	/**
-	 * Builds up a dummy {@link ScheduledExperiment} with empty controller URL and
-	 * empty selected {@link ExperimentSeriesDefinition} and passes it to the
-	 * {@link #updateAccountDetails(String, ScheduledExperiment)}.
+	 * Stores the given {@link ScenarioDefinition} in the users service database.<br />
+	 * This method <b>does not</b> check the logical correctness for the
+	 * {@link ScenarioDefinition}, moreover it just stores it without even checking null.
 	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scenarioname			the name of the scenario, which need to be updated
+	 * @param usertoken 			the user identification
+	 * @param scenarioDefintion 	the {@link ScenarioDefinition} to store
+	 * @return 						true, if the scenario was stored successfully in the database
 	 */
-	protected static void cleanAccountDetails(String usertoken, String scenarioname) {
+	protected static boolean storeScenarioDefition(String usertoken, ScenarioDefinition scenarioDefintion) {
 		
-		ScheduledExperiment scheduledExperiment = new ScheduledExperiment();
-		scheduledExperiment.setControllerUrl("");
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("");
-		scheduledExperiment.setSelectedExperiments(list);
-		ScenarioDefinition sd = new ScenarioDefinition();
-		sd.setScenarioName(scenarioname);
-		scheduledExperiment.setScenarioDefinition(new ScenarioDefinition());
+		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
-		updateAccountDetails(usertoken, scheduledExperiment);
+		if (dbCon == null) {
+			LOGGER.warn("No database connection found for the user with the token '{}'.", usertoken);
+			return false;
+		}
+		
+		dbCon.store(scenarioDefintion);
+		dbCon.closeProvider();
+		
+		return true;
 	}
-	
 }

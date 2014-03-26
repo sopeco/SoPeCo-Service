@@ -31,11 +31,11 @@ public abstract class TestConfiguration {
 	 * The "clearup" scenario is always needed in the database: It's needed to switch to this scenario and
 	 * delete the example scenario everytime.
 	 */
-	public static final String TEST_CLEAN_SCENARIO_NAME = "emptyScenarioName";
+	public static final String TEST_CLEAN_SCENARIO_NAME = "cleanupScenarioName";
 	
 	/**
 	 * The TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME defines the name for the measurement
 	 * specification for the "cleanup" scenario.
 	 */
-	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "emptyMeasurementSpecficiationName";
+	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "cleanupMeasurementSpecficiationName";
 }

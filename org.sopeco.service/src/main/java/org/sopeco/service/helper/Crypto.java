@@ -1,4 +1,4 @@
-package org.sopeco.service.security;
+package org.sopeco.service.helper;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

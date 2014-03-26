@@ -35,7 +35,6 @@ import javax.persistence.NamedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.service.builder.ScenarioDefinitionBuilder;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 
@@ -63,10 +62,6 @@ public class Users {
 	@Column(name = "account")
 	private Account currentAccount;
 	
-	@Lob
-	@Column(name = "scenarioDefinitionBuilder")
-	private ScenarioDefinitionBuilder currentScenarioDefinitionBuilder;
-	
 	@Column(name = "currentMeasurementSpecification")
 	private String currentMeasurementSpecification;
 	
@@ -87,7 +82,6 @@ public class Users {
 		this.token = token;
 		lastRequestTime = System.currentTimeMillis();
 		currentAccount = new Account();
-		currentScenarioDefinitionBuilder = new ScenarioDefinitionBuilder();
 	}
 	
 	// ******************************* Setter & Getter ************************************
@@ -102,14 +96,6 @@ public class Users {
 
 	public Account getCurrentAccount() {
 		return currentAccount;
-	}
-	
-	public ScenarioDefinitionBuilder getCurrentScenarioDefinitionBuilder() {
-		return currentScenarioDefinitionBuilder;
-	}
-
-	public void setCurrentScenarioDefinitionBuilder(ScenarioDefinitionBuilder scenarioDefinitionBuilder) {
-		this.currentScenarioDefinitionBuilder = scenarioDefinitionBuilder;
 	}
 	
 	public long getLastRequestTime() {

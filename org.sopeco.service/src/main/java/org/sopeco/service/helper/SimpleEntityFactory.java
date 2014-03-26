@@ -24,86 +24,79 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sopeco.service.builder;
+package org.sopeco.service.helper;
 
-import java.util.List;
-import java.util.Map;
-
-import org.sopeco.persistence.entities.definition.AnalysisConfiguration;
-import org.sopeco.persistence.entities.definition.ConstantValueAssignment;
-import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
-import org.sopeco.persistence.entities.definition.ExplorationStrategy;
+import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ParameterRole;
+import org.sopeco.service.configuration.ServiceConfiguration;
 
 /**
- * See {@link org.sopeco.persistence.EntityFactory}
+ * See {@link org.sopeco.persistence.EntityFactory} as reference. This utility
+ * class provides some useful default setup methods for complex SoPeCo objects.
  * 
  * @author Marius Oehler
- * 
+ * @author Peter Merkert
  */
-public class SimpleEntityFactory {
+public final class SimpleEntityFactory {
 
 	private SimpleEntityFactory() {
 	}
 
+	/**
+	 * Returns a default {@link MeasurementEnvironmentDefinition}. This should be used, as the default
+	 * {@link MeasurementEnvironmentDefinition} should have a root {@link ParameterNamespace} with 
+	 * the default name set in {@link ServiceConfiguration#MEASUREMENTENVIRONMENT_ROOTNAME}.
+	 * 
+	 * @return a default {@link MeasurementEnvironmentDefinition}
+	 */
+	public static MeasurementEnvironmentDefinition createDefaultMeasurementEnvironmentDefinition() {
+		MeasurementEnvironmentDefinition med = new MeasurementEnvironmentDefinition();
+		ParameterNamespace rootNamespace = SimpleEntityFactory.createNamespace(ServiceConfiguration.MEASUREMENTENVIRONMENT_ROOTNAME);
+		med.setRoot(rootNamespace);
+		return med;
+	}
+	
+	/**
+	 * Creates a {@link MeasurementSpecification} with the given name. A blank
+	 * {@link MeasurementSpecification} is created and only the name set.
+	 * 
+	 * @param name	the name
+	 * @return		the created {@link MeasurementSpecification}
+	 */
 	public static MeasurementSpecification createMeasurementSpecification(String name) {
 		MeasurementSpecification ms = new MeasurementSpecification();
 		ms.setName(name);
 		return ms;
 	}
-
-	public static ConstantValueAssignment createConstantValueAssignment(final ParameterDefinition parameter,
-			String value) {
-		ConstantValueAssignment cva = new ConstantValueAssignment();
-		cva.setParameter(parameter);
-		cva.setValue(value);
-		return cva;
-	}
-
-	public static ExperimentSeriesDefinition createExperimentSeriesDefinition(String name) {
-		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		esd.setName(name);
-		return esd;
-	}
-
+	
+	/**
+	 * Creates a {@link ParameterNamespace} with the given name.
+	 * 
+	 * @param name	the {@link ParameterNamespace} name
+	 * @return		the created {@link ParameterNamespace}
+	 */
 	public static ParameterNamespace createNamespace(String name) {
 		ParameterNamespace child = new ParameterNamespace();
 		child.setName(name);
 		return child;
 	}
 
+	/**
+	 * Creates a {@link ParameterDefinition} with the given attributes.
+	 * 
+	 * @param name	the name of the {@link ParameterDefinition}
+	 * @param type	the type
+	 * @param role	the role as {@link ParameterRole}
+	 * @return		the created {@link ParameterDefinition}
+	 */
 	public static ParameterDefinition createParameterDefinition(String name, String type, ParameterRole role) {
 		ParameterDefinition pd = new ParameterDefinition();
 		pd.setName(name);
 		pd.setRole(role);
 		pd.setType(type);
 		return pd;
-	}
-
-	public static ExplorationStrategy createExplorationStrategy(String name, Map<String, String> config) {
-		ExplorationStrategy es = new ExplorationStrategy();
-		es.setName(name);
-		if (config != null) {
-			es.getConfiguration().putAll(config);
-		}
-		return es;
-	}
-
-	public static ExplorationStrategy createExplorationStrategy(String explorationName,
-			Map<String, String> explorationConfig, String analysisName, Map<String, String> analysisConfig,
-			ParameterDefinition dependentParameter, List<ParameterDefinition> independentParameters) {
-		ExplorationStrategy es = createExplorationStrategy(explorationName, explorationConfig);
-		AnalysisConfiguration ac = new AnalysisConfiguration();
-		ac.setName(analysisName);
-		if (analysisConfig != null) {
-			ac.getConfiguration().putAll(analysisConfig);
-		}
-		ac.getDependentParameters().add(dependentParameter);
-		ac.getIndependentParameters().addAll(independentParameters);
-		es.getAnalysisConfigurations().add(ac);
-		return es;
 	}
 }

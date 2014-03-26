@@ -17,8 +17,9 @@ import org.sopeco.service.rest.MeasurementEnvironmentDefinitionService;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 /**
- * The {@link MeasurementEnvironmentDefinitionServiceTest} tests the {@link MeasurementEnvironmentDefinitionService} class.
- * E.g. MED adding, parameter namespace updating...
+ * The {@link MeasurementEnvironmentDefinitionServiceTest} tests the
+ * {@link MeasurementEnvironmentDefinitionService} class. E.g. MED adding,
+ * parameter namespace updating...
  * 
  * @author Peter Merkert
  */
@@ -50,22 +51,23 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 				  .request(MediaType.APPLICATION_JSON)
 				  .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				     .request(MediaType.APPLICATION_JSON)
-				  .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// blank the MeasurementEnvironmentDefinition
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+				  			 .path(TEST_SCENARIO_NAME)
 				             .path(ServiceConfiguration.SVC_MED_SET)
 				             .path(ServiceConfiguration.SVC_MED_SET_BLANK)
 				             .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 				             .request(MediaType.APPLICATION_JSON)
 				             .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		r = target().path(ServiceConfiguration.SVC_MED)
+	  			 	.path(TEST_SCENARIO_NAME)
+	  			 	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
+	  			 	.request(MediaType.APPLICATION_JSON)
+	  			 	.get();
+
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
@@ -102,17 +104,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 				     .request(MediaType.APPLICATION_JSON)
 				  .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				     .request(MediaType.APPLICATION_JSON)
-				  .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// return the MED for the current user
 		Response r = target().path(ServiceConfiguration.SVC_MED)
-			  	             .path(ServiceConfiguration.SVC_MED_CURRENT)
+							 .path(TEST_SCENARIO_NAME)
 			  	             .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 			  	             .request(MediaType.APPLICATION_JSON)
 			  	             .get();
@@ -156,16 +150,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 				  .request(MediaType.APPLICATION_JSON)
 				  .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				     .request(MediaType.APPLICATION_JSON)
-				  .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// return the MED for the current user
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 				             .path(ServiceConfiguration.SVC_MED_NAMESPACE)
 				             .path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 				             .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -177,7 +164,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// return the MED for the current user
 		r = target().path(ServiceConfiguration.SVC_MED)
-				 	.path(ServiceConfiguration.SVC_MED_CURRENT)
+					.path(TEST_SCENARIO_NAME)
 				 	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 				 	.request(MediaType.APPLICATION_JSON)
 				 	.get();
@@ -221,16 +208,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		  		.request(MediaType.APPLICATION_JSON)
 		  		.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			  	.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			  	.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			  	.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			  	.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			  	.request(MediaType.APPLICATION_JSON)
-			  	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// create the namespace
 		target().path(ServiceConfiguration.SVC_MED)
+		 		.path(TEST_SCENARIO_NAME)
 		  		.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 		  		.path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 		  		.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -240,6 +220,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// return the MED for the current user
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 				    		 .path(ServiceConfiguration.SVC_MED_NAMESPACE)
 				    		 .path(ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
 				    		 .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -286,16 +267,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			    .request(MediaType.APPLICATION_JSON)
 			    .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-		  		.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-		  		.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-		  		.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-		  		.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-		  		.request(MediaType.APPLICATION_JSON)
-		  		.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// create the namespace, to ensure to have at least this one
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 				.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 				.path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 				.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -304,6 +278,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 						     .path(ServiceConfiguration.SVC_MED_NAMESPACE)
 						     .path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
 						     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -317,7 +292,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// return the MED for the current user
 		r = target().path(ServiceConfiguration.SVC_MED)
-				    .path(ServiceConfiguration.SVC_MED_CURRENT)
+					.path(TEST_SCENARIO_NAME)
 				    .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 				    .request(MediaType.APPLICATION_JSON)
 				    .get();
@@ -333,6 +308,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// test not valid token
 		r = target().path(ServiceConfiguration.SVC_MED)
+					.path(TEST_SCENARIO_NAME)
 			        .path(ServiceConfiguration.SVC_MED_NAMESPACE)
 			        .path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
 			        .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, "123")
@@ -345,6 +321,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		
 		// test not available namespace (delete once for safety)
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 			    .path(ServiceConfiguration.SVC_MED_NAMESPACE)
 			    .path(ServiceConfiguration.SVC_MED_NAMESPACE_REMOVE)
 			    .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -353,6 +330,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			    .delete();
 		
 		r = target().path(ServiceConfiguration.SVC_MED)
+					.path(TEST_SCENARIO_NAME)
 			  	 	.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 			  	 	.path(ServiceConfiguration.SVC_MED_NAMESPACE_RENAME)
 			  	 	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -397,16 +375,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			    .request(MediaType.APPLICATION_JSON)
 			    .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			    .request(MediaType.APPLICATION_JSON)
-			    .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// create the namespace, to ensure to have at least this one
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 			  	.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 			  	.path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 			  	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -415,6 +386,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			  	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 						     .path(ServiceConfiguration.SVC_MED_PARAM)
 						     .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
 						     .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -462,16 +434,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		  		.request(MediaType.APPLICATION_JSON)
 		  		.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-		  		.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-	  			.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-	  			.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-	  			.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-	  			.request(MediaType.APPLICATION_JSON)
-	  			.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// create the namespace, to ensure to have at least this one
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 			  	.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 			  	.path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 			  	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -480,6 +445,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			  	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 			    .path(ServiceConfiguration.SVC_MED_PARAM)
 			    .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
 			    .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -490,6 +456,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			    .put(Entity.entity(paramRole, MediaType.APPLICATION_JSON));
 
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 	  					  	 .path(ServiceConfiguration.SVC_MED_PARAM)
 	  					  	 .path(ServiceConfiguration.SVC_MED_PARAM_UPDATE)
 	  					  	 .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -537,16 +504,9 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		  		.request(MediaType.APPLICATION_JSON)
 		  		.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			    .request(MediaType.APPLICATION_JSON)
-			    .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// create the namespace, to ensure to have at least this one
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 		  		.path(ServiceConfiguration.SVC_MED_NAMESPACE)
 		  		.path(ServiceConfiguration.SVC_MED_NAMESPACE_ADD)
 		  		.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -555,6 +515,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 		  		.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		target().path(ServiceConfiguration.SVC_MED)
+				.path(TEST_SCENARIO_NAME)
 			    .path(ServiceConfiguration.SVC_MED_PARAM)
 			    .path(ServiceConfiguration.SVC_MED_PARAM_ADD)
 			    .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
@@ -565,6 +526,7 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 			    .put(Entity.entity(paramRole, MediaType.APPLICATION_JSON));
 
 		Response r = target().path(ServiceConfiguration.SVC_MED)
+							 .path(TEST_SCENARIO_NAME)
 							 .path(ServiceConfiguration.SVC_MED_PARAM)
 							 .path(ServiceConfiguration.SVC_MED_PARAM_REMOVE)
 							 .queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)

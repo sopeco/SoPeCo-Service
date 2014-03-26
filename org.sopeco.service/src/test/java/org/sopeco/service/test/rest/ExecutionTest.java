@@ -64,44 +64,27 @@ public class ExecutionTest extends AbstractServiceTest {
 		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
 		esd.setName("experimentSeriesDefintion");
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-			    .path(TestConfiguration.TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-			    .request(MediaType.APPLICATION_JSON)
-			    .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
+			    	.path(ServiceConfiguration.SVC_SCENARIO_ADD)
+			    	.path(TestConfiguration.TEST_SCENARIO_NAME)
+			    	.queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
+			    	.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+			    	.request(MediaType.APPLICATION_JSON)
+			    	.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TestConfiguration.TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-		      	.request(MediaType.APPLICATION_JSON)
-		      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-				    .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
-				    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				    .request(MediaType.APPLICATION_JSON)
-				    .get();
+					.path(TestConfiguration.TEST_SCENARIO_NAME)
+					.path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
+					.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+					.request(MediaType.APPLICATION_JSON)
+					.get();
 
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		ScenarioDefinition sd = r.readEntity(ScenarioDefinition.class);
 		
 		assertEquals(true, sd != null); // the user must have a scenario now
-		
-		//switch to created measurement specification
-		r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
-			        .path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TestConfiguration.TEST_MEASUREMENT_SPECIFICATION_NAME)
-			        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-			      	.request(MediaType.APPLICATION_JSON)
-			      	.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		// now start the MEC fake, which connects to the ServerSocket created by the RESTful service
 		TestMEC.start();

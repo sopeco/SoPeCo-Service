@@ -51,7 +51,7 @@ public final class ExampleServiceRequest {
 	private static final String serviceUrl 		= "http://localhost:8080/";
 	
 	private static Client client;
-	private static String token = "4dfd4535-ec87-48b9-9029-b805347d61e8";
+	private static String token = "50098139-1e8c-4e1c-bf7f-e9090fa19da5";
 	/**
 	 * As this is only an example program, everything is done in the main
 	 * method.

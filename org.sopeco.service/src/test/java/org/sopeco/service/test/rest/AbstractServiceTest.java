@@ -120,14 +120,6 @@ public abstract class AbstractServiceTest extends JerseyTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, scenarioNameEmpty)
-				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
 		// delete the example scenario
 		target().path(ServiceConfiguration.SVC_SCENARIO)
 				.path(TestConfiguration.TEST_SCENARIO_NAME)

@@ -61,10 +61,6 @@ public class ExecutedExperimentDetails implements Serializable {
 	@Column(name = "timeFinished")
 	private long timeFinished;
 
-	/*@Lob
-	@Column(name = "eventLog")
-	private List<MECLogEntry> eventLog;*/
-
 	@Column(name = "successful")
 	private boolean successful;
 

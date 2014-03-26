@@ -184,7 +184,7 @@ public class ExecutionService {
 			ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
 
 			// update the AccountDetails
-			updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
+			//updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
 			
 		}
 

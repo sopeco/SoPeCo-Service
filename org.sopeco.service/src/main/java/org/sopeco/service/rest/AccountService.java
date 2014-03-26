@@ -18,10 +18,10 @@ import org.slf4j.LoggerFactory;
 import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.helper.Crypto;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.Users;
-import org.sopeco.service.security.Crypto;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 

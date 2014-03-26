@@ -71,7 +71,6 @@ public abstract class ServiceConfiguration {
 	 * 		- add
 	 * 		- list
 	 * 		- delete
-	 * 		- switch
 	 * 		- current
 	 * 		- store
 	 * 		- xml
@@ -79,7 +78,6 @@ public abstract class ServiceConfiguration {
 	 * measurementspecification
 	 * 		- list
 	 * 		- listspecifications (as objects)
-	 * 		- switch
 	 * 		- create
 	 * 		- rename (current measuremtnspecification)
 	 * 
@@ -133,11 +131,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_LIST	 		= "list";
 	public static final String SVC_SCENARIO_DEFINITON 		= "definition";
 	public static final String SVC_SCENARIO_DELETE 			= "delete";
-	public static final String SVC_SCENARIO_SWITCH 			= "switch";
-	public static final String SVC_SCENARIO_SWITCH_NAME 	= "name";
-	public static final String SVC_SCENARIO_SWITCH_DEFINITION = "definition";
-	public static final String SVC_SCENARIO_CURRENT 		= "current";
-	public static final String SVC_SCENARIO_STORE 			= "archive";
+	public static final String SVC_SCENARIO_ARCHIVE 		= "archive";
 	public static final String SVC_SCENARIO_UPDATE 			= "update";
 	public static final String SVC_SCENARIO_XML 			= "xml";
 	public static final String SVC_SCENARIO_INSTANCE	 	= "instance";
@@ -150,11 +144,12 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT 				= "measurementspecification";
 	public static final String SVC_MEASUREMENT_LIST 		= "list";
 	public static final String SVC_MEASUREMENT_LISTSPECS 	= "listspecification";
-	public static final String SVC_MEASUREMENT_SWITCH 		= "switch";
 	public static final String SVC_MEASUREMENT_CREATE 		= "create";
 	public static final String SVC_MEASUREMENT_RENAME 		= "rename";
+	public static final String SVC_MEASUREMENT_NAME 		= "name";
 	public static final String SVCP_MEASUREMENT_TOKEN 		= "token";
 	public static final String SVCP_MEASUREMENT_SPECNAME 	= "specname";
+	public static final String SVCP_MEASUREMENT_SCENARIONAME = "scenarioname";
 	
 	public static final String SVC_MEC 						= "mec";
 	public static final String SVC_MEC_STATUS 				= "status";
@@ -162,6 +157,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_PORTREACHABLE		= "reachable";
 	public static final String SVC_MEC_LIST 				= "list";
 	public static final String SVC_MEC_MED 					= "med";
+	public static final String SVC_MEC_SCENARIONAME 		= "scenarioname";
 	public static final String SVCP_MEC_TOKEN 				= "token";
 	public static final String SVCP_MEC_URL 				= "url";
 	public static final String SVCP_MEC_HOST 				= "host";
@@ -181,6 +177,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MED_PARAM_ADD 			= "add";
 	public static final String SVC_MED_PARAM_REMOVE 		= "remove";
 	public static final String SVC_MED_PARAM_UPDATE 		= "update";
+	public static final String SVC_MED_SCENARIONAME 		= "scenarioname";
 	public static final String SVCP_MED_TOKEN 				= "token";
 	public static final String SVCP_MED_MEC_URL 			= "url";
 	public static final String SVCP_MED_NAMESPACE 			= "path"; // namespace path
@@ -205,6 +202,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
+
+
 
 
 }

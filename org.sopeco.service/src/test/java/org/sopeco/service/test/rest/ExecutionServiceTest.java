@@ -76,16 +76,10 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-					.path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+					.path(TEST_SCENARIO_NAME)
+					.path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
 					.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 					.request(MediaType.APPLICATION_JSON)
 					.get();
@@ -177,19 +171,13 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-				.path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
-				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.get();
+					.path(TEST_SCENARIO_NAME)
+					.path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
+					.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+					.request(MediaType.APPLICATION_JSON)
+					.get();
 
 		ScenarioDefinition sd = r.readEntity(ScenarioDefinition.class);
 		
@@ -295,16 +283,9 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-				.path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+				.path(TEST_SCENARIO_NAME)
+				.path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
 				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 				.request(MediaType.APPLICATION_JSON)
 				.get();
@@ -442,19 +423,12 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-			    .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-			    .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-
 		Response r = target().path(ServiceConfiguration.SVC_SCENARIO)
-				    		 .path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
-				    		 .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				    		 .request(MediaType.APPLICATION_JSON)
-				    		 .get();
+							 .path(TEST_SCENARIO_NAME)
+							 .path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
+							 .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							 .request(MediaType.APPLICATION_JSON)
+							 .get();
 
 		ScenarioDefinition sd = r.readEntity(ScenarioDefinition.class);
 		

@@ -15,6 +15,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Entity;
@@ -29,6 +30,7 @@ import org.sopeco.engine.measurementenvironment.connector.MEConnectorFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAppWrapper;
 import org.sopeco.engine.measurementenvironment.socket.SocketManager;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
@@ -95,8 +97,8 @@ public class MeasurementControllerService {
 	
 	/**
 	 * Returns the status of the MEC on the given URL. The status of the MEC can be fetched via
-	 * the {@link MECStatus}. If the URL is inavlid or something happened to the MEC, null might
-	 * be returned.
+	 * the {@link MECStatus}. If the URL is inavlid or something happened to the MEC,
+	 * <code>null</code> might be returned.
 	 * 
 	 * @param usertoken authentification of the user
 	 * @param url 		the URL to the MEC
@@ -202,7 +204,7 @@ public class MeasurementControllerService {
 	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
 	 * 		  			ServerSocket of the service
 	 * @return 			{@link Response} OK, UNAUTHORIZED, ACCEPTED, CONFLICT or INTERNAL_SERVER_ERROR<br />
-	 * 					OK with the {@code MeasurementEnvironmentDefinition} to the MEC on the given URI as {@link Entity}<br />
+	 * 					OK with the {@link MeasurementEnvironmentDefinition} to the MEC on the given URI as {@link Entity}<br />
 	 * 					ACCEPTED indicates that the information from the MEC could not be fetched
 	 */
 	@GET
@@ -253,22 +255,22 @@ public class MeasurementControllerService {
 	/**
 	 * Before: The MeasurementEnvironmentController (MEC) should be connected to the service
 	 * ServerSocket. Otherwise the method is going to fail and return false.<br />
-	 * After getting the {@code MeasurementEnvironmentDefinition} (MED) from the MEC, the MED
-	 * is stored in the account database.<br />
-	 * This method only uses the services at {@code getMEDefinitionFromMEC()} and
-	 * {@code MeasurementEnvironmentDefinitionService.setNewMEDefinition()}. See
-	 * their comments for more information.
+	 * After getting the {@link MeasurementEnvironmentDefinition} (MED) from the MEC, the MED
+	 * is stored in the {@link ScenarioDefinition} - given via it's name - the account database.<br />
+	 * This method only uses the services at {@link #getMEDefinitionFromMEC(String, String)}.
 	 * 
-	 * @param usertoken authentification of the user
-	 * @param uri 		the URI of the MeasurementEnvironmentController already connected to the
-	 * 		  			ServerSocket of the service
-	 * @return 			{@link Response} OK, UNAUTHORIZED, ACCEPTED, CONFLICT or INTERNAL_SERVER_ERROR<br />
-	 * 					ACCEPTED indicates that the information from the MEC could not be fetched
+	 * @param scenarioName	the name of the scenario
+	 * @param usertoken 	authentification of the user
+	 * @param uri 			the URI of the MeasurementEnvironmentController already connected to the
+	 * 		  				ServerSocket of the service
+	 * @return 				{@link Response} OK, UNAUTHORIZED, ACCEPTED, CONFLICT or INTERNAL_SERVER_ERROR<br />
+	 * 						ACCEPTED indicates that the information from the MEC could not be fetched
 	 */
 	@POST
-	@Path(ServiceConfiguration.SVC_MEC_MED)
+	@Path("{" + ServiceConfiguration.SVC_MEC_SCENARIONAME + "}/" + ServiceConfiguration.SVC_MEC_MED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response setMEDefinitionFromMEC(@QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
+	public Response setMEDefinitionFromMEC(@PathParam(ServiceConfiguration.SVC_MEC_SCENARIONAME) String scenarioName,
+										   @QueryParam(ServiceConfiguration.SVCP_MEC_TOKEN) String usertoken,
 										   @QueryParam(ServiceConfiguration.SVCP_MEC_URL) String uri) {
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
@@ -284,9 +286,16 @@ public class MeasurementControllerService {
 
 			MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
 			
-			boolean b = ServiceStorageModul.setNewMeasurementEnvironmentDefinition(med, u);
+			ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
 			
-			if (!b) {
+			if (sd == null) {
+				LOGGER.info("No ScenarioDefinition with given name.", usertoken);
+				return Response.status(Status.CONFLICT).entity("No ScenarioDefinition with given name.").build();
+			}
+			
+			sd.setMeasurementEnvironmentDefinition(med);
+			
+			if (!ServiceStorageModul.storeScenarioDefition(usertoken, sd)) {
 				return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot store MED in database.").build();
 			}
 			

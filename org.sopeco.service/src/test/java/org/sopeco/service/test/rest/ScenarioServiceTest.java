@@ -2,7 +2,6 @@ package org.sopeco.service.test.rest;
 
 import static org.junit.Assert.assertEquals;
 
-import javax.validation.constraints.Null;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -14,11 +13,12 @@ import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementEnvironmentDefinition;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.rest.ScenarioService;
 import org.sopeco.service.test.configuration.TestConfiguration;
 
 /**
- * The <code>ScenarioServiceTest</code> tests various features of the
- * <code>ScenarioService</code> RESTful services.
+ * The {@link ScenarioServiceTest} tests various features of the
+ * {@link ScenarioService} RESTful services.
  * 
  * @author Peter Merkert
  */
@@ -156,47 +156,6 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		
 		logout(token);
 	}
-
-	/**
-	 * Try to switch to a newly created scenario
-	 * 
-	 * 1. log in
-	 * 2. add scenario
-	 * 3. switch scenario
-	 */
-	@Test
-	public void testScenarioSwitch() {
-		// connect to test users account
-		String accountname = TestConfiguration.TESTACCOUNTNAME;
-		String password = TestConfiguration.TESTPASSWORD;
-		
-		String token = login(accountname, password);
-		
-		// add a default scenario
-		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				  .path(ServiceConfiguration.SVC_SCENARIO_ADD)
-				  .path(TEST_SCENARIO_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-				  .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  .request(MediaType.APPLICATION_JSON)
-				  
-				  .post(Entity.entity(esd, MediaType.APPLICATION_JSON));
-		
-		// now try to switch the scenario
-		Response r = target().path(ServiceConfiguration.SVC_SCENARIO)
-				  			 .path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				  			 .path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				  			 .queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-				  			 .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				  			 .request(MediaType.APPLICATION_JSON)
-				  			 .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
-		// the switch should be succesful
-		assertEquals(Status.OK.getStatusCode(), r.getStatus());
-		
-		logout(token);
-	}
 	
 	/**
 	 * Try to extract a scenario out of the Service as xml file.
@@ -236,23 +195,9 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 			  	.request(MediaType.APPLICATION_JSON)
 			  	.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_SCENARIO)
-				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH)
-				.path(ServiceConfiguration.SVC_SCENARIO_SWITCH_NAME)
-				.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, TEST_SCENARIO_NAME)
-				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
-				.request(MediaType.APPLICATION_JSON)
-				.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
-		// switch to the newly created measurmentspecification
-		target().path(ServiceConfiguration.SVC_MEASUREMENT)
-		  		.path(ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-		  		.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
-		  		.queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-		  		.request(MediaType.APPLICATION_JSON)
-		  		.put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
-		
+		// now fetch the scenario data from the RESTful service
 		Response r = target().path(ServiceConfiguration.SVC_SCENARIO)
+				 			 .path(TEST_SCENARIO_NAME)
 							 .path(ServiceConfiguration.SVC_SCENARIO_XML)
 							 .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 							 .request(MediaType.APPLICATION_JSON)
@@ -263,7 +208,7 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		String xml = r.readEntity(String.class);
 		
 		r = target().path(ServiceConfiguration.SVC_MED)
-				 	.path(ServiceConfiguration.SVC_MED_CURRENT)
+	 			 	.path(TEST_SCENARIO_NAME)
 				 	.queryParam(ServiceConfiguration.SVCP_MED_TOKEN, token)
 				 	.request(MediaType.APPLICATION_JSON)
 				 	.get();
@@ -276,7 +221,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 		ScenarioDefinition scenarioDefinitionXML = sdr.readFromString(xml);
 		
 		r = target().path(ServiceConfiguration.SVC_SCENARIO)
-			     	.path(ServiceConfiguration.SVC_SCENARIO_CURRENT)
+			  		.path(TEST_SCENARIO_NAME)
+			     	.path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
 			     	.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
 			     	.request(MediaType.APPLICATION_JSON)
 			     	.get();
