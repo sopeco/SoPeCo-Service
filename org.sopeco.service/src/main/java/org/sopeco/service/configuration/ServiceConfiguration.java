@@ -59,52 +59,6 @@ public abstract class ServiceConfiguration {
 	 * All the REST services are listed down here.
 	 * All params with prefix SVC points to paths.
 	 * All params with prefix SVCP points to parameter names.
-	 * 
-	 * account
-	 * 		- create (username/pw)
-	 * 		- exists (username)
-	 * 		- login (username/pw)
-	 * 
-	 * info
-	 * 
-	 * scenario
-	 * 		- add
-	 * 		- list
-	 * 		- delete
-	 * 		- current
-	 * 		- store
-	 * 		- xml
-	 * 
-	 * measurementspecification
-	 * 		- list
-	 * 		- listspecifications (as objects)
-	 * 		- create
-	 * 		- rename (current measuremtnspecification)
-	 * 
-	 * measurementcontroller
-	 * 		- status (of MEC)
-	 * 		- validate
-	 * 		- med (measurment environment definition)
-	 * 			- blank
-	 * 		- current (MED)
-	 * 		- check (if Port is reachable)
-	 * 
-	 * measurementenviromentdefintion (MED)
-	 * 		- med
-	 * 			- blank
-	 * 		- current (MED)
-	 * 		- namespace
-	 * 			- add
-	 * 			- remove
-	 * 			- rename
-	 * 		- parameter
-	 * 			- add
-	 * 			- remove
-	 * 			- update
-	 * 
-	 * execute
-	 * 		- schedule (POST, GET, REMOVE)
-	 * 	 	- details
 	 */
 	public static final String SVC_ACCOUNT 					= "account";
 	public static final String SVC_ACCOUNT_CHECK 			= "check";
@@ -168,7 +122,6 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MED_SET 					= "set";
 	public static final String SVC_MED_SET_MEC		 		= "mec";
 	public static final String SVC_MED_SET_BLANK 			= "blank";
-	public static final String SVC_MED_CURRENT 				= "current";
 	public static final String SVC_MED_NAMESPACE 			= "namespace";
 	public static final String SVC_MED_NAMESPACE_ADD 		= "add";
 	public static final String SVC_MED_NAMESPACE_REMOVE 	= "remove";
@@ -202,8 +155,5 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
-
-
-
 
 }
