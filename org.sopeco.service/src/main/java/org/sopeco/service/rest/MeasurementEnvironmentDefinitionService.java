@@ -183,7 +183,8 @@ public class MeasurementEnvironmentDefinitionService {
 	}
 	
 	/**
-	 * Adds a namespace to the currently selected {@link MeasurementEnvironmentDefinition} (MED) of the user.
+	 * Adds a namespace to the {@link MeasurementEnvironmentDefinition} (MED) connected the the {@link ScenarioDefinition}
+	 * given via the name.
 	 * 
 	 * @param scenarioName	the name of the scenario
 	 * @param usertoken 	the user identification
