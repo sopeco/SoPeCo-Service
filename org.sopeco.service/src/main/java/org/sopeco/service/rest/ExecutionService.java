@@ -30,10 +30,8 @@ import org.sopeco.service.execute.QueuedExperiment;
 import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
-import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
-import org.sopeco.service.persistence.entities.ScenarioDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.ExperimentStatus;
@@ -76,6 +74,11 @@ public class ExecutionService {
 	public Response addScheduledExperiment(@QueryParam(TOKEN) String usertoken,
 						  				   ScheduledExperiment scheduledExperiment) {
 		
+		if (usertoken == null || scheduledExperiment == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -88,6 +91,12 @@ public class ExecutionService {
 		if (scheduledExperiment.isActive() && !experimentSeriesIsValid(scheduledExperiment)) {
 			LOGGER.info("The selected experiments are corrupt.");
 			return Response.status(Status.CONFLICT).entity("The selected experiments are corrupt.").build();
+		}
+		
+		// TODO better check for correct MEController URL
+		if (scheduledExperiment.getControllerUrl().equals("")) {
+			LOGGER.info("The URL to the MeasurementEnvironmentController is invalid.");
+			return Response.status(Status.CONFLICT).entity("The URL to the MeasurementEnvironmentController is invalid.").build();
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
@@ -114,9 +123,6 @@ public class ExecutionService {
 
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(scheduledExperiment);
 
-		// update the AccountDetails
-		updateAccountDetails(usertoken, scheduledExperiment);
-
 		// now get the scheduled experiment id, to return it
 		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
 													.loadScheduledExperimentsByAccount(u.getAccountID());
@@ -129,6 +135,7 @@ public class ExecutionService {
 
 		}
 
+		LOGGER.warn("ScheduledExperiment was not stored correctly in database. The stored entity cannot be found!");
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
 	
@@ -145,6 +152,11 @@ public class ExecutionService {
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
+		
+		if (usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -169,6 +181,11 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
 		
+		if (usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -182,9 +199,6 @@ public class ExecutionService {
 		for (ScheduledExperiment exp : scheduledExperiments) {
 			
 			ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
-
-			// update the AccountDetails
-			//updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
 			
 		}
 
@@ -204,6 +218,11 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 										   @QueryParam(TOKEN) String usertoken) {
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -248,7 +267,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												  @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -283,9 +307,6 @@ public class ExecutionService {
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 		
-		// now there must be selected experiments, therfor update the AccountDetails
-		updateAccountDetails(usertoken, exp);
-		
 		return Response.ok(exp.getExperimentKey()).build();
 	}
 	
@@ -301,7 +322,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 											  	   @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -339,7 +365,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     	  @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -360,9 +391,6 @@ public class ExecutionService {
 		}
 		
 		ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
-
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
 		
 		return Response.ok().build();
 	}
@@ -382,7 +410,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
 									     		 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (usertoken == null) {
+			LOGGER.warn("Given usertoken is null.");
+			return Response.status(Status.CONFLICT).entity("Given usertoken is null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -416,7 +449,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
 									     	 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (usertoken == null) {
+			LOGGER.warn("Given usertoken is null.");
+			return Response.status(Status.CONFLICT).entity("Given usertoken is null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -444,7 +482,12 @@ public class ExecutionService {
 	public Response removeSelectedExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 								  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 							  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || experimentseriesname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -486,9 +529,6 @@ public class ExecutionService {
 		}
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
-		
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp);
 
 		return Response.ok().build();
 	}
@@ -509,6 +549,11 @@ public class ExecutionService {
 								  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 						  	  				 		 @QueryParam(TOKEN) String usertoken) {
 
+		if (id < 0 || experimentseriesname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -560,9 +605,6 @@ public class ExecutionService {
 		experimentList.add(experimentseriesname);
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
-
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp);
 		
 		return Response.ok().build();
 	}
@@ -580,8 +622,9 @@ public class ExecutionService {
 	public Response getExecutedExperimentDetails(@QueryParam(TOKEN) String usertoken,
 												 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_SCENARIONAME) String scenarioname) {
 		
-		if (scenarioname == null) {
-			return Response.status(Status.CONFLICT).entity("Given scenario name invalid.").build();
+		if (scenarioname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
 		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
@@ -610,7 +653,12 @@ public class ExecutionService {
 	@Path(ServiceConfiguration.SVC_EXECUTE_MECLOG)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMECLog(@QueryParam(TOKEN) String usertoken,
-				    			    		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
+				    		  @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -672,97 +720,6 @@ public class ExecutionService {
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
-	 * token. The update only happens, when the name of the scenario in the {@link AccountDetails} match
-	 * the name of the scenario in the given {@link ScheduledExperiment}.<br />
-	 * The controller URL and the first item of the list of selected experiments is fetched and
-	 * updated in the {@link AccountDetails}.<br />
-	 * Afterwards the {@link AccountDetails} will be stored in the database.<br />
-	 * <br />
-	 * Only error outputs are created, because here must be no error!
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scheduledExperiment	the {@link ScheduledExperiment} with all necessary information
-	 */
-	private void updateAccountDetails(String usertoken, ScheduledExperiment scheduledExperiment) {
-		
-		if (scheduledExperiment == null) {
-			LOGGER.error("The given ScheduledExperiment is null.");
-			return;
-		}
-		
-		LOGGER.debug("Trying to update the AccountDetails with a MeasurementSpecification name.");
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		if (u == null) {
-			LOGGER.error("The given token is invalid.");
-			return;
-		}
-
-		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
-		
-		if (ad == null) {
-			LOGGER.error("The user should have selected a scenario before setting the MeasurementSpecification!");
-			return;
-		}
-
-		String scenarioname = scheduledExperiment.getScenarioDefinition().getScenarioName();
-		
-		ScenarioDetails sd = ad.getScenarioDetail(scenarioname);
-		
-		if (sd == null) {
-			LOGGER.error("There must be already a ScenarioDetails object in the AccountDetails list with the given scenario name!");
-			return;
-		}
-		
-		List<String> list = scheduledExperiment.getSelectedExperiments();
-		
-		if (list != null && !list.isEmpty()) {
-			sd.setSelectedExperiment(list.get(0)); // TODO only takes the first one
-		} else {
-			sd.setSelectedExperiment("");
-		}
-
-		// get the controller URL via the scheduled experiment
-		String controllername = "";
-		
-		if (scheduledExperiment.getControllerUrl() != null) {
-			String[] url = scheduledExperiment.getControllerUrl().split("/");
-			if (url != null &&  url.length > 0) {
-				controllername = url[url.length-1];
-			}
-		}
-		
-		sd.setControllerName(controllername);
-
-		// store the updated AccountDetail in the database
-		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
-	}
-	
-	/**
-	 * Builds up a puppy {@link ScheduledExperiment} with empty controller URL and
-	 * empty selected {@link ExperimentSeriesDefinition} and passes it to the
-	 * {@link #updateAccountDetails(String, ScheduledExperiment)}.
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scenarioname			the name of the scenario, which need to be updated
-	 */
-	private void updateAccountDetails(String usertoken, String scenarioname) {
-		
-		ScheduledExperiment scheduledExperiment = new ScheduledExperiment();
-		scheduledExperiment.setControllerUrl("");
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("");
-		scheduledExperiment.setSelectedExperiments(list);
-		ScenarioDefinition sd = new ScenarioDefinition();
-		sd.setScenarioName(scenarioname);
-		scheduledExperiment.setScenarioDefinition(new ScenarioDefinition());
-		
-		updateAccountDetails(usertoken, scheduledExperiment);
 	}
 	
 }

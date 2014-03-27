@@ -27,13 +27,10 @@
 package org.sopeco.service.persistence.entities;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 
@@ -55,10 +52,6 @@ public class AccountDetails implements Serializable {
 	@Column(name = "accountName")
 	private String accountName;
 
-	@Lob
-	@Column(name = "scenarioDetails")
-	private List<ScenarioDetails> scenarioDetails;
-
 	@Column(name = "csvValueSeparator")
 	private String csvValueSeparator = ";";
 
@@ -69,18 +62,6 @@ public class AccountDetails implements Serializable {
 	private String csvDecimalDelimiter = ".";
 
 	public AccountDetails() {
-		scenarioDetails = new ArrayList<ScenarioDetails>();
-	}
-
-	/**
-	 * Creates a new ScenarioDetails object and adds that to the scenarioDetails
-	 * List.
-	 */
-	public void addScenarioDetails(String scenarioName) {
-		ScenarioDetails detail = new ScenarioDetails();
-		detail.setScenarioName(scenarioName);
-
-		scenarioDetails.add(detail);
 	}
 
 	/**
@@ -111,21 +92,6 @@ public class AccountDetails implements Serializable {
 	 */
 	public void setAccountName(String pAccountName) {
 		this.accountName = pAccountName;
-	}
-
-	/**
-	 * @return the scenarioDetails
-	 */
-	public List<ScenarioDetails> getScenarioDetails() {
-		return scenarioDetails;
-	}
-
-	/**
-	 * @param pScenarioDetails
-	 *            the scenarioDetails to set
-	 */
-	public void setScenarioDetails(List<ScenarioDetails> pScenarioDetails) {
-		this.scenarioDetails = pScenarioDetails;
 	}
 
 	/**
@@ -181,43 +147,11 @@ public class AccountDetails implements Serializable {
 	public void setCsvDecimalDelimiter(String pCsvDecimalDelimiter) {
 		this.csvDecimalDelimiter = pCsvDecimalDelimiter;
 	}
-
-	/**
-	 * Returns the object that has the specified name, if it exists in the list.
-	 * 
-	 * @param scenarioName
-	 * @return
-	 */
-	public ScenarioDetails getScenarioDetail(String scenarioName) {
-		if (scenarioName == null) {
-			return null;
-		}
-		for (ScenarioDetails detail : scenarioDetails) {
-			if (detail.getScenarioName().equals(scenarioName)) {
-				return detail;
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * Returns an array with all names of the existing scenarios.
-	 * 
-	 * @return
-	 */
-	public String[] getScenarioNames() {
-		String[] names = new String[scenarioDetails.size()];
-		for (int i = 0; i < names.length; i++) {
-			names[i] = scenarioDetails.get(i).getScenarioName();
-		}
-		return names;
-	}
 	
 	@Override
 	public String toString() {
 		return "====      AccountDetails     ====" + "\n"
 				+ "ID: " + id  + "\n"
-				+ "Name: " + accountName  + "\n"
-				+ "#ScenarioDetails: " + scenarioDetails.size();
+				+ "Name: " + accountName  + "\n";
 	}
 }
