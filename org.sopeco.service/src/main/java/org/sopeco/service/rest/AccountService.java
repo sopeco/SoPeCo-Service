@@ -8,6 +8,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -41,6 +42,7 @@ public class AccountService {
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
 	 * @return 				{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
@@ -62,6 +64,7 @@ public class AccountService {
 	 * @param dbname		the database name
 	 * @param dbport		the database password
 	 * @return 				{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/" + ServiceConfiguration.SVC_ACCOUNT_CUSTOMIZE)
@@ -241,7 +244,8 @@ public class AccountService {
 	 * @param password  	the password to login into this account
 	 * @param dbHost 		the database for this account
 	 * @param dbPort 		the database port for this account
-	 * @return            	{@link Response} OK or CONFLICT
+	 * @return            	{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	private Response createAccount(String accountName, String password, String dbHost, int dbPort) {
 		
@@ -263,7 +267,7 @@ public class AccountService {
 
 		LOGGER.debug("Account created with id {}", account.getId());
 
-		return Response.ok().build();
+		return Response.ok(account).build();
 	}
 
 	/**
