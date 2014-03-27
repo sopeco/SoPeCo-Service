@@ -722,9 +722,14 @@ public class ExecutionService {
 
 			// WHY THE HACK SPLITTED WITH '.'???? TODO! Check SPC Core
 			String[] experimentSplitted = experimentName.split(".");
+		
+			if (experimentSplitted.length <= 1) {
+				LOGGER.debug("ESD name corrupt: '{}'.", experimentName);
+				return false;
+			}
 			
-			String msName 	= experimentSplitted[0];
-			String esdName 	= experimentSplitted[1];
+			String msName 	= experimentSplitted[0].trim();
+			String esdName 	= experimentSplitted[1].trim();
 			
 			LOGGER.debug("Checking selected ESD '{}', if it is in the list of all ESD of the ScenarioDefinition.", esdName);
 			LOGGER.debug("The ESD is in the MeasurementSpecification with name '{}'.", msName);
