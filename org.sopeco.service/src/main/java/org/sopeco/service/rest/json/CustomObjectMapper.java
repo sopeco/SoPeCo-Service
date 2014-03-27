@@ -2,7 +2,6 @@ package org.sopeco.service.rest.json;
 
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
-import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,6 +36,5 @@ public class CustomObjectMapper extends ObjectMapper {
 		addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 		addMixInAnnotations(ParameterDefinition.class, ParameterDefinitionMixIn.class);
 		addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
-		addMixInAnnotations(AccountDetails.class, AccountDetailsMixIn.class);
 	 }
 }

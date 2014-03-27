@@ -10,16 +10,13 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.exception.ConfigurationException;
-import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
-import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
@@ -81,22 +78,6 @@ public final class ServicePersistenceProvider {
 	 */
 	ServicePersistenceProvider(EntityManagerFactory factory) {
 		emf = factory;
-	}
-
-	public AccountDetails loadAccountDetails(long accountId) {
-		return loadSingleById(AccountDetails.class, accountId);
-	}
-
-	public List<AccountDetails> loadAllAccountDetails() throws DataNotFoundException {
-		return loadByQuery(AccountDetails.class, "getAllAccountDetails");
-	}
-
-	public void removeAccountDetails(AccountDetails accountDetails) {
-		remove(accountDetails);
-	}
-
-	public void storeAccountDetails(AccountDetails accountDetails) {
-		store(accountDetails);
 	}
 	
 	public Users loadUser(String token) {
