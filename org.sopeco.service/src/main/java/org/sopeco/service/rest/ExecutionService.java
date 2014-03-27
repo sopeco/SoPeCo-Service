@@ -720,12 +720,19 @@ public class ExecutionService {
 
 		for (String experimentName : selectedExperiment) {
 
-			LOGGER.debug("Checking selected ESD '{}', if it is in the list of all ESD of the ScenarioDefinition.", experimentName);
+			// WHY THE HACK SPLITTED WITH '.'???? TODO! Check SPC Core
+			String[] experimentSplitted = experimentName.split(".");
+			
+			String msName 	= experimentSplitted[0];
+			String esdName 	= experimentSplitted[1];
+			
+			LOGGER.debug("Checking selected ESD '{}', if it is in the list of all ESD of the ScenarioDefinition.", esdName);
+			LOGGER.debug("The ESD is in the MeasurementSpecification with name '{}'.", msName);
 			
 			for (ExperimentSeriesDefinition esd : experiment.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
 				
-				if (esd.getName().equals(experimentName)) {
-					LOGGER.debug("ESD '{}' is a valid ESD name.", experimentName);
+				if (esd.getName().equals(esdName)) {
+					LOGGER.debug("ESD '{}' is a valid ESD name.", esdName);
 					validName = true;
 				}
 				
@@ -733,7 +740,7 @@ public class ExecutionService {
 			
 			// only if no experimentSeries with the given name was found
 			if (!validName) {
-				LOGGER.debug("The ESD '{}' not found in list of all ESD in MeasurementSpecifications.", experimentName);
+				LOGGER.debug("The ESD '{}' not found in list of all ESD in MeasurementSpecifications.", esdName);
 				return false;
 			}
 			
