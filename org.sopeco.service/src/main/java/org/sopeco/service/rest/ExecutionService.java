@@ -51,7 +51,7 @@ public class ExecutionService {
 	private static final String TOKEN = ServiceConfiguration.SVCP_EXECUTE_TOKEN;
 	
 	/**
-	 * Adds a {@link ScheduledExperiment} to the service.
+	 * Adds a {@link ScheduledExperiment} in the service.
 	 * The last execution time for the schedule is set to <i>-1</i> and the
 	 * properties are referenced from the configuration with the given token.<br />
 	 * An integrity check is done for active scenarios: Their selected experiment
@@ -65,7 +65,10 @@ public class ExecutionService {
 	 * @param scheduledExperiment 	the ScheduledExperiment object
 	 * @return 						{@link Response} with status OK, UNAUTHORIZED, CONFLICT or
 	 * 								INTERNAL_SERVER_ERROR<br />
-	 * 								OK has the experiment ID as {@link Long} in the {@link Entity}
+	 * 								OK with the experiment key as {@link Long} in the {@link Entity} when
+	 * 								the experiment has been set to active state already, OK with the experiment
+	 * 								ID as {@link Long}, when the experiment has just been added, but is not in
+	 * 								active state.
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -93,7 +96,7 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("The selected experiments are corrupt.").build();
 		}
 		
-		// TODO better check for correct MEController URL
+		// TODO better check for correct MEController URL, rather then only for empty String
 		if (scheduledExperiment.getControllerUrl().equals("")) {
 			LOGGER.info("The URL to the MeasurementEnvironmentController is invalid.");
 			return Response.status(Status.CONFLICT).entity("The URL to the MeasurementEnvironmentController is invalid.").build();
@@ -130,7 +133,19 @@ public class ExecutionService {
 		for (ScheduledExperiment se : list) {
 
 			if (se.equals(scheduledExperiment)) {
-				return Response.ok(se.getId()).build();
+				
+				if (se.isActive()) {
+					
+					LOGGER.info("Experiment successful dispatched in active mode (Experiment key: '{}')", se.getExperimentKey());
+					return Response.ok(se.getId()).build();
+					
+				} else {
+					
+					LOGGER.info("Experiment successful dispatched in inactive mode (Experiment id: '{}')", se.getId());
+					return Response.ok(se.getId()).build();
+					
+				}
+				
 			}
 
 		}
@@ -690,10 +705,13 @@ public class ExecutionService {
 	 */
 	private boolean experimentSeriesIsValid(ScheduledExperiment experiment) {
 		
+		LOGGER.info("Checking ESD of Scenario ' {}' for validity.", experiment.getScenarioDefinition().getScenarioName());
+		
 		// first check for a valid selected experiment list
 		List<String> selectedExperiment = experiment.getSelectedExperiments();
 		
 		if (selectedExperiment == null || selectedExperiment.isEmpty()) {
+			LOGGER.debug("ESD is null or empty.");
 			return false;
 		}
 		
@@ -701,10 +719,13 @@ public class ExecutionService {
 		boolean validName = false;
 
 		for (String experimentName : selectedExperiment) {
+
+			LOGGER.debug("Checking selected ESD '{}', if it is in the list of all ESD of the ScenarioDefinition.", experimentName);
 			
 			for (ExperimentSeriesDefinition esd : experiment.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
 				
 				if (esd.getName().equals(experimentName)) {
+					LOGGER.debug("ESD '{}' is a valid ESD name.", experimentName);
 					validName = true;
 				}
 				
@@ -712,6 +733,7 @@ public class ExecutionService {
 			
 			// only if no experimentSeries with the given name was found
 			if (!validName) {
+				LOGGER.debug("The ESD '{}' not found in list of all ESD in MeasurementSpecifications.", experimentName);
 				return false;
 			}
 			
