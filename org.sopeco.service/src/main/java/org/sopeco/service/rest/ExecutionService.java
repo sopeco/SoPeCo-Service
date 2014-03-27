@@ -2,6 +2,7 @@ package org.sopeco.service.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -721,7 +722,7 @@ public class ExecutionService {
 		for (String experimentName : selectedExperiment) {
 
 			// WHY THE HACK SPLITTED WITH '.'???? TODO! Check SPC Core
-			String[] experimentSplitted = experimentName.split(".");
+			String[] experimentSplitted = experimentName.split(Pattern.quote( "." ));
 		
 			if (experimentSplitted.length <= 1) {
 				LOGGER.debug("ESD name corrupt: '{}'.", experimentName);
