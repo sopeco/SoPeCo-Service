@@ -262,10 +262,10 @@ public final class ExecutionScheduler implements Runnable {
 		status.setAccountId(se.getAccountId());
 		status.setEventLogList(new ArrayList<MECLogEntry>());
 		status.setFinished(false);
-		status.setLabel("");
+		status.setLabel(se.getLabel());
 		status.setProgress(0.0f);
 		status.setScenarioName(se.getScenarioDefinition().getScenarioName());
-		status.setTimeStart(0);
+		status.setTimeStart(se.getStartTime());
 		status.setTimeRemaining(0);
 		
 		return status;
