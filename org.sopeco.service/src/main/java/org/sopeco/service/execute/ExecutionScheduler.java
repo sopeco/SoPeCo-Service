@@ -284,11 +284,11 @@ public final class ExecutionScheduler implements Runnable {
 		ExperimentStatus status = new ExperimentStatus();
 		status.setAccountId(eed.getAccountId());
 		status.setEventLogList(new ArrayList<MECLogEntry>());
-		status.setFinished(false);
-		status.setLabel("");
-		status.setProgress(0.0f);
+		status.setFinished(true);
+		status.setLabel(eed.getName());
+		status.setProgress(100.0f);
 		status.setScenarioName(eed.getScenarioName());
-		status.setTimeStart(0);
+		status.setTimeStart(eed.getTimeStarted());
 		status.setTimeRemaining(0);
 		
 		// the event log list
