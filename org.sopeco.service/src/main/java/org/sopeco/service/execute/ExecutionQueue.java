@@ -517,7 +517,7 @@ public class ExecutionQueue implements IStatusListener {
 		eed.setTimeStarted(experiment.getTimeStarted());
 		eed.setName(experiment.getScheduledExperiment().getLabel());
 		eed.setControllerURL(experiment.getScheduledExperiment().getControllerUrl());
-		eed.setExperimentKey(String.valueOf(experiment.getScheduledExperiment().getExperimentKey()));
+		eed.setExperimentKey(experiment.getScheduledExperiment().getExperimentKey());
 		eed.setAccountId(experiment.getScheduledExperiment().getAccountId());
 		eed.setScenarioName(experiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
 		// TODO why was commented out? Why is the event log not set - Answer: Because the MECLog is stored on it's own
@@ -534,7 +534,7 @@ public class ExecutionQueue implements IStatusListener {
 	 */
 	private void storeMECLog(QueuedExperiment experiment) {
 		
-		int hashcode = experiment.getScheduledExperiment().getExperimentKey();
+		long hashcode = experiment.getScheduledExperiment().getExperimentKey();
 		
 		MECLog log = ServicePersistenceProvider.getInstance().loadMECLog(hashcode);
 		

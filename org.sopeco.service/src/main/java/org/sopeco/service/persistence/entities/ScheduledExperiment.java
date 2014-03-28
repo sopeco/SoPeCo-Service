@@ -263,11 +263,11 @@ public class ScheduledExperiment implements Serializable {
 
 	/**
 	 * Calculates a unique the experiment key for this {@link ScheduledExperiment}.
-	 * At the moment only take the hash code of this object.
+	 * At the moment only take the hash code of this object.<br />
 	 * 
 	 * @return the experiment key
 	 */
-	public int getExperimentKey() {
+	public long getExperimentKey() {
 		return hashCode();
 	}
 	

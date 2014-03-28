@@ -72,7 +72,7 @@ public class ExecutedExperimentDetails implements Serializable {
 	private String controllerURL;
 
 	@Column(name = "experimentKey", unique = true)
-	private String experimentKey;
+	private long experimentKey;
 	
 	public long getAccountId() {
 		return accountId;
@@ -106,11 +106,11 @@ public class ExecutedExperimentDetails implements Serializable {
 		this.controllerURL = pControllerURL;
 	}
 
-	public String getExperimentKey() {
+	public long getExperimentKey() {
 		return experimentKey;
 	}
 
-	public void setExperimentKey(String experimentKey) {
+	public void setExperimentKey(long experimentKey) {
 		this.experimentKey = experimentKey;
 	}
 

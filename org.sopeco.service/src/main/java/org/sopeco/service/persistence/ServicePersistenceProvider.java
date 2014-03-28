@@ -136,11 +136,11 @@ public final class ServicePersistenceProvider {
 	/**
 	 * Loads an {@link ExecutedExperimentDetails} via the given experiment key.
 	 * 
-	 * @param experimentkey	the experiment key
+	 * @param experimentKey	the experiment key
 	 * @return				the 
 	 */
-	public ExecutedExperimentDetails loadExecutedExperimentDetails(long experimentkey) {
-		return loadSingleByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", experimentkey);
+	public ExecutedExperimentDetails loadExecutedExperimentDetails(long experimentKey) {
+		return loadSingleByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", String.valueOf(experimentKey));
 	}
 	
 	/**
