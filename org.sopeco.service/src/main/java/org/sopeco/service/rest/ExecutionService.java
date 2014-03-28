@@ -138,7 +138,7 @@ public class ExecutionService {
 				if (se.isActive()) {
 					
 					LOGGER.info("Experiment successful dispatched in active mode (Experiment key: '{}')", se.getExperimentKey());
-					return Response.ok(se.getId()).build();
+					return Response.ok(se.getExperimentKey()).build();
 					
 				} else {
 					
