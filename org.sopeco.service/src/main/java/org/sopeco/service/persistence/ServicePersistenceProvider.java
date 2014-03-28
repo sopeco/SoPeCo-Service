@@ -140,7 +140,14 @@ public final class ServicePersistenceProvider {
 	 * @return				the 
 	 */
 	public ExecutedExperimentDetails loadExecutedExperimentDetails(long experimentKey) {
-		return loadSingleByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", String.valueOf(experimentKey));
+		LOGGER.debug("Trying to fetch ExecutedExperimentDetails for key '{}' from database.", experimentKey);
+		List<ExecutedExperimentDetails> eeds = loadByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", experimentKey);
+		
+		if (eeds != null && !eeds.isEmpty()) {
+			return eeds.get(0);
+		}
+		
+		return null;
 	}
 	
 	/**
