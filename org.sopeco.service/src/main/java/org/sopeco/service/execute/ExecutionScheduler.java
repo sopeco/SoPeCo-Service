@@ -9,6 +9,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
+import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
+import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.rest.exchange.ExperimentStatus;
 
@@ -180,7 +182,7 @@ public final class ExecutionScheduler implements Runnable {
 	 * @return				{@link ExperimentStatus} of the experiment with the given key, null if
 	 * 						the key does not match
 	 */
-	public ExperimentStatus getExperimentStatus(String experimentKey) {
+	public ExperimentStatus getExperimentStatus(long experimentKey) {
 		
 		// this can be a bottleneck, when a lot of experiments are enqueued
 		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
@@ -190,29 +192,26 @@ public final class ExecutionScheduler implements Runnable {
 			if (status != null) {
 				return status;
 			}
-			
+		
 		}
 		
 		// now check the ScheduledExperiment database for the experiment
-		for (ScheduledExperiment se : ServicePersistenceProvider.getInstance().loadAllScheduledExperiments()) {
-			
-			if (se.getExperimentKey() == Integer.parseInt(experimentKey)) {
-				ExperimentStatus status = new ExperimentStatus();
-				status.setAccountId(se.getAccountId());
-				status.setEventLogList(new ArrayList<MECLogEntry>());
-				status.setFinished(false);
-				status.setLabel("");
-				status.setProgress(0.0f);
-				status.setScenarioName(se.getScenarioDefinition().getScenarioName());
-				status.setTimeStart(0);
-				status.setTimeRemaining(0);
-				
-				return status;
-			}
-			
+		// the experiment can be in the list of ScheduledExperiments waiting in active state to be scheduled
+		for (ScheduledExperiment se : ServicePersistenceProvider.getInstance().loadAllScheduledExperiments()) {	
+			if (se.getExperimentKey() == experimentKey) {
+				return createExperimentStatus(se);
+			}	
 		}
 		
+		// now check the ExecutedExperimentDetails
+		// the experiment is then already finished
+		ExecutedExperimentDetails eed = ServicePersistenceProvider.getInstance().loadExecutedExperimentDetails(experimentKey);
 		
+		if (eed != null) {
+			return createExperimentStatus(experimentKey, eed);
+		}
+		
+		// the experiment with given key cannot be found anywhere in the database
 		return null ;
 	}
 	
@@ -223,7 +222,7 @@ public final class ExecutionScheduler implements Runnable {
 	 * 
 	 * @param experimentKey	the experiment key of the experiment to abort
 	 */
-	public void setExperimentAborting(String experimentKey) {
+	public void setExperimentAborting(long experimentKey) {
 		
 		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
 			
@@ -250,6 +249,59 @@ public final class ExecutionScheduler implements Runnable {
 															   experiment.getRepeatMinutes());
 		experiment.setNextExecutionTime(nextRepetition);
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(experiment);
+	}
+
+	/**
+	 * Creates the {@link ExperimentStatus} for an experiment with the given key.
+	 * 
+	 * @param se	the {@link ScheduledExperiment}
+	 * @return		the {@link ExperimentStatus}
+	 */
+	private ExperimentStatus createExperimentStatus(ScheduledExperiment se) {
+		ExperimentStatus status = new ExperimentStatus();
+		status.setAccountId(se.getAccountId());
+		status.setEventLogList(new ArrayList<MECLogEntry>());
+		status.setFinished(false);
+		status.setLabel("");
+		status.setProgress(0.0f);
+		status.setScenarioName(se.getScenarioDefinition().getScenarioName());
+		status.setTimeStart(0);
+		status.setTimeRemaining(0);
+		
+		return status;
+	}
+
+	/**
+	 * Creates the {@link ExperimentStatus} with the passed information. Information
+	 * about the {@link MECLogEntry}s is fetched from the database via the experimentkey.
+	 * 
+	 * @param experimentKey	the experiment key
+	 * @param eed			the {@link ExecutedExperimentDetails}
+	 * @return				the {@link ExperimentStatus}
+	 */
+	private ExperimentStatus createExperimentStatus(long experimentKey, ExecutedExperimentDetails eed) {
+		
+		ExperimentStatus status = new ExperimentStatus();
+		status.setAccountId(eed.getAccountId());
+		status.setEventLogList(new ArrayList<MECLogEntry>());
+		status.setFinished(false);
+		status.setLabel("");
+		status.setProgress(0.0f);
+		status.setScenarioName(eed.getScenarioName());
+		status.setTimeStart(0);
+		status.setTimeRemaining(0);
+		
+		// the event log list
+		List<MECLogEntry> mecloglist = new ArrayList<MECLogEntry>();
+		
+		MECLog meclog = ServicePersistenceProvider.getInstance().loadMECLog(experimentKey);
+		
+		if (meclog != null) {
+			mecloglist = meclog.getEntries();
+		}
+		
+		status.setEventLogList(mecloglist);
+		return status;
 	}
 	
 }

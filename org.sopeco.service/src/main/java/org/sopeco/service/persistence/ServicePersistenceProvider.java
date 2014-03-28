@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.exception.ConfigurationException;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.execute.MECLogEntry;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
@@ -129,12 +130,27 @@ public final class ServicePersistenceProvider {
 	}
 
 	public List<ExecutedExperimentDetails> loadExecutedExperimentDetails(long accountId, String scenarioName) {
-		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName",
-				scenarioName);
+		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName", scenarioName);
+	}
+
+	/**
+	 * Loads an {@link ExecutedExperimentDetails} via the given experiment key.
+	 * 
+	 * @param experimentkey	the experiment key
+	 * @return				the 
+	 */
+	public ExecutedExperimentDetails loadExecutedExperimentDetails(long experimentkey) {
+		return loadSingleByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", experimentkey);
 	}
 	
-	public MECLog loadMECLog(long id) {
-		return loadSingleById(MECLog.class, id);
+	/**
+	 * The ID of the {@link MECLog} is the epxerimnet key of the connected experiment.
+	 * 
+	 * @param experimentkey	the experiment key
+	 * @return				the {@link MECLog} with {@link MECLogEntry}s
+	 */
+	public MECLog loadMECLog(long experimentkey) {
+		return loadSingleById(MECLog.class, experimentkey);
 	}
 	
 	public long storeExecutedExperimentDetails(ExecutedExperimentDetails experimentDetails) {

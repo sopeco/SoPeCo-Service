@@ -144,11 +144,11 @@ public class ExecutionQueue implements IStatusListener {
 	 * 						it to the {@link ExecutionScheduler}.
 	 * @return				the {@link ExperimentStatus} of the {@link QueuedExperiment}
 	 */
-	public ExperimentStatus getExperimentStatus(String experimentKey) {
+	public ExperimentStatus getExperimentStatus(long experimentKey) {
 		
 		QueuedExperiment experiment = null;
 		
-		if (experimentHashCode == experimentKey) {
+		if (experimentHashCode == String.valueOf(experimentKey)) {
 			
 			// the current running experiment is requested
 			experiment = runningExperiment;
@@ -195,10 +195,10 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * Abots the current experiment in execution.
 	 */
-	public void abortExperiment(String experimentKey) {
+	public void abortExperiment(long experimentKey) {
 		
 		if (isExecuting()) {
-			Configuration.getSessionSingleton(experimentKey)
+			Configuration.getSessionSingleton(String.valueOf(experimentKey))
 						 .setProperty(IConfiguration.EXPERIMENT_RUN_ABORT, new Boolean(true));
 		}
 

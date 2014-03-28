@@ -416,15 +416,15 @@ public class ExecutionService {
 	 * and the one for {@link QueuedExperiment}s is searched for the given key. This implies, that this
 	 * method can be called for active and inactive {@link ScheduledExperiment}s.
 	 * 
-	 * @param id		the experiment key
-	 * @param usertoken	the user identification
-	 * @return			{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
-	 * 					OK with the {@link ExperimentStatus} as entity
+	 * @param experimentKey	the experiment key
+	 * @param usertoken		the user identification
+	 * @return				{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
+	 * 						OK with the {@link ExperimentStatus} as entity
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int experimentKey,
 									     		 @QueryParam(TOKEN) String usertoken) {
 		
 		if (usertoken == null) {
@@ -439,7 +439,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(String.valueOf(key));
+		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(experimentKey);
 		
 		// if the status is null, the key must be corrupt, because the table ScheduledExepriment
 		// and the QueuedExperiment is searched for the key.
@@ -456,14 +456,14 @@ public class ExecutionService {
 	 * as it's set via a configuration property, which is read in the {@link SoPeCoRunner}.
 	 * Be aware, that the experiment might not be in execution yet, but the status can change anyway.
 	 * 
-	 * @param key		the experiment key
-	 * @param usertoken	the user identification
-	 * @return			{@link Response} OK or UNAUTHORIZED
+	 * @param experimentKey	the experiment key
+	 * @param usertoken		the user identification
+	 * @return				{@link Response} OK or UNAUTHORIZED
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_EXECUTE_ABORT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) long experimentKey,
 									     	 @QueryParam(TOKEN) String usertoken) {
 		
 		if (usertoken == null) {
@@ -478,7 +478,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ExecutionScheduler.getInstance().setExperimentAborting(String.valueOf(key));
+		ExecutionScheduler.getInstance().setExperimentAborting(experimentKey);
 
 		return Response.ok().build();
 	}
