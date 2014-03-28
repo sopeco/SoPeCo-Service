@@ -40,7 +40,8 @@ import javax.persistence.NamedQuery;
  * @author Marius Oehler
  */
 @Entity
-@NamedQueries({ @NamedQuery(name = "getExperiments", query = "SELECT s FROM ExecutedExperimentDetails s WHERE s.accountId = :accountId AND s.scenarioName = :scenarioName") })
+@NamedQueries({ @NamedQuery(name = "getExperiments", query = "SELECT s FROM ExecutedExperimentDetails s WHERE s.accountId = :accountId AND s.scenarioName = :scenarioName"),
+				@NamedQuery(name = "getExperiment", query = "SELECT s FROM ExecutedExperimentDetails s WHERE s.experimentKey = :experimentKey")})
 public class ExecutedExperimentDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -70,8 +71,8 @@ public class ExecutedExperimentDetails implements Serializable {
 	@Column(name = "controllerURL")
 	private String controllerURL;
 
-	@Column(name = "experimentKey")
-	private String experimentKey;
+	@Column(name = "experimentKey", unique = true)
+	private long experimentKey;
 	
 	public long getAccountId() {
 		return accountId;
@@ -105,11 +106,11 @@ public class ExecutedExperimentDetails implements Serializable {
 		this.controllerURL = pControllerURL;
 	}
 
-	public String getExperimentKey() {
+	public long getExperimentKey() {
 		return experimentKey;
 	}
 
-	public void setExperimentKey(String experimentKey) {
+	public void setExperimentKey(long experimentKey) {
 		this.experimentKey = experimentKey;
 	}
 

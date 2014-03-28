@@ -45,7 +45,12 @@ public class MECLog implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
+	/**
+	 * The ID for the MECLog is set to the experiment key for the connected executed
+	 * experiment. Thath why the name for the column is experimentkey.
+	 */
 	@Id
+	@Column(name = "experimentkey")
 	private long id;
 
 	@Lob

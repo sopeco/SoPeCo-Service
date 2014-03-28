@@ -336,11 +336,11 @@ public class ScenarioService {
 	 * @return 			{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@PUT
-	@Path(ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
+	@Path("{" + NAME + "}/" + ServiceConfiguration.SVC_SCENARIO_ARCHIVE)
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response archiveScenario(@QueryParam(TOKEN) String usertoken,
-								  	String scenarioDefinitionName) {
+								  	@PathParam(NAME) String scenarioDefinitionName) {
 		
 		if (scenarioDefinitionName == null) {
 			LOGGER.info("ScenarioDefinition name is null and therefor invalid.");
@@ -407,6 +407,8 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateScenario(@QueryParam(TOKEN) String usertoken,
 								  ScenarioDefinition scenarioDefinition) {
+
+		LOGGER.debug("Updating the ScenarioDefinition.");
 		
 		if (scenarioDefinition == null) {
 			LOGGER.info("Invalid ScenarioDefinition!");
@@ -417,6 +419,8 @@ public class ScenarioService {
 			LOGGER.info("Invalid ScenarioDefinition name!");
 			return Response.status(Status.CONFLICT).entity("Invalid ScenarioDefinition name!").build();
 		}
+		
+		LOGGER.debug("Updating the ScenarioDefinition with the name '{}'.", scenarioDefinition.getScenarioName());
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		

@@ -10,16 +10,14 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.Persistence;
-import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.config.exception.ConfigurationException;
-import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
+import org.sopeco.service.execute.MECLogEntry;
 import org.sopeco.service.persistence.entities.Account;
-import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
@@ -82,22 +80,6 @@ public final class ServicePersistenceProvider {
 	ServicePersistenceProvider(EntityManagerFactory factory) {
 		emf = factory;
 	}
-
-	public AccountDetails loadAccountDetails(long accountId) {
-		return loadSingleById(AccountDetails.class, accountId);
-	}
-
-	public List<AccountDetails> loadAllAccountDetails() throws DataNotFoundException {
-		return loadByQuery(AccountDetails.class, "getAllAccountDetails");
-	}
-
-	public void removeAccountDetails(AccountDetails accountDetails) {
-		remove(accountDetails);
-	}
-
-	public void storeAccountDetails(AccountDetails accountDetails) {
-		store(accountDetails);
-	}
 	
 	public Users loadUser(String token) {
 		return loadSingleByQuery(Users.class, "getUserByToken", "token", token);
@@ -148,12 +130,34 @@ public final class ServicePersistenceProvider {
 	}
 
 	public List<ExecutedExperimentDetails> loadExecutedExperimentDetails(long accountId, String scenarioName) {
-		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName",
-				scenarioName);
+		return loadByQuery(ExecutedExperimentDetails.class, "getExperiments", "accountId", accountId, "scenarioName", scenarioName);
+	}
+
+	/**
+	 * Loads an {@link ExecutedExperimentDetails} via the given experiment key.
+	 * 
+	 * @param experimentKey	the experiment key
+	 * @return				the 
+	 */
+	public ExecutedExperimentDetails loadExecutedExperimentDetails(long experimentKey) {
+		LOGGER.debug("Trying to fetch ExecutedExperimentDetails for key '{}' from database.", experimentKey);
+		List<ExecutedExperimentDetails> eeds = loadByQuery(ExecutedExperimentDetails.class, "getExperiment", "experimentKey", experimentKey);
+		
+		if (eeds != null && !eeds.isEmpty()) {
+			return eeds.get(0);
+		}
+		
+		return null;
 	}
 	
-	public MECLog loadMECLog(long id) {
-		return loadSingleById(MECLog.class, id);
+	/**
+	 * The ID of the {@link MECLog} is the epxerimnet key of the connected experiment.
+	 * 
+	 * @param experimentkey	the experiment key
+	 * @return				the {@link MECLog} with {@link MECLogEntry}s
+	 */
+	public MECLog loadMECLog(long experimentkey) {
+		return loadSingleById(MECLog.class, experimentkey);
 	}
 	
 	public long storeExecutedExperimentDetails(ExecutedExperimentDetails experimentDetails) {

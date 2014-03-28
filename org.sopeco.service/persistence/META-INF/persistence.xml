@@ -25,10 +25,7 @@
 	<persistence-unit name="sopeco-service" transaction-type="RESOURCE_LOCAL">
 	    
 		<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
-
-		<class>org.sopeco.service.persistence.entities.ScenarioDetails</class>
 		<class>org.sopeco.service.persistence.entities.Account</class>
-		<class>org.sopeco.service.persistence.entities.AccountDetails</class>
 		<class>org.sopeco.service.persistence.entities.ScheduledExperiment</class>
 		<class>org.sopeco.service.persistence.entities.Users</class>
 		<class>org.sopeco.service.persistence.entities.MECLog</class>

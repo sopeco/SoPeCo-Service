@@ -2,14 +2,13 @@ package org.sopeco.service.rest;
 
 import java.util.UUID;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
@@ -20,11 +19,10 @@ import org.sopeco.config.Configuration;
 import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.helper.Crypto;
-import org.sopeco.service.persistence.entities.Account;
-import org.sopeco.service.persistence.entities.AccountDetails;
-import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.entities.Account;
+import org.sopeco.service.persistence.entities.Users;
 
 /**
  * Add the RESTful service for account handling. This service class enables e.g. account creation.
@@ -44,6 +42,7 @@ public class AccountService {
 	 * @param accountname 	the accountname
 	 * @param password	 	the password for the account
 	 * @return 				{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE)
@@ -65,6 +64,7 @@ public class AccountService {
 	 * @param dbname		the database name
 	 * @param dbport		the database password
 	 * @return 				{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_ACCOUNT_CREATE + "/" + ServiceConfiguration.SVC_ACCOUNT_CUSTOMIZE)
@@ -90,85 +90,6 @@ public class AccountService {
 		LOGGER.debug("Trying to check account existence");
 		Boolean exists = accountExist(accountname);
 		return Response.ok(exists).build();
-	}
-	
-	
-	/**
-	 * Access the {@link AccountDetails} information for a given username.
-	 * 
-	 * @param usertoken 	the user identification
-	 * @return 				{@link Response} with {@link AccountDetails} (null possible)
-	 */
-	@GET
-	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response getInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken) {
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-				
-		if (u == null) {
-			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return Response.status(Status.UNAUTHORIZED).build();
-		}	
-		
-		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
-		
-		return Response.ok(ad).build();
-	}
-	
-	/**
-	 * Stores the given {@link AccountDetails} in the database. Existing information
-	 * will be overwritten. This method is privileged and need a correct token, to modify
-	 * the database.
-	 * 
-	 * @param usertoken			the user authentification
-	 * @param accountDetails	the {@link AccountDetails}
-	 * @return 					{@link Response} OK, CONFLICT or UNAUTHORIZED
-	 */
-	@PUT
-	@Path(ServiceConfiguration.SVC_ACCOUNT_INFO)
-	@Produces(MediaType.APPLICATION_JSON)
-	@Consumes(MediaType.APPLICATION_JSON)
-	public Response setInfo(@QueryParam(ServiceConfiguration.SVCP_ACCOUNT_TOKEN) String usertoken,
-							AccountDetails accountDetails) {
-		
-		if (accountDetails == null) {
-			LOGGER.debug("AccountDetails invalid");
-			return Response.status(Status.CONFLICT).entity("AccountDetails invalid").build();
-		}
-		
-		Response r = getAccount(usertoken);
-		
-		if (r.getStatus() != Status.OK.getStatusCode()) {
-			LOGGER.debug("Invalid token");
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
-		
-		/*
-		 *  r.readEntity(Account.class) is not allowed here, as we have not the correct
-		 *  ObjectMapper injected. Anf furthermore Jersey throws and error, that this method is not allowed
-		 *  when it's called in the same class. r.readEntity() fixes the issue.
-		 */
-		Account account = (Account) r.getEntity();
-		
-		if (account == null) {
-			LOGGER.debug("Invalid token");
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
-	
-		// now check if account details correspond to the given token
-		if (accountDetails.getId() == account.getId() &&
-			accountDetails.getAccountName().equals(account.getName())) {
-
-			ServicePersistenceProvider.getInstance().storeAccountDetails(accountDetails);
-			return Response.ok().build();
-			
-		} else {
-			
-			LOGGER.debug("Token does not authorize to modify this account.");
-			return Response.status(Status.UNAUTHORIZED).build();
-			
-		}
 	}
 
 	/**
@@ -281,15 +202,6 @@ public class AccountService {
 		// save the current user
 		Users u = new Users(uuid, account.getId());
 		ServicePersistenceProvider.getInstance().storeUser(u);
-
-		// update the account details for a user
-		AccountDetails details = ServicePersistenceProvider.getInstance().loadAccountDetails(account.getId());
-		if (details == null) {
-			details = new AccountDetails();
-			details.setId(account.getId());
-			details.setAccountName(account.getName());
-			ServicePersistenceProvider.getInstance().storeAccountDetails(details);
-		}
 		
 		// update the SoPeCo configuration for the configuration with the usertoken
 		UserPersistenceProvider.updatePersistenceProviderConfiguration(uuid);
@@ -332,7 +244,8 @@ public class AccountService {
 	 * @param password  	the password to login into this account
 	 * @param dbHost 		the database for this account
 	 * @param dbPort 		the database port for this account
-	 * @return            	{@link Response} OK or CONFLICT
+	 * @return            	{@link Response} OK or CONFLICT<br />
+	 * 						OK with {@link Entity} {@link Account}
 	 */
 	private Response createAccount(String accountName, String password, String dbHost, int dbPort) {
 		
@@ -354,7 +267,7 @@ public class AccountService {
 
 		LOGGER.debug("Account created with id {}", account.getId());
 
-		return Response.ok().build();
+		return Response.ok(account).build();
 	}
 
 	/**

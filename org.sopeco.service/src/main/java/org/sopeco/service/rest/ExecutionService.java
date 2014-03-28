@@ -2,6 +2,7 @@ package org.sopeco.service.rest;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -30,10 +31,8 @@ import org.sopeco.service.execute.QueuedExperiment;
 import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
-import org.sopeco.service.persistence.entities.AccountDetails;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
-import org.sopeco.service.persistence.entities.ScenarioDetails;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.ExperimentStatus;
@@ -53,7 +52,7 @@ public class ExecutionService {
 	private static final String TOKEN = ServiceConfiguration.SVCP_EXECUTE_TOKEN;
 	
 	/**
-	 * Adds a {@link ScheduledExperiment} to the service.
+	 * Adds a {@link ScheduledExperiment} in the service.
 	 * The last execution time for the schedule is set to <i>-1</i> and the
 	 * properties are referenced from the configuration with the given token.<br />
 	 * An integrity check is done for active scenarios: Their selected experiment
@@ -67,7 +66,10 @@ public class ExecutionService {
 	 * @param scheduledExperiment 	the ScheduledExperiment object
 	 * @return 						{@link Response} with status OK, UNAUTHORIZED, CONFLICT or
 	 * 								INTERNAL_SERVER_ERROR<br />
-	 * 								OK has the experiment ID as {@link Long} in the {@link Entity}
+	 * 								OK with the experiment key as {@link Long} in the {@link Entity} when
+	 * 								the experiment has been set to active state already, OK with the experiment
+	 * 								ID as {@link Long}, when the experiment has just been added, but is not in
+	 * 								active state.
 	 */
 	@POST
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
@@ -75,6 +77,11 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response addScheduledExperiment(@QueryParam(TOKEN) String usertoken,
 						  				   ScheduledExperiment scheduledExperiment) {
+		
+		if (usertoken == null || scheduledExperiment == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -88,6 +95,12 @@ public class ExecutionService {
 		if (scheduledExperiment.isActive() && !experimentSeriesIsValid(scheduledExperiment)) {
 			LOGGER.info("The selected experiments are corrupt.");
 			return Response.status(Status.CONFLICT).entity("The selected experiments are corrupt.").build();
+		}
+		
+		// TODO better check for correct MEController URL, rather then only for empty String
+		if (scheduledExperiment.getControllerUrl().equals("")) {
+			LOGGER.info("The URL to the MeasurementEnvironmentController is invalid.");
+			return Response.status(Status.CONFLICT).entity("The URL to the MeasurementEnvironmentController is invalid.").build();
 		}
 		
 		scheduledExperiment.setLastExecutionTime(-1);
@@ -114,9 +127,6 @@ public class ExecutionService {
 
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(scheduledExperiment);
 
-		// update the AccountDetails
-		updateAccountDetails(usertoken, scheduledExperiment);
-
 		// now get the scheduled experiment id, to return it
 		List<ScheduledExperiment> list = ServicePersistenceProvider.getInstance()
 													.loadScheduledExperimentsByAccount(u.getAccountID());
@@ -124,11 +134,24 @@ public class ExecutionService {
 		for (ScheduledExperiment se : list) {
 
 			if (se.equals(scheduledExperiment)) {
-				return Response.ok(se.getId()).build();
+				
+				if (se.isActive()) {
+					
+					LOGGER.info("Experiment successful dispatched in active mode (Experiment key: '{}')", se.getExperimentKey());
+					return Response.ok(se.getExperimentKey()).build();
+					
+				} else {
+					
+					LOGGER.info("Experiment successful dispatched in inactive mode (Experiment id: '{}')", se.getId());
+					return Response.ok(se.getId()).build();
+					
+				}
+				
 			}
 
 		}
 
+		LOGGER.warn("ScheduledExperiment was not stored correctly in database. The stored entity cannot be found!");
 		return Response.status(Status.INTERNAL_SERVER_ERROR).build();
 	}
 	
@@ -145,6 +168,11 @@ public class ExecutionService {
 	@Path(ServiceConfiguration.SVC_EXECUTE_SCHEDULE)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
+		
+		if (usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -169,6 +197,11 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeScheduledExperiments(@QueryParam(TOKEN) String usertoken) {
 		
+		if (usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -182,9 +215,6 @@ public class ExecutionService {
 		for (ScheduledExperiment exp : scheduledExperiments) {
 			
 			ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
-
-			// update the AccountDetails
-			//updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
 			
 		}
 
@@ -204,6 +234,11 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 										   @QueryParam(TOKEN) String usertoken) {
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -248,7 +283,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												  @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -283,9 +323,6 @@ public class ExecutionService {
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
 		
-		// now there must be selected experiments, therfor update the AccountDetails
-		updateAccountDetails(usertoken, exp);
-		
 		return Response.ok(exp.getExperimentKey()).build();
 	}
 	
@@ -301,7 +338,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 											  	   @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -339,7 +381,12 @@ public class ExecutionService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     	  @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -360,9 +407,6 @@ public class ExecutionService {
 		}
 		
 		ServicePersistenceProvider.getInstance().removeScheduledExperiment(exp);
-
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp.getScenarioDefinition().getScenarioName());
 		
 		return Response.ok().build();
 	}
@@ -372,17 +416,22 @@ public class ExecutionService {
 	 * and the one for {@link QueuedExperiment}s is searched for the given key. This implies, that this
 	 * method can be called for active and inactive {@link ScheduledExperiment}s.
 	 * 
-	 * @param id		the experiment key
-	 * @param usertoken	the user identification
-	 * @return			{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
-	 * 					OK with the {@link ExperimentStatus} as entity
+	 * @param experimentKey	the experiment key
+	 * @param usertoken		the user identification
+	 * @return				{@link Response} OK, CONFLICT or UNAUTHORIZED<br />
+	 * 						OK with the {@link ExperimentStatus} as entity
 	 */
 	@GET
 	@Path(ServiceConfiguration.SVC_EXECUTE_STATUS)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+	public Response getScheduledExperimentStatus(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int experimentKey,
 									     		 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (usertoken == null) {
+			LOGGER.warn("Given usertoken is null.");
+			return Response.status(Status.CONFLICT).entity("Given usertoken is null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -390,7 +439,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(String.valueOf(key));
+		ExperimentStatus status = ExecutionScheduler.getInstance().getExperimentStatus(experimentKey);
 		
 		// if the status is null, the key must be corrupt, because the table ScheduledExepriment
 		// and the QueuedExperiment is searched for the key.
@@ -407,16 +456,21 @@ public class ExecutionService {
 	 * as it's set via a configuration property, which is read in the {@link SoPeCoRunner}.
 	 * Be aware, that the experiment might not be in execution yet, but the status can change anyway.
 	 * 
-	 * @param key		the experiment key
-	 * @param usertoken	the user identification
-	 * @return			{@link Response} OK or UNAUTHORIZED
+	 * @param experimentKey	the experiment key
+	 * @param usertoken		the user identification
+	 * @return				{@link Response} OK or UNAUTHORIZED
 	 */
 	@PUT
 	@Path(ServiceConfiguration.SVC_EXECUTE_ABORT)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) int key,
+	public Response abortScheduledExperiment(@QueryParam(ServiceConfiguration.SVCP_EXECUTE_KEY) long experimentKey,
 									     	 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (usertoken == null) {
+			LOGGER.warn("Given usertoken is null.");
+			return Response.status(Status.CONFLICT).entity("Given usertoken is null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -424,7 +478,7 @@ public class ExecutionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ExecutionScheduler.getInstance().setExperimentAborting(String.valueOf(key));
+		ExecutionScheduler.getInstance().setExperimentAborting(experimentKey);
 
 		return Response.ok().build();
 	}
@@ -444,7 +498,12 @@ public class ExecutionService {
 	public Response removeSelectedExperimentSeriesDefinition(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 								  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 							  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
-
+		
+		if (id < 0 || experimentseriesname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -486,9 +545,6 @@ public class ExecutionService {
 		}
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
-		
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp);
 
 		return Response.ok().build();
 	}
@@ -509,6 +565,11 @@ public class ExecutionService {
 								  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 						  	  				 		 @QueryParam(TOKEN) String usertoken) {
 
+		if (id < 0 || experimentseriesname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
 		if (u == null) {
@@ -560,9 +621,6 @@ public class ExecutionService {
 		experimentList.add(experimentseriesname);
 		
 		ServicePersistenceProvider.getInstance().storeScheduledExperiment(exp);
-
-		// update the AccountDetails
-		updateAccountDetails(usertoken, exp);
 		
 		return Response.ok().build();
 	}
@@ -580,8 +638,9 @@ public class ExecutionService {
 	public Response getExecutedExperimentDetails(@QueryParam(TOKEN) String usertoken,
 												 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_SCENARIONAME) String scenarioname) {
 		
-		if (scenarioname == null) {
-			return Response.status(Status.CONFLICT).entity("Given scenario name invalid.").build();
+		if (scenarioname == null || usertoken == null) {
+			LOGGER.warn("One or more arguments are null.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
 		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
@@ -610,7 +669,12 @@ public class ExecutionService {
 	@Path(ServiceConfiguration.SVC_EXECUTE_MECLOG)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getMECLog(@QueryParam(TOKEN) String usertoken,
-				    			    		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
+				    		  @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
+		
+		if (id < 0 || usertoken == null) {
+			LOGGER.warn("One or more arguments are null/invalid.");
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
+		}
 		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 
@@ -642,10 +706,13 @@ public class ExecutionService {
 	 */
 	private boolean experimentSeriesIsValid(ScheduledExperiment experiment) {
 		
+		LOGGER.info("Checking ESD of Scenario ' {}' for validity.", experiment.getScenarioDefinition().getScenarioName());
+		
 		// first check for a valid selected experiment list
 		List<String> selectedExperiment = experiment.getSelectedExperiments();
 		
 		if (selectedExperiment == null || selectedExperiment.isEmpty()) {
+			LOGGER.debug("ESD is null or empty.");
 			return false;
 		}
 		
@@ -653,10 +720,25 @@ public class ExecutionService {
 		boolean validName = false;
 
 		for (String experimentName : selectedExperiment) {
+
+			// WHY THE HACK SPLITTED WITH '.'???? TODO! Check SPC Core
+			String[] experimentSplitted = experimentName.split(Pattern.quote( "." ));
+		
+			if (experimentSplitted.length <= 1) {
+				LOGGER.debug("ESD name corrupt: '{}'.", experimentName);
+				return false;
+			}
+			
+			String msName 	= experimentSplitted[0].trim();
+			String esdName 	= experimentSplitted[1].trim();
+			
+			LOGGER.debug("Checking selected ESD '{}', if it is in the list of all ESD of the ScenarioDefinition.", esdName);
+			LOGGER.debug("The ESD is in the MeasurementSpecification with name '{}'.", msName);
 			
 			for (ExperimentSeriesDefinition esd : experiment.getScenarioDefinition().getAllExperimentSeriesDefinitions()) {
 				
-				if (esd.getName().equals(experimentName)) {
+				if (esd.getName().equals(esdName)) {
+					LOGGER.debug("ESD '{}' is a valid ESD name.", esdName);
 					validName = true;
 				}
 				
@@ -664,6 +746,7 @@ public class ExecutionService {
 			
 			// only if no experimentSeries with the given name was found
 			if (!validName) {
+				LOGGER.debug("The ESD '{}' not found in list of all ESD in MeasurementSpecifications.", esdName);
 				return false;
 			}
 			
@@ -672,97 +755,6 @@ public class ExecutionService {
 		}
 		
 		return true;
-	}
-	
-	/**
-	 * Update the {@link AccountDetails} for the account connected to the {@link Users} with the given
-	 * token. The update only happens, when the name of the scenario in the {@link AccountDetails} match
-	 * the name of the scenario in the given {@link ScheduledExperiment}.<br />
-	 * The controller URL and the first item of the list of selected experiments is fetched and
-	 * updated in the {@link AccountDetails}.<br />
-	 * Afterwards the {@link AccountDetails} will be stored in the database.<br />
-	 * <br />
-	 * Only error outputs are created, because here must be no error!
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scheduledExperiment	the {@link ScheduledExperiment} with all necessary information
-	 */
-	private void updateAccountDetails(String usertoken, ScheduledExperiment scheduledExperiment) {
-		
-		if (scheduledExperiment == null) {
-			LOGGER.error("The given ScheduledExperiment is null.");
-			return;
-		}
-		
-		LOGGER.debug("Trying to update the AccountDetails with a MeasurementSpecification name.");
-		
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		if (u == null) {
-			LOGGER.error("The given token is invalid.");
-			return;
-		}
-
-		AccountDetails ad = ServicePersistenceProvider.getInstance().loadAccountDetails(u.getAccountID());
-		
-		if (ad == null) {
-			LOGGER.error("The user should have selected a scenario before setting the MeasurementSpecification!");
-			return;
-		}
-
-		String scenarioname = scheduledExperiment.getScenarioDefinition().getScenarioName();
-		
-		ScenarioDetails sd = ad.getScenarioDetail(scenarioname);
-		
-		if (sd == null) {
-			LOGGER.error("There must be already a ScenarioDetails object in the AccountDetails list with the given scenario name!");
-			return;
-		}
-		
-		List<String> list = scheduledExperiment.getSelectedExperiments();
-		
-		if (list != null && !list.isEmpty()) {
-			sd.setSelectedExperiment(list.get(0)); // TODO only takes the first one
-		} else {
-			sd.setSelectedExperiment("");
-		}
-
-		// get the controller URL via the scheduled experiment
-		String controllername = "";
-		
-		if (scheduledExperiment.getControllerUrl() != null) {
-			String[] url = scheduledExperiment.getControllerUrl().split("/");
-			if (url != null &&  url.length > 0) {
-				controllername = url[url.length-1];
-			}
-		}
-		
-		sd.setControllerName(controllername);
-
-		// store the updated AccountDetail in the database
-		ServicePersistenceProvider.getInstance().storeAccountDetails(ad);
-	}
-	
-	/**
-	 * Builds up a puppy {@link ScheduledExperiment} with empty controller URL and
-	 * empty selected {@link ExperimentSeriesDefinition} and passes it to the
-	 * {@link #updateAccountDetails(String, ScheduledExperiment)}.
-	 * 
-	 * @param usertoken				the token to identify the user
-	 * @param scenarioname			the name of the scenario, which need to be updated
-	 */
-	private void updateAccountDetails(String usertoken, String scenarioname) {
-		
-		ScheduledExperiment scheduledExperiment = new ScheduledExperiment();
-		scheduledExperiment.setControllerUrl("");
-		ArrayList<String> list = new ArrayList<String>();
-		list.add("");
-		scheduledExperiment.setSelectedExperiments(list);
-		ScenarioDefinition sd = new ScenarioDefinition();
-		sd.setScenarioName(scenarioname);
-		scheduledExperiment.setScenarioDefinition(new ScenarioDefinition());
-		
-		updateAccountDetails(usertoken, scheduledExperiment);
 	}
 	
 }

@@ -144,11 +144,11 @@ public class ExecutionQueue implements IStatusListener {
 	 * 						it to the {@link ExecutionScheduler}.
 	 * @return				the {@link ExperimentStatus} of the {@link QueuedExperiment}
 	 */
-	public ExperimentStatus getExperimentStatus(String experimentKey) {
+	public ExperimentStatus getExperimentStatus(long experimentKey) {
 		
 		QueuedExperiment experiment = null;
 		
-		if (experimentHashCode == experimentKey) {
+		if (experimentHashCode == String.valueOf(experimentKey)) {
 			
 			// the current running experiment is requested
 			experiment = runningExperiment;
@@ -195,10 +195,10 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * Abots the current experiment in execution.
 	 */
-	public void abortExperiment(String experimentKey) {
+	public void abortExperiment(long experimentKey) {
 		
 		if (isExecuting()) {
-			Configuration.getSessionSingleton(experimentKey)
+			Configuration.getSessionSingleton(String.valueOf(experimentKey))
 						 .setProperty(IConfiguration.EXPERIMENT_RUN_ABORT, new Boolean(true));
 		}
 
@@ -517,7 +517,7 @@ public class ExecutionQueue implements IStatusListener {
 		eed.setTimeStarted(experiment.getTimeStarted());
 		eed.setName(experiment.getScheduledExperiment().getLabel());
 		eed.setControllerURL(experiment.getScheduledExperiment().getControllerUrl());
-		eed.setExperimentKey(String.valueOf(experiment.getScheduledExperiment().getExperimentKey()));
+		eed.setExperimentKey(experiment.getScheduledExperiment().getExperimentKey());
 		eed.setAccountId(experiment.getScheduledExperiment().getAccountId());
 		eed.setScenarioName(experiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
 		// TODO why was commented out? Why is the event log not set - Answer: Because the MECLog is stored on it's own
@@ -534,7 +534,7 @@ public class ExecutionQueue implements IStatusListener {
 	 */
 	private void storeMECLog(QueuedExperiment experiment) {
 		
-		int hashcode = experiment.getScheduledExperiment().getExperimentKey();
+		long hashcode = experiment.getScheduledExperiment().getExperimentKey();
 		
 		MECLog log = ServicePersistenceProvider.getInstance().loadMECLog(hashcode);
 		
