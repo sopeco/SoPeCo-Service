@@ -5,12 +5,14 @@ import org.sopeco.persistence.dataset.DataSetAggregated;
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.dataset.DataSetObservationColumn;
 import org.sopeco.persistence.dataset.ParameterValue;
+import org.sopeco.persistence.dataset.ParameterValueList;
 import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ParameterValueAssignment;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
@@ -42,6 +44,8 @@ public class CustomObjectMapper extends ObjectMapper {
 		//enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
 		//enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
 		
+		//setVisibilityChecker(getSerializationConfig().getDefaultVisibilityChecker().withFieldVisibility(JsonAutoDetect.Visibility.ANY));
+		
 		// mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
 		addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 		addMixInAnnotations(ParameterDefinition.class, ParameterDefinitionMixIn.class);
@@ -50,10 +54,13 @@ public class CustomObjectMapper extends ObjectMapper {
 		
 		// the following MixIns are only needed to pass a ScenarioInstance with JSON
 		addMixInAnnotations(ScenarioInstance.class, ScenarioInstanceMixIn.class);
-		addMixInAnnotations(DataSetInputColumn.class, DataSetInputColumnMixIn.class);
-		addMixInAnnotations(ParameterValue.class, ParameterValueMixIn.class);
-		addMixInAnnotations(DataSetObservationColumn.class, DataSetObservationColumnMixIn.class);
-		addMixInAnnotations(DataSetAggregated.class, DataSetAggregatedMixIn.class);
-		addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
+		//addMixInAnnotations(DataSetInputColumn.class, DataSetInputColumnMixIn.class);
+		//addMixInAnnotations(ParameterValue.class, ParameterValueMixIn.class);
+		//addMixInAnnotations(DataSetObservationColumn.class, DataSetObservationColumnMixIn.class);
+		//addMixInAnnotations(ParameterValueList.class, ParameterValueListMixIn.class);
+		
+		//addMixInAnnotations(DataSetAggregated.class, DataSetAggregatedMixIn.class);
+		//addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
+		//addMixInAnnotations(ParameterValueList.class, ParameterValueListMixIn.class);
 	 }
 }

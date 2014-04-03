@@ -35,7 +35,7 @@ public final class DataSetInputColumnMixIn<T> {
 	public double getMax() {
 		return 0.0f;
 	}
-	
+
 	@JsonIgnore
 	public DataSetInputColumn<T> getCopy() {
 		return null;
