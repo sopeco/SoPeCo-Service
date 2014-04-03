@@ -18,7 +18,7 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
  */
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public final class ScenarioInstanceMixIn {
-
+	
 	@JsonIgnore
 	public String getName() {
 		return "";

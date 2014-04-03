@@ -1,5 +1,7 @@
 package org.sopeco.service.rest.json;
 
+import org.sopeco.persistence.dataset.AbstractDataSetColumn;
+import org.sopeco.persistence.dataset.DataSetAggregated;
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.dataset.DataSetObservationColumn;
 import org.sopeco.persistence.dataset.ParameterValue;
@@ -45,9 +47,13 @@ public class CustomObjectMapper extends ObjectMapper {
 		addMixInAnnotations(ParameterDefinition.class, ParameterDefinitionMixIn.class);
 		addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
 		addMixInAnnotations(ParameterValueAssignment.class, ParameterValueAssignmentMixIn.class);
+		
+		// the following MixIns are only needed to pass a ScenarioInstance with JSON
 		addMixInAnnotations(ScenarioInstance.class, ScenarioInstanceMixIn.class);
 		addMixInAnnotations(DataSetInputColumn.class, DataSetInputColumnMixIn.class);
 		addMixInAnnotations(ParameterValue.class, ParameterValueMixIn.class);
 		addMixInAnnotations(DataSetObservationColumn.class, DataSetObservationColumnMixIn.class);
+		addMixInAnnotations(DataSetAggregated.class, DataSetAggregatedMixIn.class);
+		addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
 	 }
 }
