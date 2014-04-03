@@ -42,6 +42,8 @@ public class ExecutionTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testExecution() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;

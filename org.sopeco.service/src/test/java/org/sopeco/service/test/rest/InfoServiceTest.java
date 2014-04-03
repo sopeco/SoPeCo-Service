@@ -23,6 +23,8 @@ public class InfoServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testServiceRunning() {
+		if (skipTests) return;
+		
 		Response r = target().path(ServiceConfiguration.SVC_INFO)
 							 .path(ServiceConfiguration.SVC_INFO_RUNNING)
 							 .request(MediaType.APPLICATION_JSON)

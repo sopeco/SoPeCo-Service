@@ -43,6 +43,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScenarioDoubleAdd() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
@@ -84,6 +86,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScenarioListing() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
@@ -126,6 +130,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScenarioDeletion() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
@@ -172,6 +178,8 @@ public class ScenarioServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScenarioXMLParsing() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;

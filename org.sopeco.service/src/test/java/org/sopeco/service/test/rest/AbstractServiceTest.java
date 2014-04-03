@@ -38,6 +38,11 @@ public abstract class AbstractServiceTest extends JerseyTest {
 	private static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceTest.class);
 	
 	/**
+	 * True, when to skip all the test.
+	 */
+	protected static boolean skipTests = true;
+	
+	/**
 	 * This method is called on the Grizzly container creation of a {@link JerseyTest}.
 	 * It's used to configure where the servlet container.<br />
 	 * In this case, the package is definied where the RESTful services are and
@@ -83,6 +88,8 @@ public abstract class AbstractServiceTest extends JerseyTest {
 	 */
 	@After
 	public void cleanUpDatabase() {
+		if (skipTests) return;
+		
 		LOGGER.debug("Cleaning up the database.");
 		
 		// connect to test users account

@@ -45,6 +45,8 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMECStatus() {
+		if (skipTests) return;
+		
 		LOGGER.debug("Testing fetch of MEC status.");
 		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
@@ -91,6 +93,8 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMECStatusValidController() {
+		if (skipTests) return;
+		
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 		String socketURI 	= "socket://" + TestMEC.MEC_ID + "/" + TestMEC.MEC_SUB_ID_1;
@@ -127,6 +131,8 @@ public class MeasurementControllerServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMECGetControllerList() {
+		if (skipTests) return;
+		
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 		String mecID 		= TestMEC.MEC_ID;

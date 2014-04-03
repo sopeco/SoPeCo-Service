@@ -36,6 +36,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testBlankMED() {
+		if (skipTests) return;
+		
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 
@@ -89,6 +91,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testCurrentMED() {
+		if (skipTests) return;
+		
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 		
@@ -133,6 +137,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDNamespaceAdding() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String mynamespace = "mynamespacepath";
@@ -191,6 +197,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDNamespaceRemoving() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String mynamespace = "mynamespacepath";
@@ -249,6 +257,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDNamespaceRenaming() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String mynamespace = "mynamespacepath";
@@ -355,6 +365,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDParameterAdding() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String mynamespace = "mynamespacepath";
@@ -413,6 +425,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDParameterUpdating() {
+		if (skipTests) return;
+		
 		String accountname 			= TestConfiguration.TESTACCOUNTNAME;
 		String password 			= TestConfiguration.TESTPASSWORD;
 		String mynamespace 			= "mynamespacepath";
@@ -484,6 +498,8 @@ public class MeasurementEnvironmentDefinitionServiceTest extends AbstractService
 	 */
 	@Test
 	public void testMEDParameterRemoving() {
+		if (skipTests) return;
+		
 		String accountname 			= TestConfiguration.TESTACCOUNTNAME;
 		String password 			= TestConfiguration.TESTPASSWORD;
 		String mynamespace 			= "mynamespacepath";
