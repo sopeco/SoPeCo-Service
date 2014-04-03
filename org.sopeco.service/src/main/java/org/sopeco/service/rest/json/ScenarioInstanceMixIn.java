@@ -25,13 +25,13 @@ import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 @JsonIdentityInfo(generator = ObjectIdGenerators.IntSequenceGenerator.class, property = "@id")
 public final class ScenarioInstanceMixIn {
 	
-	@JsonIgnore
+	@JsonProperty("description")
 	private String description;
 
 	@JsonIgnore
 	private List<ExperimentSeries> experimentSeriesList = new ArrayList<ExperimentSeries>();
 
-	@JsonIgnore
+	@JsonProperty("scenarioDefinition")
 	private ScenarioDefinition scenarioDefinition;
 
 	@JsonProperty("primaryKey")
