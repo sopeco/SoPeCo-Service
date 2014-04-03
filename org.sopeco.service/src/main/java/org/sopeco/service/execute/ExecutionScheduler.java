@@ -184,6 +184,8 @@ public final class ExecutionScheduler implements Runnable {
 	 */
 	public ExperimentStatus getExperimentStatus(long experimentKey) {
 		
+		LOGGER.info("Trying to fetch experiment with key: " + experimentKey);
+		
 		// this can be a bottleneck, when a lot of experiments are enqueued
 		for (ExecutionQueue queue : ExecutionQueueManager.getAllQueues()) {
 			
@@ -281,6 +283,9 @@ public final class ExecutionScheduler implements Runnable {
 	 */
 	private ExperimentStatus createExperimentStatus(long experimentKey, ExecutedExperimentDetails eed) {
 		
+		LOGGER.debug("+++++++++++++++++++++++++++++++++++++++");
+		LOGGER.debug("" + experimentKey);
+		
 		ExperimentStatus status = new ExperimentStatus();
 		status.setAccountId(eed.getAccountId());
 		status.setEventLogList(new ArrayList<MECLogEntry>());
@@ -295,8 +300,11 @@ public final class ExecutionScheduler implements Runnable {
 		List<MECLogEntry> mecloglist = new ArrayList<MECLogEntry>();
 		
 		MECLog meclog = ServicePersistenceProvider.getInstance().loadMECLog(experimentKey);
+
+		LOGGER.debug("searching MECLOG");
 		
 		if (meclog != null) {
+			LOGGER.debug("found MECLOG");
 			mecloglist = meclog.getEntries();
 		}
 		
