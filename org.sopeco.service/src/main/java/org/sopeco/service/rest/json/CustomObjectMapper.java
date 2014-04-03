@@ -1,5 +1,7 @@
 package org.sopeco.service.rest.json;
 
+import org.sopeco.persistence.dataset.DataSetInputColumn;
+import org.sopeco.persistence.dataset.ParameterValue;
 import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
@@ -43,5 +45,7 @@ public class CustomObjectMapper extends ObjectMapper {
 		addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
 		addMixInAnnotations(ParameterValueAssignment.class, ParameterValueAssignmentMixIn.class);
 		addMixInAnnotations(ScenarioInstance.class, ScenarioInstanceMixIn.class);
+		addMixInAnnotations(DataSetInputColumn.class, DataSetInputColumnMixIn.class);
+		addMixInAnnotations(ParameterValue.class, ParameterValueMixIn.class);
 	 }
 }
