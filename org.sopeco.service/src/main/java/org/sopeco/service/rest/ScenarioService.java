@@ -531,7 +531,6 @@ public class ScenarioService {
 	 * @return			{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 					OK with List<{@link ScenarioInstance}s> as {@link Entity}
 	 */
-	@Context UriInfo uriInfo;
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCES)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -544,8 +543,6 @@ public class ScenarioService {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
-		
-		System.out.println("++++++++++++++++++" + uriInfo.getPath());
 		
 		try {
 			
