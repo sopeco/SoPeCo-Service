@@ -509,6 +509,7 @@ public class ScenarioService {
 		try {
 			
 			ScenarioInstance tmpSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
+			decoratedExperimentSeriesRuns(tmpSI, u.getAccountID());
 			return Response.ok(tmpSI).build();
 			
 		} catch (DataNotFoundException e) {
@@ -545,7 +546,9 @@ public class ScenarioService {
 			
 			List<ScenarioInstance> listSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
 			
-			decoratedExperimentSeriesRuns(listSI, u.getAccountID());
+			for (ScenarioInstance si : listSI) {
+				decoratedExperimentSeriesRuns(si, u.getAccountID());
+			}
 			
 			return Response.ok(listSI).build();
 			
@@ -657,42 +660,38 @@ public class ScenarioService {
 	}
 	
 	/**
-	 * Converts all the {@link ExperimentSeriesRun}s in the given {@link ScenarioInstance} list
+	 * Converts all the {@link ExperimentSeriesRun}s in the given {@link ScenarioInstance}
 	 * into {@link ExperimentSeriesRunDecorator}s.<br />
 	 * The account ID is required to pass them to the {@link ExperimentSeriesRunDecorator} to have
 	 * access to the Service Layer afterwards to fetch the results. See comments in the class for more
 	 * information.
 	 * 
-	 * @param listSI	the {@link ScenarioInstance} list
-	 * @param accountID	the account ID of the caller
+	 * @param scenarioInstance	the {@link ScenarioInstance}
+	 * @param accountID			the account ID of the caller
 	 */
-	private void decoratedExperimentSeriesRuns(List<ScenarioInstance> listSI, long accountID) {
-		if (listSI == null) return;
-		
-		for(ScenarioInstance si : listSI) {
+	private void decoratedExperimentSeriesRuns(ScenarioInstance scenarioInstance, long accountID) {
+		if (scenarioInstance == null) return;
 			
-	    	for(ExperimentSeries es : si.getExperimentSeriesList()) {
-	    		
-	    		// need these lists to avoid ConcurrentModificationException in the next for loop
-	    		List<ExperimentSeriesRun> esrToRemove 	= new ArrayList<ExperimentSeriesRun>();
-	    		List<ExperimentSeriesRun> esrToAdd 		= new ArrayList<ExperimentSeriesRun>();
-	    		
-	    		for(ExperimentSeriesRun esr : es.getExperimentSeriesRuns()) {
-	    			
-	    			ExperimentSeriesRunDecorator esrd = new ExperimentSeriesRunDecorator(esr,
-	    																				 accountID,
-	    																				 ServiceConfiguration.SERVICE_URL_HOST,
-	    																				 ServiceConfiguration.SERVICE_URL_PORT);
-	    			
-	    			esrToAdd.add(esrd);
-	    			esrToRemove.add(esr);
-	    		}
-	    			
-	    		es.getExperimentSeriesRuns().removeAll(esrToRemove);
-	    		es.getExperimentSeriesRuns().addAll(esrToAdd);
-	    	}
-	    	
-	    }
+    	for(ExperimentSeries es : scenarioInstance.getExperimentSeriesList()) {
+    		
+    		// need these lists to avoid ConcurrentModificationException in the next for loop
+    		List<ExperimentSeriesRun> esrToRemove 	= new ArrayList<ExperimentSeriesRun>();
+    		List<ExperimentSeriesRun> esrToAdd 		= new ArrayList<ExperimentSeriesRun>();
+    		
+    		for(ExperimentSeriesRun esr : es.getExperimentSeriesRuns()) {
+    			
+    			ExperimentSeriesRunDecorator esrd = new ExperimentSeriesRunDecorator(esr,
+    																				 accountID,
+    																				 ServiceConfiguration.SERVICE_URL_HOST,
+    																				 ServiceConfiguration.SERVICE_URL_PORT);
+    			
+    			esrToAdd.add(esrd);
+    			esrToRemove.add(esr);
+    		}
+    			
+    		es.getExperimentSeriesRuns().removeAll(esrToRemove);
+    		es.getExperimentSeriesRuns().addAll(esrToAdd);
+    	}
 		
 	}
 }
