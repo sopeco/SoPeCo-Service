@@ -2,6 +2,7 @@ package org.sopeco.service.rest.json;
 
 import java.util.List;
 
+import org.sopeco.persistence.dataset.ParameterValue;
 import org.sopeco.persistence.dataset.ParameterValueList;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 
@@ -19,6 +20,11 @@ public final class ParameterValueListMixIn<T> {
 	
 	@JsonCreator
 	public ParameterValueListMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("values") List<T> values) {
+	}
+
+	@JsonIgnore
+	public ParameterValue<?> getMeanAsParameterValue() {
+		return null;
 	}
 	
 	@JsonIgnore
@@ -45,4 +51,5 @@ public final class ParameterValueListMixIn<T> {
 	public int getSize() {
 		return 0;
 	}
+
 }

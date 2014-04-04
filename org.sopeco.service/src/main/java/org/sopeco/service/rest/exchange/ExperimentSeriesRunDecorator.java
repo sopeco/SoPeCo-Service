@@ -243,12 +243,12 @@ public class ExperimentSeriesRunDecorator extends ExperimentSeriesRun {
 	 * @return a Client configured to call the Service Layer
 	 */
 	private Client getClient() {
-		/*ClientConfig config = new ClientConfig();
+		ClientConfig config = new ClientConfig();
 		JacksonJaxbJsonProvider provider = new JacksonJaxbJsonProvider();
         provider.setMapper(new CustomObjectMapper());
-        config.register(provider);*/
+        config.register(provider);
         
-		Client client = ClientBuilder.newClient();
+		Client client = ClientBuilder.newClient(config);
 		return client;
 	}
 
