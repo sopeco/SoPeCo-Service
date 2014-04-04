@@ -17,6 +17,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * @author Peter Merkert
  */
 public final class ParameterValueListMixIn<T> {
+
+	@JsonProperty("parameter")
+	private ParameterDefinition parameter;
+	
+	@JsonProperty("values")
+	private List<T> values;
 	
 	@JsonCreator
 	public ParameterValueListMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("values") List<T> values) {
