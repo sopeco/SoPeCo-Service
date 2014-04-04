@@ -29,13 +29,13 @@ public final class ParameterValueListMixIn<T> {
 	}
 
 	@JsonIgnore
-	public ParameterValue<?> getMeanAsParameterValue() {
-		return null;
+	public double getMean() {
+		return 0.0f;
 	}
 	
 	@JsonIgnore
-	public double getMean() {
-		return 0.0f;
+	public ParameterValue<?> getMeanAsParameterValue() {
+		return null;
 	}
 
 	@JsonIgnore

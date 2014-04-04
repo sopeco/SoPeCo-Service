@@ -1,6 +1,7 @@
 package org.sopeco.service.rest.json;
 
 import java.util.List;
+import java.util.Set;
 
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
@@ -17,6 +18,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class DataSetInputColumnMixIn<T> {
 
+	@JsonProperty("valueList")
+	private List<T> valueList;
+	
 	@JsonCreator
 	protected DataSetInputColumnMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("valueList") List<T> values) {
 	}
@@ -36,6 +40,11 @@ public final class DataSetInputColumnMixIn<T> {
 		return 0.0f;
 	}
 
+	@JsonIgnore
+	public Set<T> getValueSet() {
+		return null;
+	}
+	
 	@JsonIgnore
 	public DataSetInputColumn<T> getCopy() {
 		return null;

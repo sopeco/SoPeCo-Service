@@ -3,7 +3,9 @@ package org.sopeco.service.rest.json;
 import org.sopeco.persistence.dataset.AbstractDataSetColumn;
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.dataset.DataSetObservationColumn;
+import org.sopeco.persistence.entities.definition.ParameterDefinition;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -18,4 +20,8 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 	@JsonSubTypes.Type(value=DataSetObservationColumn.class, name="dataSetObservationColumn")
 })
 public abstract class AbstractDataSetColumnMixIn {
+
+	@JsonProperty("parameter")
+	private ParameterDefinition parameter;
+	
 }

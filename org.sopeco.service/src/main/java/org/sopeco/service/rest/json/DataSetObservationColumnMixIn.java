@@ -5,6 +5,7 @@ import java.util.List;
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.dataset.DataSetObservationColumn;
 import org.sopeco.persistence.dataset.ParameterValue;
+import org.sopeco.persistence.dataset.ParameterValueList;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -19,10 +20,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class DataSetObservationColumnMixIn<T> {
 
+	@JsonProperty("valueLists")
+	private List<ParameterValueList<T>> valueLists;
+	
 	@JsonCreator
-	protected DataSetObservationColumnMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("valueList") List<T> values) {
+	protected DataSetObservationColumnMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("valueLists") List<T> values) {
 	}
 
+	@JsonIgnore
+	public int size() {
+		return 0;
+	}
+	
 	@JsonIgnore
 	public List<T> getAllValues() {
 		return null;
