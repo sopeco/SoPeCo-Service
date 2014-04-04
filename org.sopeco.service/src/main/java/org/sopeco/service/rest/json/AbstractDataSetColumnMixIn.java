@@ -1,11 +1,6 @@
 package org.sopeco.service.rest.json;
 
 import org.sopeco.persistence.dataset.AbstractDataSetColumn;
-import org.sopeco.persistence.dataset.DataSetInputColumn;
-import org.sopeco.persistence.dataset.DataSetObservationColumn;
-
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 /**
  * MixIn for {@link AbstractDataSetColumn} to respect inheritance in JSON parsing.
