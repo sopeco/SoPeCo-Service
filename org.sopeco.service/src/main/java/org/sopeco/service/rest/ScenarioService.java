@@ -13,9 +13,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -529,6 +531,7 @@ public class ScenarioService {
 	 * @return			{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 					OK with List<{@link ScenarioInstance}s> as {@link Entity}
 	 */
+	@Context UriInfo uriInfo;
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCES)
 	@Produces(MediaType.APPLICATION_JSON)
@@ -541,6 +544,8 @@ public class ScenarioService {
 			LOGGER.info("Invalid token '{}'!", usertoken);
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
+		
+		System.out.println("++++++++++++++++++" + uriInfo.getPath());
 		
 		try {
 			
