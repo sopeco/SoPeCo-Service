@@ -1,5 +1,6 @@
 package org.sopeco.service.rest;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -37,6 +38,7 @@ import org.sopeco.service.helper.SimpleEntityFactory;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 import org.sopeco.service.persistence.UserPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
+import org.sopeco.service.rest.exchange.ExperimentSeriesRunDecorator;
 
 /**
  * The {@link ScenarioService} class provides RESTful services to handle scenarios in SoPeCo.
@@ -542,6 +544,9 @@ public class ScenarioService {
 		try {
 			
 			List<ScenarioInstance> listSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
+			
+			decoratedExperimentSeriesRuns(listSI, u.getAccountID());
+			
 			return Response.ok(listSI).build();
 			
 		} catch (DataNotFoundException e) {
@@ -651,4 +656,43 @@ public class ScenarioService {
 		
 	}
 	
+	/**
+	 * Converts all the {@link ExperimentSeriesRun}s in the given {@link ScenarioInstance} list
+	 * into {@link ExperimentSeriesRunDecorator}s.<br />
+	 * The account ID is required to pass them to the {@link ExperimentSeriesRunDecorator} to have
+	 * access to the Service Layer afterwards to fetch the results. See comments in the class for more
+	 * information.
+	 * 
+	 * @param listSI	the {@link ScenarioInstance} list
+	 * @param accountID	the account ID of the caller
+	 */
+	private void decoratedExperimentSeriesRuns(List<ScenarioInstance> listSI, long accountID) {
+		if (listSI == null) return;
+		
+		for(ScenarioInstance si : listSI) {
+			
+	    	for(ExperimentSeries es : si.getExperimentSeriesList()) {
+	    		
+	    		// need these lists to avoid ConcurrentModificationException in the next for loop
+	    		List<ExperimentSeriesRun> esrToRemove 	= new ArrayList<ExperimentSeriesRun>();
+	    		List<ExperimentSeriesRun> esrToAdd 		= new ArrayList<ExperimentSeriesRun>();
+	    		
+	    		for(ExperimentSeriesRun esr : es.getExperimentSeriesRuns()) {
+	    			
+	    			ExperimentSeriesRunDecorator esrd = new ExperimentSeriesRunDecorator(esr,
+	    																				 accountID,
+	    																				 ServiceConfiguration.SERVICE_URL_HOST,
+	    																				 ServiceConfiguration.SERVICE_URL_PORT);
+	    			
+	    			esrToAdd.add(esrd);
+	    			esrToRemove.add(esr);
+	    		}
+	    			
+	    		es.getExperimentSeriesRuns().removeAll(esrToRemove);
+	    		es.getExperimentSeriesRuns().addAll(esrToAdd);
+	    	}
+	    	
+	    }
+		
+	}
 }

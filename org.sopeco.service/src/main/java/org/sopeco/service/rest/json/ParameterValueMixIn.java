@@ -14,6 +14,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public final class ParameterValueMixIn<T> {
 
+	@JsonProperty("TOLERANCE_VALUE")
+	private static final double TOLERANCE_VALUE = 0.0000000000000001;
+
+	@JsonProperty("parameter")
+	private ParameterDefinition parameter;
+	
 	@JsonCreator
 	protected ParameterValueMixIn(@JsonProperty("parameter") ParameterDefinition parameter, @JsonProperty("value") T value) {
 	}

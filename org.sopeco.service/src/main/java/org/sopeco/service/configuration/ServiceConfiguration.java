@@ -11,6 +11,33 @@ import java.util.concurrent.TimeUnit;
 public abstract class ServiceConfiguration {
 
 	/**
+	 * The Service URL prefix (protocol part of URL) attributes.
+	 */
+	public static final String SERVICE_URL_PREFIX 			= "http://";
+
+	/**
+	 * The Service host.
+	 */
+	public static final String SERVICE_URL_HOST 			= "localhost";
+	
+	/**
+	 * The Service host and port split sign in the URL.
+	 */
+	public static final String SERVICE_URL_HOSTPORTSPLIT	= ":";
+	
+	/**
+	 * The Service URL port.
+	 */
+	public static final String SERVICE_URL_PORT 			= "8080";
+	
+	/**
+	 * The Service URL split sign. E.g.
+	 * http://host:port/a/b/c, whent the splitting sign is '/',
+	 * http://host:port#a#b#c, whent the splitting sign is '#'.
+	 */
+	public static final String SERVICE_URL_SPLIT 			= "/";
+	
+	/**
 	 * The package where all the RESTful services are in. Used to setup the {@link JerseyTest}
 	 * correctly.
 	 */
@@ -155,5 +182,10 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
 	public static final String SVCP_EXECUTE_SCENARIONAME 	= "scenarioname";
+
+	public static final String SVC_RESULT					= "result";
+	public static final String SVC_RESULT_DATASETAGGREGATED = "datasetaggregated";
+	public static final String SVCP_RESULT_ACCOUNTID 		= "accountid";
+	public static final String SVCP_RESULT_DATASETID 		= "datasetid";
 
 }
