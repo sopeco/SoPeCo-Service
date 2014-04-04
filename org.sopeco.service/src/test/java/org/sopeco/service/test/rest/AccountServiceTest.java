@@ -19,12 +19,14 @@ import org.sopeco.service.test.configuration.TestConfiguration;
  * @author Peter Merkert
  */
 public class AccountServiceTest extends AbstractServiceTest {
-
+	
 	/**
 	 * Checks it the account with the name already exists (after creating it).
 	 */
 	@Test
 	public void testCheckAccountExistence() {
+		if (skipTests) return;
+		
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
 		

@@ -148,7 +148,9 @@ public class ExecutionQueue implements IStatusListener {
 		
 		QueuedExperiment experiment = null;
 		
-		if (experimentHashCode == String.valueOf(experimentKey)) {
+		LOGGER.info("In this queue (URL = " + this.controllerURL + "), the current running experiment hashcode is: " + experimentHashCode + ".");
+		
+		if (experimentHashCode.equals(String.valueOf(experimentKey))) {
 			
 			// the current running experiment is requested
 			experiment = runningExperiment;

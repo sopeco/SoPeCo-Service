@@ -1,24 +1,30 @@
 package org.sopeco.service.rest.json;
 
+import org.sopeco.persistence.dataset.AbstractDataSetColumn;
+import org.sopeco.persistence.dataset.DataSetAggregated;
+import org.sopeco.persistence.dataset.DataSetInputColumn;
+import org.sopeco.persistence.dataset.DataSetObservationColumn;
+import org.sopeco.persistence.dataset.DataSetRow;
+import org.sopeco.persistence.dataset.ParameterValue;
+import org.sopeco.persistence.dataset.ParameterValueList;
+import org.sopeco.persistence.entities.ExperimentSeries;
+import org.sopeco.persistence.entities.ExperimentSeriesRun;
+import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.entities.definition.ParameterDefinition;
 import org.sopeco.persistence.entities.definition.ParameterNamespace;
 import org.sopeco.persistence.entities.definition.ParameterValueAssignment;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
+import org.sopeco.service.rest.exchange.ExperimentSeriesRunDecorator;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * This class is used to customize the used Jackson Json converter. E.g. say that the conversation must
- * not fail when there are unknown properties. 
+ * This class is used to customize the used Jackson Json converter. E.g. say that some methods should be
+ * ignored when serializing.<br />
  * The example above happened, whe trying to map the {@code ParameterNamespace} from SoPeCo Core, because
  * a method called "getFullName" exists, but not the field "fullName". The Jackson Json parsing provider
- * throw an error and shut down. To prevent this behaviour we need to tell Jackson to ingore these "not
- * mappable properties".
- * 
- * Needed to fix the class {@code ParameterNamespace} to be serialized and deserialized with self
- * references. To do so, we needed to add a Jackson Annotation for the class {@code ParameterNamespace}.
- * As we are not allowed to change the class code itself, we use a MixIn via Jackson to inject our
- * Jackson annotation for correct JSON converting with self-references.
+ * throws an error and shuts down, but actually we just want the parser to ignore the automatically (wrong)
+ * identified field "fullName" to be ignored.
  * 
  * @author Peter Merkert
  */
@@ -32,14 +38,25 @@ public class CustomObjectMapper extends ObjectMapper {
 	 * In this case the MixIn classes are injected into the {@link ObjectMapper}.
 	 */
 	public CustomObjectMapper() {
-	
-		//enableDefaultTyping(); // default to using DefaultTyping.OBJECT_AND_NON_CONCRETE
-		//enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-		
 		// mixin for ParameterNamespace, to have Jackson annotation from ParameterNamespaceMixIn
 		addMixInAnnotations(ParameterNamespace.class, ParameterNamespaceMixIn.class);
 		addMixInAnnotations(ParameterDefinition.class, ParameterDefinitionMixIn.class);
 		addMixInAnnotations(ScheduledExperiment.class, ScheduledExperimentMixIn.class);
 		addMixInAnnotations(ParameterValueAssignment.class, ParameterValueAssignmentMixIn.class);
+		
+		// the following MixIns are only needed to pass a ScenarioInstance with JSON
+		addMixInAnnotations(ScenarioInstance.class, ScenarioInstanceMixIn.class);
+		addMixInAnnotations(DataSetInputColumn.class, DataSetInputColumnMixIn.class);
+		addMixInAnnotations(ParameterValue.class, ParameterValueMixIn.class);
+		addMixInAnnotations(DataSetObservationColumn.class, DataSetObservationColumnMixIn.class);
+		addMixInAnnotations(ParameterValueList.class, ParameterValueListMixIn.class);
+		addMixInAnnotations(ExperimentSeries.class, ExperimentSeriesMixIn.class);
+		addMixInAnnotations(ExperimentSeriesRun.class, ExperimentSeriesRunMixIn.class);
+		addMixInAnnotations(ExperimentSeriesRunDecorator.class, ExperimentSeriesRunDecoratorMixIn.class);
+		
+		addMixInAnnotations(DataSetAggregated.class, DataSetAggregatedMixIn.class);
+		addMixInAnnotations(ParameterValueList.class, ParameterValueListMixIn.class);
+		addMixInAnnotations(DataSetRow.class, DataSetRowMixIn.class);
+		addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
 	 }
 }

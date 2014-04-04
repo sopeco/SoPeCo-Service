@@ -34,6 +34,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMeasurementSpecNameListing() {
+		if (skipTests) return;
+		
 		String accountname 				= TestConfiguration.TESTACCOUNTNAME;
 		String password 				= TestConfiguration.TESTPASSWORD;
 		String measurementSpecName2 	= "examplespecname2";
@@ -109,6 +111,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMeasurementSpecNameDoubleAdding() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		
@@ -159,6 +163,8 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testMeasurementSpecSwitchWorkingSpec() {
+		if (skipTests) return;
+		
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
 		String newMeasurementSpecName = "newMeasurementSpecificationName";

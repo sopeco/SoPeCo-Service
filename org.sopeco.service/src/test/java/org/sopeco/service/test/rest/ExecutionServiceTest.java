@@ -52,6 +52,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScheduleExperimentDeletion() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
@@ -146,6 +148,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScheduleExperiment() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname 	= TestConfiguration.TESTACCOUNTNAME;
 		String password 	= TestConfiguration.TESTPASSWORD;
@@ -258,6 +262,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testScheduleExperimentEnablingDisabling() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
@@ -407,6 +413,8 @@ public class ExecutionServiceTest extends AbstractServiceTest {
 	 */
 	@Test
 	public void testGetExecutionDetails() {
+		if (skipTests) return;
+		
 		// connect to test users account
 		String accountname = TestConfiguration.TESTACCOUNTNAME;
 		String password = TestConfiguration.TESTPASSWORD;
