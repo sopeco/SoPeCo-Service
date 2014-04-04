@@ -1,5 +1,6 @@
 package org.sopeco.service.rest.json;
 
+import org.sopeco.persistence.dataset.AbstractDataSetColumn;
 import org.sopeco.persistence.dataset.DataSetAggregated;
 import org.sopeco.persistence.dataset.DataSetInputColumn;
 import org.sopeco.persistence.dataset.DataSetObservationColumn;
@@ -56,6 +57,6 @@ public class CustomObjectMapper extends ObjectMapper {
 		addMixInAnnotations(DataSetAggregated.class, DataSetAggregatedMixIn.class);
 		addMixInAnnotations(ParameterValueList.class, ParameterValueListMixIn.class);
 		addMixInAnnotations(DataSetRow.class, DataSetRowMixIn.class);
-		//addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
+		addMixInAnnotations(AbstractDataSetColumn.class, AbstractDataSetColumnMixIn.class);
 	 }
 }
