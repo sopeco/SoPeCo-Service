@@ -3,13 +3,14 @@ package org.sopeco.service.configuration;
 import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.jersey.servlet.ServletContainer;
 import org.sopeco.service.rest.json.CustomObjectMapper;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * This class is registered as an {@link Application} class at the Jersey web.xml settings
- * and is called once the servlet is started up. The class is needed to register the custom
+ * and is called once the {@link ServletContainer} is started up. The class is needed to register the custom
  * {@link JacksonJaxbJsonProvider} to the RESTful service, to get the {@link CustomObjectMapper}. It's also
  * needed to register the {@link ServletContainerLifecycleListener} to listen for changes
  * in the servlet context.
