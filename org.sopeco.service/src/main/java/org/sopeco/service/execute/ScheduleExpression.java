@@ -33,7 +33,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
- * 
+ * @author Marius Oehler
  */
 public final class ScheduleExpression {
 
