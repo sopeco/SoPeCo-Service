@@ -35,11 +35,6 @@ public class ExperimentSeriesRunDecorator extends ExperimentSeriesRun {
 	private static Logger logger = LoggerFactory.getLogger(ExperimentSeriesRunDecorator.class);
 
 	/**
-	 * The decorated {@link ExperimentSeriesRun}.
-	 */
-	//private ExperimentSeriesRun decoratedObject;
-
-	/**
 	 * The result of the experiment. As "lazy loading" is used in SoPeCo, this 
 	 * object is default <code>null</code>. It's filled once, the result is queried.
 	 */
@@ -79,6 +74,9 @@ public class ExperimentSeriesRunDecorator extends ExperimentSeriesRun {
 	 */
 	private long accountID;
 
+	/**
+	 * Default constructor.
+	 */
 	public ExperimentSeriesRunDecorator() {
 	}
 	
@@ -91,10 +89,29 @@ public class ExperimentSeriesRunDecorator extends ExperimentSeriesRun {
 	public ExperimentSeriesRunDecorator(ExperimentSeriesRun decoratedObject, long accountID) {
 		super();
 		configureSuperclass(decoratedObject);
-		//this.decoratedObject = decoratedObject;
 		this.accountID		 = accountID;
 	}
 
+	/**
+	 * Constructor with possibility to change the important Service Layer attribute: Host. The port
+	 * is set to empty and there is not host port split sign. This constructor is used, when the 
+	 * Service Layer is running on URL like "http://myserviceurl.de".<br />
+	 * The given {@link ExperimentSeriesRun} will be decorated.
+	 * 
+	 * @param decoratedObject	the decorated {@link ExperimentSeriesRun}
+	 * @param accountID			the account ID to identify at the Service afterwards
+	 * @param host				the host of the Service Layer (default 'localhost')
+	 */
+	public ExperimentSeriesRunDecorator(ExperimentSeriesRun decoratedObject, long accountID, String host) {
+		super();
+		configureSuperclass(decoratedObject);
+		this.accountID		 	= accountID;
+		this.host 				= host;
+		// port and host are empty in this constructor
+		this.port 				= "";
+		this.hostPortSplitSign  = "";
+	}
+	
 	/**
 	 * Constructor with possibility to change the important Service Layer attributes: Host and port.
 	 * The {@link ExperimentSeriesRun} will be decorated.
@@ -107,7 +124,6 @@ public class ExperimentSeriesRunDecorator extends ExperimentSeriesRun {
 	public ExperimentSeriesRunDecorator(ExperimentSeriesRun decoratedObject, long accountID, String host, String port) {
 		super();
 		configureSuperclass(decoratedObject);
-		//this.decoratedObject 	= decoratedObject;
 		this.accountID		 	= accountID;
 		this.host 				= host;
 		this.port 				= port;

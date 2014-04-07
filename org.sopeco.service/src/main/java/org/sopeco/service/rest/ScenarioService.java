@@ -6,6 +6,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -13,11 +14,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,14 +109,6 @@ public class ScenarioService {
 		}
 
 		LOGGER.debug("MeasurementSpecifiation name is valid.");
-
-		// TODO: what is the WebUI displaying if the ESD has no name?
-		/*if (esd.getName().equals("")) {
-			LOGGER.info("ExperimentSeriesDefinition name is invalid.");
-			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition name is invalid.").build();
-		}*/
-		
-		LOGGER.debug("ExperimentSeriesDefinition is valid.");
 		
 		// adjust the builder for the new scenario
 		ScenarioDefinition sd = new ScenarioDefinition();
@@ -230,6 +221,10 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getScenarioNames(@QueryParam(TOKEN) String usertoken) {
 
+		if (usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 
 		if (dbCon == null) {
@@ -277,6 +272,10 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeScenario(@PathParam(NAME) String scenarioname,
 								   @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioname == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
 		
 		LOGGER.debug("Try to remove scenario with name '{}'.", scenarioname);
 		
@@ -361,8 +360,8 @@ public class ScenarioService {
 		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
-			LOGGER.info("Invalid token '{}'!", usertoken);
-			return Response.status(Status.UNAUTHORIZED).build();
+			LOGGER.info("Cannot fetch database connection with given token.");
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot fetch database connection with given token.").build();
 		}
 		
 		ScenarioDefinition sd = loadScenarioDefinition(scenarioDefinitionName, usertoken);
@@ -411,7 +410,11 @@ public class ScenarioService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response updateScenario(@QueryParam(TOKEN) String usertoken,
 								  ScenarioDefinition scenarioDefinition) {
-
+		
+		if (usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("Usertoken is null.").build();
+		}
+		
 		LOGGER.debug("Updating the ScenarioDefinition.");
 		
 		if (scenarioDefinition == null) {
@@ -465,6 +468,10 @@ public class ScenarioService {
 	public Response getScenarioAsXML(@QueryParam(TOKEN) String usertoken,
 									 @PathParam(NAME) String scenarioname) {
 		
+		if (usertoken == null || scenarioname == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -497,10 +504,15 @@ public class ScenarioService {
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCE)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScenarioInstance(@QueryParam(TOKEN) String usertoken,
+	public Response getScenarioInstance(@HeaderParam("host") String host,
+										@QueryParam(TOKEN) String usertoken,
 										@QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name,
 										@QueryParam(ServiceConfiguration.SVCP_SCENARIO_URL) String url) {
 			
+		if (host == null || usertoken == null || name == null || url == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+	
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -511,7 +523,7 @@ public class ScenarioService {
 		try {
 			
 			ScenarioInstance tmpSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
-			decoratedExperimentSeriesRuns(tmpSI, u.getAccountID());
+			decoratedExperimentSeriesRuns(tmpSI, u.getAccountID(), host);
 			return Response.ok(tmpSI).build();
 			
 		} catch (DataNotFoundException e) {
@@ -534,9 +546,14 @@ public class ScenarioService {
 	@GET
 	@Path(ServiceConfiguration.SVC_SCENARIO_INSTANCES)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getScenarioInstances(@QueryParam(TOKEN) String usertoken,
+	public Response getScenarioInstances(@HeaderParam("host") String host,
+										 @QueryParam(TOKEN) String usertoken,
 										 @QueryParam(ServiceConfiguration.SVCP_SCENARIO_NAME) String name) {
-			
+		
+		if (host == null || usertoken == null || name == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -549,7 +566,7 @@ public class ScenarioService {
 			List<ScenarioInstance> listSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
 			
 			for (ScenarioInstance si : listSI) {
-				decoratedExperimentSeriesRuns(si, u.getAccountID());
+				decoratedExperimentSeriesRuns(si, u.getAccountID(), host);
 			}
 			
 			return Response.ok(listSI).build();
@@ -577,6 +594,10 @@ public class ScenarioService {
 	public Response getScenarioDefinition(@QueryParam(TOKEN) String usertoken,
 										  @PathParam(NAME) String scenarioName) {
 			
+		if (usertoken == null || scenarioName == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
 		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
 		
 		if (u == null) {
@@ -666,12 +687,15 @@ public class ScenarioService {
 	 * into {@link ExperimentSeriesRunDecorator}s.<br />
 	 * The account ID is required to pass them to the {@link ExperimentSeriesRunDecorator} to have
 	 * access to the Service Layer afterwards to fetch the results. See comments in the class for more
-	 * information.
+	 * information.<br />
+	 * The passed hostURI is analysed, wheather it's "http://myserviceurl.de:8080" or <br />
+	 * "http://myserviceurl.de".
 	 * 
 	 * @param scenarioInstance	the {@link ScenarioInstance}
 	 * @param accountID			the account ID of the caller
+	 * @param host				the host of the service layer
 	 */
-	private void decoratedExperimentSeriesRuns(ScenarioInstance scenarioInstance, long accountID) {
+	private void decoratedExperimentSeriesRuns(ScenarioInstance scenarioInstance, long accountID, String hostURI) {
 		if (scenarioInstance == null) return;
 			
     	for(ExperimentSeries es : scenarioInstance.getExperimentSeriesList()) {
@@ -682,10 +706,25 @@ public class ScenarioService {
     		
     		for(ExperimentSeriesRun esr : es.getExperimentSeriesRuns()) {
     			
-    			ExperimentSeriesRunDecorator esrd = new ExperimentSeriesRunDecorator(esr,
-    																				 accountID,
-    																				 ServiceConfiguration.SERVICE_URL_HOST,
-    																				 ServiceConfiguration.SERVICE_URL_PORT);
+    			// if the host is called on a special port, the port needs to be fetched
+    			String[] hostPort = splitHostURI(hostURI);
+    			
+    			ExperimentSeriesRunDecorator esrd;
+    			
+    			if (hostPort.length == 2) {
+    				
+    				esrd = new ExperimentSeriesRunDecorator(esr,
+															accountID,
+															hostPort[0],
+															hostPort[1]);
+    				
+    			} else {
+    				
+    				esrd = new ExperimentSeriesRunDecorator(esr,
+															accountID,
+															hostPort[0]);
+    				
+    			}
     			
     			esrToAdd.add(esrd);
     			esrToRemove.add(esr);
@@ -694,6 +733,34 @@ public class ScenarioService {
     		es.getExperimentSeriesRuns().removeAll(esrToRemove);
     		es.getExperimentSeriesRuns().addAll(esrToAdd);
     	}
+		
+	}
+
+	
+	/**
+	 * Splits the given URI up into a String array. This method is used to conver the passed 'host'
+	 * field in the HTTP header.
+	 * 
+	 * @param hostURI					the 'host' HTTP header param
+	 * @return							the hostURI split up, either into 2 substring (host+port) or <br />
+	 * 									1 string, which contains just the hostURI
+	 * @throws IllegalArgumentException If the hostURI contains more than one ':'
+	 */
+	private String[] splitHostURI(String hostURI) {
+		
+		if (hostURI.contains(":")) {
+
+			String[] splitted = hostURI.split(":");
+			
+			if (splitted.length == 2) {
+				return splitted;
+			} else {
+				throw new IllegalArgumentException("URI contains more than one ':'.");
+			}
+			
+		} else {
+			return new String[]{ hostURI };
+		}
 		
 	}
 }
