@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.engine.measurementenvironment.socket.SocketAcception;
 import org.sopeco.service.execute.ExecutionScheduler;
+import org.sopeco.service.persistence.ServicePersistenceProvider;
 
 /**
  * The {@link ServletContainerLifecycleListener} class is used to handle the initialization of (servlet-){@link Container}.
@@ -56,14 +57,15 @@ public final class ServletContainerLifecycleListener implements ContainerLifecyc
 	 */
 	@Override
 	public void onShutdown(Container container) {
-
+		
 		LOGGER.debug("RESTful SoPeCo Service Layer shutting down.");
 		
 		// start the experiment scheduler to peek for executable senarios
 		while (!ExecutionScheduler.getInstance().stopScheduler()) {
 			LOGGER.info("Shutdown of experiment scheduler failed. Try again.");
 		}
-		
+
+		ServicePersistenceProvider.close();
 	}
 
 	/**
