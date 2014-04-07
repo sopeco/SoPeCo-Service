@@ -9,33 +9,13 @@ import java.util.concurrent.TimeUnit;
  * @author Peter Merkert
  */
 public abstract class ServiceConfiguration {
-
-	/**
-	 * The Service URL prefix (protocol part of URL) attributes.
-	 */
-	public static final String SERVICE_URL_PREFIX 			= "http://";
-
-	/**
-	 * The Service host.
-	 */
-	public static final String SERVICE_URL_HOST 			= "localhost";
-	
-	/**
-	 * The Service host and port split sign in the URL.
-	 */
-	public static final String SERVICE_URL_HOSTPORTSPLIT	= ":";
-	
-	/**
-	 * The Service URL port.
-	 */
-	public static final String SERVICE_URL_PORT 			= "8080";
 	
 	/**
 	 * The Service URL split sign. E.g.
 	 * http://host:port/a/b/c, whent the splitting sign is '/',
 	 * http://host:port#a#b#c, whent the splitting sign is '#'.
 	 */
-	public static final String SERVICE_URL_SPLIT 			= "/";
+	public static final String SERVICE_URL_SPLIT = "/";
 	
 	/**
 	 * The package where all the RESTful services are in. Used to setup the {@link JerseyTest}
@@ -49,13 +29,13 @@ public abstract class ServiceConfiguration {
 	public static final String PACKAGE_NAME_LIFECYCLELISTENER = "org.sopeco.service.configuration";
 	
 	// the applications session ID, if needed
-	public static final String SESSION_ID = "sessionid";
+	public static final String SESSION_ID 		= "sessionid";
 	
 	// default user timeout
-	public static final long USER_TIMEOUT = 600000;
+	public static final long USER_TIMEOUT 		= 600000;
 
 	// timeout to try to connect to a socket
-	public static final int SOCKET_TIMEOUT = 10000;
+	public static final int SOCKET_TIMEOUT 		= 10000;
 	
 	// timeunit for the scheduling times can be configured below them
 	public static final int SCHEDULING_REPEATE_INTERVAL = 5;
@@ -87,6 +67,8 @@ public abstract class ServiceConfiguration {
 	 * All params with prefix SVC points to paths.
 	 * All params with prefix SVCP points to parameter names.
 	 */
+	public static final String SVCP_TOKEN 					= "token";
+	
 	public static final String SVC_ACCOUNT 					= "account";
 	public static final String SVC_ACCOUNT_CHECK 			= "check";
 	public static final String SVC_ACCOUNT_PASSWORD 		= "password";
@@ -100,7 +82,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_ACCOUNT_CUSTOMIZE 		= "customize";
 	public static final String SVCP_ACCOUNT_NAME 			= "accountname";
 	public static final String SVCP_ACCOUNT_PASSWORD 		= "password";
-	public static final String SVCP_ACCOUNT_TOKEN 			= "token";
+	public static final String SVCP_ACCOUNT_TOKEN 			= SVCP_TOKEN;
 	public static final String SVCP_ACCOUNT_DATABASENAME 	= "dbname";
 	public static final String SVCP_ACCOUNT_DATABASEPORT 	= "dbpw";
 
@@ -119,7 +101,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_SCENARIO_INSTANCES 		= "instances";
 	public static final String SVCP_SCENARIO_NAME 			= "name";
 	public static final String SVCP_SCENARIO_SPECNAME	 	= "specname";
-	public static final String SVCP_SCENARIO_TOKEN 			= "token";
+	public static final String SVCP_SCENARIO_TOKEN 			= SVCP_TOKEN;
 	public static final String SVCP_SCENARIO_URL 			= "url";
 	
 	public static final String SVC_MEASUREMENT 				= "measurementspecification";
@@ -128,7 +110,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENT_CREATE 		= "create";
 	public static final String SVC_MEASUREMENT_RENAME 		= "rename";
 	public static final String SVC_MEASUREMENT_NAME 		= "name";
-	public static final String SVCP_MEASUREMENT_TOKEN 		= "token";
+	public static final String SVCP_MEASUREMENT_TOKEN 		= SVCP_TOKEN;
 	public static final String SVCP_MEASUREMENT_SPECNAME 	= "specname";
 	public static final String SVCP_MEASUREMENT_SCENARIONAME = "scenarioname";
 	
@@ -139,7 +121,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEC_LIST 				= "list";
 	public static final String SVC_MEC_MED 					= "med";
 	public static final String SVC_MEC_SCENARIONAME 		= "scenarioname";
-	public static final String SVCP_MEC_TOKEN 				= "token";
+	public static final String SVCP_MEC_TOKEN 				= SVCP_TOKEN;
 	public static final String SVCP_MEC_URL 				= "url";
 	public static final String SVCP_MEC_HOST 				= "host";
 	public static final String SVCP_MEC_PORT 				= "port";
@@ -158,7 +140,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MED_PARAM_REMOVE 		= "remove";
 	public static final String SVC_MED_PARAM_UPDATE 		= "update";
 	public static final String SVC_MED_SCENARIONAME 		= "scenarioname";
-	public static final String SVCP_MED_TOKEN 				= "token";
+	public static final String SVCP_MED_TOKEN 				= SVCP_TOKEN;
 	public static final String SVCP_MED_MEC_URL 			= "url";
 	public static final String SVCP_MED_NAMESPACE 			= "path"; // namespace path
 	public static final String SVCP_MED_NAMESPACE_NEW 		= "newName"; // updated namespace name
@@ -177,7 +159,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_EXECUTE_MECLOG 			= "meclog";
 	public static final String SVC_EXECUTE_EXECUTE 			= "execute";
 	public static final String SVC_EXECUTE_STATUS 			= "status";
-	public static final String SVCP_EXECUTE_TOKEN 			= "token";
+	public static final String SVCP_EXECUTE_TOKEN 			= SVCP_TOKEN;
 	public static final String SVCP_EXECUTE_ID 				= "id";
 	public static final String SVCP_EXECUTE_EXPERIMENTSERIES = "experimentseriesname";
 	public static final String SVCP_EXECUTE_KEY 			= "key";
