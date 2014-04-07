@@ -9,9 +9,9 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.Users;
 
-public class UserPersistenceProvider extends PersistenceProviderFactory {
+public class AccountPersistenceProvider extends PersistenceProviderFactory {
 
-	private static Logger LOGGER = LoggerFactory.getLogger(UserPersistenceProvider.class);
+	private static Logger LOGGER = LoggerFactory.getLogger(AccountPersistenceProvider.class);
 	
 	/**
 	 * Create the database connection for the given user (via token). The passed token
@@ -65,7 +65,7 @@ public class UserPersistenceProvider extends PersistenceProviderFactory {
 
 		LOGGER.debug("Creating a new persistence provider for account '{}'", account.getName());
 		
-		UserPersistenceProvider factory = new UserPersistenceProvider();
+		AccountPersistenceProvider factory = new AccountPersistenceProvider();
 		return factory.createJPAPersistenceProvider(ServiceConfiguration.SESSION_ID);
 	}
 	

@@ -37,7 +37,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.helper.ServiceStorageModul;
 import org.sopeco.service.helper.SimpleEntityFactory;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 import org.sopeco.service.rest.exchange.ExperimentSeriesRunDecorator;
 
@@ -225,7 +225,7 @@ public class ScenarioService {
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
 		}
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 
 		if (dbCon == null) {
 			LOGGER.warn("Invalid token '{}'", usertoken);
@@ -290,7 +290,7 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		try {
 			
@@ -357,7 +357,7 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
 			LOGGER.info("Cannot fetch database connection with given token.");
@@ -522,7 +522,7 @@ public class ScenarioService {
 		
 		try {
 			
-			ScenarioInstance tmpSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
+			ScenarioInstance tmpSI = AccountPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstance(name, url);
 			decoratedExperimentSeriesRuns(tmpSI, u.getAccountID(), host);
 			return Response.ok(tmpSI).build();
 			
@@ -563,7 +563,7 @@ public class ScenarioService {
 		
 		try {
 			
-			List<ScenarioInstance> listSI = UserPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
+			List<ScenarioInstance> listSI = AccountPersistenceProvider.createPersistenceProvider(usertoken).loadScenarioInstances(name);
 			
 			for (ScenarioInstance si : listSI) {
 				decoratedExperimentSeriesRuns(si, u.getAccountID(), host);
@@ -629,7 +629,7 @@ public class ScenarioService {
 	 */
 	protected static ScenarioDefinition loadScenarioDefinition(String scenarioname, String token) {
 
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(token);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(token);
 		
 		try {
 			
@@ -659,7 +659,7 @@ public class ScenarioService {
 		
 		ScenarioDefinitionWriter writer = new ScenarioDefinitionWriter(u.getToken());
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(u.getToken());
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(u.getToken());
 		
 		String scenarioDefinitionXML = writer.convertToXMLString(scenarioInstance.getScenarioDefinition());
 		

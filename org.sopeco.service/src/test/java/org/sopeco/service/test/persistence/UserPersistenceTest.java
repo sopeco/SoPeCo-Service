@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 import org.sopeco.persistence.IPersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.Account;
 
 /**
@@ -23,7 +23,7 @@ public class UserPersistenceTest {
 	 */
 	@Test
 	public void persistenceTest() {
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider((Account) null);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider((Account) null);
 		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed
 	}
 	

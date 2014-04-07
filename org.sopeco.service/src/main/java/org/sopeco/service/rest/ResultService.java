@@ -16,7 +16,7 @@ import org.sopeco.persistence.entities.ScenarioInstance;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.rest.exchange.ExperimentSeriesRunDecorator;
 
@@ -73,7 +73,7 @@ public class ResultService {
 		
 		try {
 			
-			DataSetAggregated dsa = UserPersistenceProvider.createPersistenceProvider(account).loadDataSet(dataSetID);
+			DataSetAggregated dsa = AccountPersistenceProvider.createPersistenceProvider(account).loadDataSet(dataSetID);
 			return Response.ok(dsa).build();
 			
 		} catch (DataNotFoundException e) {

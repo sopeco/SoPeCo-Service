@@ -27,7 +27,7 @@ import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.helper.ServiceStorageModul;
 import org.sopeco.service.helper.SimpleEntityFactory;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.Users;
 
 /**
@@ -69,7 +69,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection to account database found.");
@@ -120,7 +120,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection to account database found.");
@@ -349,7 +349,7 @@ public class MeasurementSpecificationService {
 	 */
 	private boolean existSpecification(String specification, String scenarioName, String token) {
 
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(token);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(token);
 		
 		ScenarioDefinition sd = null;
 		

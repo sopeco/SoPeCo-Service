@@ -30,7 +30,7 @@ import org.sopeco.service.execute.ExecutionScheduler;
 import org.sopeco.service.execute.QueuedExperiment;
 import org.sopeco.service.execute.ScheduleExpression;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
 import org.sopeco.service.persistence.entities.MECLog;
 import org.sopeco.service.persistence.entities.ScheduledExperiment;
@@ -118,7 +118,7 @@ public class ExecutionService {
 
 		scheduledExperiment.setNextExecutionTime(nextExecution);
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found.");

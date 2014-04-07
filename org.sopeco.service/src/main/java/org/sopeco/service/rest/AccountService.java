@@ -20,7 +20,7 @@ import org.sopeco.persistence.config.PersistenceConfiguration;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.helper.Crypto;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.Users;
 
@@ -204,7 +204,7 @@ public class AccountService {
 		ServicePersistenceProvider.getInstance().storeUser(u);
 		
 		// update the SoPeCo configuration for the configuration with the usertoken
-		UserPersistenceProvider.updatePersistenceProviderConfiguration(uuid);
+		AccountPersistenceProvider.updatePersistenceProviderConfiguration(uuid);
 
 		return Response.ok(uuid).build();
 	}

@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
-import org.sopeco.service.persistence.UserPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
 
 /**
  * The {@link ServiceStorageModul} is used to have general complex database storage methods
@@ -28,7 +28,7 @@ public final class ServiceStorageModul {
 	 */
 	public static boolean storeScenarioDefition(String usertoken, ScenarioDefinition scenarioDefintion) {
 		
-		IPersistenceProvider dbCon = UserPersistenceProvider.createPersistenceProvider(usertoken);
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(usertoken);
 		
 		if (dbCon == null) {
 			LOGGER.warn("No database connection found for the user with the token '{}'.", usertoken);
