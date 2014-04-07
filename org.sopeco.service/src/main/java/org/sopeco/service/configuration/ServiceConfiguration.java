@@ -43,7 +43,6 @@ public abstract class ServiceConfiguration {
 	public static final TimeUnit SCHEDULING_TIME_UNIT 	= TimeUnit.SECONDS; // in seconds
 	
 	// default MeasurementSpecification settings
-	public static final String DEFAULT_MEASUREMENTSPECIFICATION_NAME 	= "MeasurementSpecification";
 	public static final String MEASUREMENTENVIRONMENT_ROOTNAME 			= "root";
 	public static final String MEASUREMENTENVIRONMENT_DELIMITER 		= "/";
 	
@@ -67,7 +66,7 @@ public abstract class ServiceConfiguration {
 	 * All params with prefix SVC points to paths.
 	 * All params with prefix SVCP points to parameter names.
 	 */
-	public static final String SVCP_TOKEN 					= "token";
+	private static final String SVCP_TOKEN 					= "token";
 	
 	public static final String SVC_ACCOUNT 					= "account";
 	public static final String SVC_ACCOUNT_CHECK 			= "check";
