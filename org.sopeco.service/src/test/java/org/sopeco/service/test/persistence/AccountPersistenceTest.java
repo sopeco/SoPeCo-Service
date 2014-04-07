@@ -24,28 +24,33 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-package org.sopeco.service.rest.json;
+package org.sopeco.service.test.persistence;
 
-import org.sopeco.persistence.entities.definition.ParameterDefinition;
+import static org.junit.Assert.assertEquals;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.junit.Test;
+import org.sopeco.persistence.IPersistenceProvider;
+import org.sopeco.service.persistence.AccountPersistenceProvider;
+import org.sopeco.service.persistence.entities.Account;
 
 /**
- * This MixIn is needed for method in the original {@link ParameterDefinition}, which
- * need annotation for fasterxml converting.
+ * Tests the service persistence provider.
  * 
  * @author Peter Merkert
  */
-public class ParameterDefinitionMixIn {
+public class AccountPersistenceTest {
 
-	@JsonIgnore
-	public String getFullName() {
-		return "";
-	}
-	
-	@JsonIgnore
-	public boolean isNumeric() {
-		return false;
+	/**
+	 * If this test fails, then there might be a dependency to an (too) old package
+	 * of eclipselink and/or javax. Then this can happen:
+	 * {@link https://java.net/projects/jersey/lists/users/archive/2010-03/message/281}
+	 * 
+	 * For the jersey-test-framework the eclipselink package must the up to date.
+	 */
+	@Test
+	public void persistenceTest() {
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider((Account) null);
+		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed
 	}
 	
 }
