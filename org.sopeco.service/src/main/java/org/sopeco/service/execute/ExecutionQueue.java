@@ -189,9 +189,7 @@ public class ExecutionQueue implements IStatusListener {
 		experiment.setTimeQueued(System.currentTimeMillis());
 		experimentQueue.add(experiment);
 		
-		
-		
-		checkToExecuteNext(); //TODO not nice style to execute here!
+		checkToExecuteNext();
 	}
 
 	/**
@@ -241,17 +239,6 @@ public class ExecutionQueue implements IStatusListener {
 	}
 
 	/**
-	 * TODO: this method should not be possible. Be aware otherwise of side-effects!
-	 * 
-	 * Returns the experiment which is loaded at the moment.
-	 * 
-	 * @return QueuedExperiment
-	 */
-	/*public QueuedExperiment getCurrentlyRunning() {
-		return runningExperiment;
-	}*/
-
-	/**
 	 * Adds the given {@link StatusMessage} to the currently running experiment.
 	 * If this queue has no active experiment, then the message is discarded.
 	 * 
@@ -274,8 +261,6 @@ public class ExecutionQueue implements IStatusListener {
 	/**
 	 * Checks for failed adding of {@link EventType.MEASUREMENT_FINISHED}. Fires this
 	 * event manually with a {@link StatusMessage}.
-	 * 
-	 * Marked as TODO for Marius Öhler. Why is this method needed?
 	 */
 	public void check() {
 		if (!isExecuting() && runningExperiment != null) {
@@ -454,18 +439,9 @@ public class ExecutionQueue implements IStatusListener {
 		
 		experimentHashCode = String.valueOf(experiment.getScheduledExperiment().getExperimentKey());
 		
-		//TODO check the selected experiments!!
 		SoPeCoRunner runner = new SoPeCoRunner(experimentHashCode,
 											   executionProperties,
 											   experiment.getScheduledExperiment().getSelectedExperiments());
-		
-		/* Example execution for test cases.
-		// fetch example experiement to execute
-		exp.setSelectedExperiments(new ArrayList<String>(Arrays.asList("experimentSeriesDefintion")));	
-		SoPeCoRunner runner  = new SoPeCoRunner(usertoken,
-												executionProperties,
-												exp.getSelectedExperiments());
-		*/
 		
 		executeStatus = threadPool.submit(runner);
 
@@ -512,7 +488,6 @@ public class ExecutionQueue implements IStatusListener {
 			}
 		}
 
-		// TODO maybe merge ID and ExperimentKey, as both are unique
 		ExecutedExperimentDetails eed = new ExecutedExperimentDetails();
 		eed.setSuccessful(!hasError);
 		eed.setTimeFinished(experiment.getTimeEnded());
@@ -522,8 +497,6 @@ public class ExecutionQueue implements IStatusListener {
 		eed.setExperimentKey(experiment.getScheduledExperiment().getExperimentKey());
 		eed.setAccountId(experiment.getScheduledExperiment().getAccountId());
 		eed.setScenarioName(experiment.getScheduledExperiment().getScenarioDefinition().getScenarioName());
-		// TODO why was commented out? Why is the event log not set - Answer: Because the MECLog is stored on it's own
-		// eed.setEventLog(runningExperiment.getEventLogLiteList());
 
 		ServicePersistenceProvider.getInstance().storeExecutedExperimentDetails(eed);
 	}
