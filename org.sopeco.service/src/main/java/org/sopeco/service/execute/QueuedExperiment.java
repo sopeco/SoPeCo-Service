@@ -98,7 +98,6 @@ public class QueuedExperiment {
 		this.timeStarted = pTimeStarted;
 	}
 
-	// TODO
 	public List<MECLogEntry> getEventLogLiteList() {
 		List<MECLogEntry> list = new ArrayList<MECLogEntry>();
 		for (StatusMessage log : statusMessageList) {
@@ -140,7 +139,6 @@ public class QueuedExperiment {
 		return list;
 	}
 
-	// TODO
 	public static String getStatusString(EventType type) {
 		switch (type) {
 		case ACQUIRE_MEC:
