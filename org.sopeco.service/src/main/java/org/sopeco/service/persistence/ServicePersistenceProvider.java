@@ -35,15 +35,13 @@ public final class ServicePersistenceProvider {
 
 	/**
 	 * The entitymanagerfactory is like a thread pol. Entitmanagers to execute database queries
-	 * can be created with this factory.
+	 * can be created with this factory.<br />
 	 * This factory handles a connection pool automatically.
-	 * 
-	 * @Todo close the emf down at end of program life
 	 */
 	private EntityManagerFactory emf;
 
 	/**
-	 * Singleton instance.
+	 * Singleton instance for this persistence provider.
 	 */
 	private static ServicePersistenceProvider singleton;
 	
@@ -80,6 +78,19 @@ public final class ServicePersistenceProvider {
 	ServicePersistenceProvider(EntityManagerFactory factory) {
 		emf = factory;
 	}
+	
+	public static void close() {
+		
+		if (singleton != null) {
+			singleton.emf.close();
+			singleton = null;
+		}
+		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////// DATABASE FETCH METHODS ////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public Users loadUser(String token) {
 		return loadSingleByQuery(Users.class, "getUserByToken", "token", token);
@@ -271,7 +282,6 @@ public final class ServicePersistenceProvider {
 		return result;
 	}
 	
-
 	/*******************************Database configuration*************************************/
 	
 	/**
