@@ -26,6 +26,8 @@
  */
 package org.sopeco.service.test.configuration;
 
+import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+
 /**
  * Utility class with the configuration properties for the test environement.
  * 
@@ -47,6 +49,11 @@ public abstract class TestConfiguration {
 	 * The default test scenario name. It's used when creating scenarios in test cases.
 	 */
 	public static final String TEST_SCENARIO_NAME = "testScenarioName";
+
+	/**
+	 * The default name of the {@link ExperimentSeriesDefinition} when testing.
+	 */
+	public static final String TEST_ESD_NAME = "testExperimentSeriesDefinition";
 	
 	/**
 	 * The default test measurement specification name. It's used when creating the default scenario.
@@ -64,4 +71,5 @@ public abstract class TestConfiguration {
 	 * specification for the "cleanup" scenario.
 	 */
 	public static final String TEST_CLEAN_MEASUREMENT_SPECIFICATION_NAME = "cleanupMeasurementSpecficiationName";
+
 }

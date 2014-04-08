@@ -102,12 +102,13 @@ public class ExperimentSeriesDefinitionService {
 	 */
 	@POST
 	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response renameExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
 										   		  	 @PathParam(MEASURMENTSPECNAME) String measSpecName,
 											   		 @PathParam(EXPSERDEFNAME) String expSerDefName,
-										   		  	 @QueryParam(ServiceConfiguration.SVCP_ESD_NEWEXPSERDEFNAME) String newExpSerDefName,
-										   		     @QueryParam(TOKEN) String usertoken) {
+										   		     @QueryParam(TOKEN) String usertoken,
+										   		  	 String newExpSerDefName) {
 		
 		if (scenarioName == null || measSpecName == null || expSerDefName == null || newExpSerDefName == null || usertoken == null) {
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
@@ -121,7 +122,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 
 		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, newExpSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ScenarioDefinition or MeasurementSpecification or ExperimentSeriesDefinition with given name does not exist.").build();
@@ -179,7 +180,7 @@ public class ExperimentSeriesDefinitionService {
 	 * @param expSerDefName	the name of the {@link ExperimentSeriesDefinition}
 	 * @param usertoken		the user identification
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
-	 * 						OK with {@link List} of {@link ExperimentSeriesDefinition} as {@link Entity}
+	 * 						OK with {@link ExperimentSeriesDefinition} as {@link Entity}
 	 */
 	@GET
 	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
@@ -250,7 +251,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 
 		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		MeasurementSpecification ms = sd.getMeasurementSpecification(measSpecName);
 		
 		if (ms == null) {
 			return Response.status(Status.CONFLICT).entity("Scenario with given name does not exist.").build();
@@ -309,7 +310,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 
 		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		MeasurementSpecification ms = sd.getMeasurementSpecification(measSpecName);
 		
 		if (ms == null) {
 			return Response.status(Status.CONFLICT).entity("ScenarioDefitnion or MeasurementSpecification with given name does not exist.").build();
@@ -408,7 +409,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -451,7 +452,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -536,7 +537,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -598,7 +599,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -694,7 +695,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -757,7 +758,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -856,7 +857,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -920,7 +921,7 @@ public class ExperimentSeriesDefinitionService {
 		}
 		
 		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		ExperimentSeriesDefinition esd 	= getExperimentSeriesDefinition(sd, measSpecName, expSerDefName);
 		
 		if (esd == null) {
 			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
@@ -946,6 +947,42 @@ public class ExperimentSeriesDefinitionService {
 		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
 		
 		return Response.ok(esd.getExperimentAssignments()).build();
+	}
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////// HELPER ////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/**
+	 * Loads the {@link ExperimentSeriesDefinition} with the given out of the {@link ScenarioDefinition}. <b>THE DATABASE
+	 * IS NOT ACCESSED HERE</b>. The {@link MeasurementSpecification} with the given name is fetched from the
+	 * {@link ScenarioDefinition} and then the {@link ExperimentSeriesDefinition} fetched from the {@link MeasurementSpecification}.
+	 * Of coure, <code>null</code> can be returned.
+	 * 
+	 * @param scenarioDefinition	the {@link ScenarioDefinition}
+	 * @param measSpecName			the name of the {@link MeasurementSpecification}
+	 * @param expSerDefName			the name of the {@link ExperimentSeriesDefinition}
+	 * @return						the {@link ExperimentSeriesDefinition}, <code>null</code> possible
+	 */
+	private ExperimentSeriesDefinition getExperimentSeriesDefinition(ScenarioDefinition scenarioDefinition, String measSpecName, String expSerDefName) {
+		
+		MeasurementSpecification ms = scenarioDefinition.getMeasurementSpecification(measSpecName);
+		
+		if (ms == null) {
+			LOGGER.info("Cannot find a MeasurementSpecification with the given name in the database.");
+			return null;
+		}
+		
+		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
+		
+		for (ExperimentSeriesDefinition esd : listESD) {
+			if (esd.getName().equals(expSerDefName)) {
+				return esd;
+			}
+		}
+
+		LOGGER.info("Cannot find a ExperimentSeriesDefitinion with the given name in the database.");
+		return null;
 	}
 	
 }

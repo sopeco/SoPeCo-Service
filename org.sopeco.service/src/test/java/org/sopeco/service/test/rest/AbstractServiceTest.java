@@ -42,6 +42,8 @@ import org.junit.After;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
+import org.sopeco.persistence.entities.definition.MeasurementSpecification;
+import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.json.CustomObjectMapper;
 import org.sopeco.service.test.configuration.TestConfiguration;
@@ -178,6 +180,39 @@ public abstract class AbstractServiceTest extends JerseyTest {
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		return r.readEntity(String.class); // the token is in the Response object
+	}
+	
+	/**
+	 * Creates a scenario with the given data and returns the ScenarioDefinition.
+	 * The passed {@link ExperimentSeriesDefinition} can be a just empty created one.
+	 * 
+	 * @param scenarioName	the name of the {@link ScenarioDefinition}
+	 * @param measSpecName	the name of the {@link MeasurementSpecification}
+	 * @param esd			the {@link ExperimentSeriesDefinition}
+	 * @param token			the user identification
+	 * @return				the created {@link ScenarioDefinition}
+	 */
+	protected ScenarioDefinition createScenario(String scenarioName, String measSpecName, ExperimentSeriesDefinition esd, String token) {
+		
+		// most times the scenario in the testing already exists, that's why no test on the Response are made
+		target().path(ServiceConfiguration.SVC_SCENARIO)
+				.path(ServiceConfiguration.SVC_SCENARIO_ADD)
+				.path(scenarioName)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measSpecName)
+				.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+				.request(MediaType.APPLICATION_JSON)
+				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
+
+		Response r = target().path(ServiceConfiguration.SVC_SCENARIO)
+							 .path(scenarioName)
+							 .path(ServiceConfiguration.SVC_SCENARIO_DEFINITON)
+							 .queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token)
+							 .request(MediaType.APPLICATION_JSON)
+							 .get();
+
+		assertEquals(Status.OK.getStatusCode(), r.getStatus());
+		
+		return r.readEntity(ScenarioDefinition.class);
 	}
 	
 	/**
