@@ -104,9 +104,15 @@
 		<!-- persistence stuff -->
         <dependency>
 			<groupId>org.eclipse.persistence</groupId>
-			<artifactId>javax.persistence</artifactId>
-			<version>2.1.0</version>
+			<artifactId>org.eclipse.persistence.jpa</artifactId>
+			<version>2.5.1</version>
 		</dependency>
+		
+		<dependency>
+		    <groupId>org.eclipse.persistence</groupId>
+		    <artifactId>javax.persistence</artifactId>
+		    <version>2.1.0</version>
+		  </dependency>
 		
     </dependencies>
   
@@ -147,20 +153,8 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<version>${org.apache.maven.war-plugins.version}</version>
 				<configuration>
-				    
+				
 					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
-					<webResources>
-						
-						<!-- automatically include the persistence.xml -->
-						<resource>
-							<directory>persistence</directory>
-							<targetPath>/</targetPath>
-							<includes>
-								<include>**/META-INF/*</include>
-							</includes>
-						</resource>
-						
-					</webResources>
 					
 				</configuration>
 			</plugin>
@@ -171,7 +165,7 @@
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${org.apache.maven.jar-plugins.version}</version>
 				<executions>
-					<execution>
+					<execution> 
 						<id>make-a-jar</id>
 						<phase>compile</phase>
 						<goals>
