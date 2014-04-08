@@ -177,49 +177,6 @@ public class MeasurementSpecificationService {
 	}
 	
 	/**
-	 * Switch to a given {@link MeasurementSpecification} (MS). If the MS does not exist, the switch fails.
-	 * 
-	 * @param usertoken 		the user identification
-	 * @param specificationName the name of the MS to switch to
-	 * @param scenarioName		the scenario name
-	 * @return 					{@link Response} OK, UNAUTHORIZED or CONFLICT
-	 */
-	/*@PUT
-	@Path("{" + NAME + "}/" + ServiceConfiguration.SVC_MEASUREMENT_SWITCH)
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response switchWorkingSpecification(@QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN) String usertoken,
-										       @QueryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME) String specificationName,
-										       @PathParam(NAME) String scenarioName) {
-
-		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-		
-		if (u == null) {
-			LOGGER.warn("Invalid token '{}'!", usertoken);
-			return Response.status(Status.UNAUTHORIZED).build();
-		}
-		
-		LOGGER.debug("Set working specification to: " + specificationName);
-
-		if (existSpecification(specificationName, scenarioName, usertoken)) {
-			LOGGER.debug("Can't set working specification to '{}' because it doesn't exists. ", specificationName);
-			return Response.status(Status.CONFLICT).entity("Can't set working specification.").build();
-		}
-		
-		u.setMeasurementSpecification(specificationName);
-		
-		// update the builder
-		MeasurementSpecificationBuilder msb = new MeasurementSpecificationBuilder(u.getCurrentScenarioDefinitionBuilder(), specificationName);
-		u.getCurrentScenarioDefinitionBuilder().setMeasurementSpecificationBuilder(msb);
-		
-		ServicePersistenceProvider.getInstance().storeUser(u);
-
-		// update the AccountDetails#
-		ServiceStorageModul.updateAccountDetailsSelectedSpecification(usertoken, specificationName);
-		
-		return Response.ok().build();
-	}*/
-	
-	/**
 	 * Creates a new {@link MeasurementSpecification} (MS).<br />
 	 * Return false, if a MS with the given name already exists or the addition failed.
 	 * 
