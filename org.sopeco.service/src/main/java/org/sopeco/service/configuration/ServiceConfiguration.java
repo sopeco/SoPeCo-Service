@@ -198,14 +198,20 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_RESULT_ACCOUNTID 		= "accountid";
 	public static final String SVCP_RESULT_DATASETID 		= "datasetid";
 
-	public static final String SVC_EXPERIMENTSERIES 					= "experimentseries";
-	public static final String SVC_EXPERIMENTSERIES_SCENARIONAME 		= "scenarioname";
-	public static final String SVC_EXPERIMENTSERIES_MEASUREMENTSPECNAME = "measurementspecname";
-	public static final String SVCP_EXPERIMENTSERIES_TOKEN 				= SVCP_TOKEN;
-	public static final String SVCP_EXPERIMENTSERIES_EXPSERDEFNAME 		= "experimentseriesdefinitionname";
-
-
-
-
+	public static final String SVC_ESD 							= "experimentseriesdefinition";
+	public static final String SVC_ESD_SCENARIONAME 			= "scenarioname";
+	public static final String SVC_ESD_MEASUREMENTSPECNAME 		= "measurementspecname";
+	public static final String SVC_ESD_EXPLORATIONSTRATEGY 		= "exporationstrategy";
+	public static final String SVC_ESD_TERMINATIONCONDITIONS 	= "terminationcondition";
+	public static final String SVC_ESD_EXPERIMENTASSIGNMENTS	= "experimentassignments";
+	public static final String SVC_ESD_PREPARATIONASSIGNMENTS 	= "preparationassignments";
+	public static final String SVCP_ESD_TOKEN 					= SVCP_TOKEN;
+	public static final String SVCP_ESD_EXPSERDEFNAME 			= "experimentseriesdefinitionname";
+	public static final String SVCP_ESD_EXPSERDEF 				= "experimentseriesdefinition";
+	public static final String SVCP_ESD_EXPLORATIONSTRATEGY 	= "exporationstrategy2";
+	public static final String SVCP_ESD_TERMINATIONCONDITION 	= "terminationcondition";
+	public static final String SVCP_ESD_NEWEXPSERDEFNAME 		= "newexperimentseriesdefinitionname";
+	public static final String SVCP_ESD_EXPERIMENTASSIGNMENT 	= "experimentassignment";
+	public static final String SVCP_ESD_PREPARATIONASSIGNMENT 	= "preparationassignment";
 
 }

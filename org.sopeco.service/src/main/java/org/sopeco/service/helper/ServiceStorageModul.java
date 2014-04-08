@@ -26,9 +26,12 @@
  */
 package org.sopeco.service.helper;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
+import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
 import org.sopeco.persistence.exceptions.DataNotFoundException;
@@ -117,5 +120,44 @@ public final class ServiceStorageModul {
 		}
 		
 		return sd.getMeasurementSpecification(measSpecName);
+	}
+	
+	/**
+	 * Loads the {@link ExperimentSeriesDefinition} with the given name out of the database. The {@link MeasurementSpecification}
+	 * with the given name is fetched from the loaded {@link ScenarioDefinition} and then the {@link ExperimentSeriesDefinition}
+	 * fetched from the {@link MeasurementSpecification}. Of coure, <code>null</code> can be returned.
+	 * 
+	 * @param scenarioName	the name of the {@link ScenarioDefinition}
+	 * @param measSpecName	the name of the {@link MeasurementSpecification}
+	 * @param expSerDefName	the name of the {@link ExperimentSeriesDefinition}
+	 * @param token			the user identification
+	 * @return				the {@link ExperimentSeriesDefinition}, <code>null</code> possible
+	 */
+	public static ExperimentSeriesDefinition loadExperimentSeriesDefinition(String scenarioName, String measSpecName, String expSerDefName, String token) {
+
+		ScenarioDefinition sd = loadScenarioDefinition(scenarioName, token);
+		
+		if (sd == null) {
+			LOGGER.info("Cannot find a ScenarioDefition with the given name in the database.");
+			return null;
+		}
+		
+		MeasurementSpecification ms = sd.getMeasurementSpecification(measSpecName);
+		
+		if (ms == null) {
+			LOGGER.info("Cannot find a MeasurementSpecification with the given name in the database.");
+			return null;
+		}
+		
+		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
+		
+		for (ExperimentSeriesDefinition esd : listESD) {
+			if (esd.getName().equals(expSerDefName)) {
+				return esd;
+			}
+		}
+
+		LOGGER.info("Cannot find a ExperimentSeriesDefitinion with the given name in the database.");
+		return null;
 	}
 }
