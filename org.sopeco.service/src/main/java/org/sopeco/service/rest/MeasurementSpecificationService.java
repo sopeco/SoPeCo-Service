@@ -325,6 +325,46 @@ public class MeasurementSpecificationService {
 
 		return Response.ok().build();
 	}
+
+	/**
+	 * Returns a {@link List}<{@link ConstantValueAssignment}> of all initial assignments of the {@link MeasurementSpecification}.
+	 * 
+	 * @param specificationName	the name of the {@link MeasurementSpecification} to change
+	 * @param scenarioName		the {@link ScenarioDefinition} name to update
+	 * @param usertoken			the user identification
+	 * @param param				the {@link ParameterDefinition}, which is one part of the {@link ConstantValueAssignment}
+	 * @param parameterValue	the value, which is the second part of the {@link ConstantValueAssignment}
+	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
+	 * 							OK with {@link List}<{@link ConstantValueAssignment}> as {@link Entity}
+	 */		
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME + "}/" + ServiceConfiguration.SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllInitialAssignments(@PathParam(ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME) String specificationName,
+		      							     @PathParam(SCENARIONAME) String scenarioName,
+		      							     @QueryParam(TOKEN) String usertoken,
+		      							     @QueryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_PARAMETERVAL) String parameterValue) {
+
+		if (usertoken == null || specificationName == null || scenarioName == null || parameterValue == null) {
+			return Response.status(Status.CONFLICT).entity("One or more values are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, specificationName, usertoken);
+		
+		if (ms == null) {
+			LOGGER.warn("MeasurementSpecification or ScenarioDefinition with the given name doesn't exist.");
+			return Response.status(Status.CONFLICT).entity("MeasurementSpecification or ScenarioDefinition with the given name doesn't exist.").build();	
+		}
+		
+		return Response.ok(ms.getInitializationAssignemts()).build();
+	}
 	
 	/**
 	 * Adds or updates an initial assignments in the {@link MeasurementSpecification}. The initial assignment is an 
@@ -338,64 +378,64 @@ public class MeasurementSpecificationService {
 	 * @param parameterValue	the value, which is the second part of the {@link ConstantValueAssignment}
 	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@POST
-//	@Path("{" + SCENARIONAME + "}/{" + ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME + "}/" + ServiceConfiguration.SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response addInitialAssignments(@PathParam(ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME) String specificationName,
-//		      							  @PathParam(SCENARIONAME) String scenarioName,
-//		      							  @QueryParam(TOKEN) String usertoken,
-//									      @QueryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_PARAMETERDEF) ParameterDefinition param,
-//									      @QueryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_PARAMETERVAL) String parameterValue) {
-//
-//		if (usertoken == null || specificationName == null || scenarioName == null || param == null || parameterValue == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more values are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//		
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		
-//		if (sd == null) {
-//			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
-//			return Response.status(Status.CONFLICT).entity("ScenarioDefinition with the given name doesn't exists.").build();	
-//		}
-//		
-//		MeasurementSpecification ms = sd.getMeasurementSpecification(specificationName);
-//		
-//		if (ms == null) {
-//			LOGGER.warn("MeasurementSpecification with the name '{}' doesn't exist.", specificationName);
-//			return Response.status(Status.CONFLICT).entity("MeasurementSpecification with the given name doesn't exist.").build();	
-//		}
-//		
-//		List<ConstantValueAssignment> listCVA = ms.getInitializationAssignemts();
-//		
-//		// check if the assignment is already there
-//		boolean found = false;
-//		for (ConstantValueAssignment cva : listCVA) {
-//			
-//			if (cva.getParameter().equals(param)) {
-//				cva.setValue(parameterValue);
-//				found = true;
-//				break;
-//			}
-//			
-//		}
-//		
-//		if (!found) {
-//			ConstantValueAssignment cva = new ConstantValueAssignment();
-//			cva.setParameter(param);
-//			cva.setValue(parameterValue);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//
-//		return Response.ok().build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME + "}/" + ServiceConfiguration.SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addInitialAssignments(@PathParam(ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME) String specificationName,
+		      							  @PathParam(SCENARIONAME) String scenarioName,
+		      							  @QueryParam(TOKEN) String usertoken,
+									      @QueryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_PARAMETERVAL) String parameterValue,
+									      ParameterDefinition param) {
+
+		if (usertoken == null || specificationName == null || scenarioName == null || param == null || parameterValue == null) {
+			return Response.status(Status.CONFLICT).entity("One or more values are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+		
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		
+		if (sd == null) {
+			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
+			return Response.status(Status.CONFLICT).entity("ScenarioDefinition with the given name doesn't exists.").build();	
+		}
+		
+		MeasurementSpecification ms = sd.getMeasurementSpecification(specificationName);
+		
+		if (ms == null) {
+			LOGGER.warn("MeasurementSpecification with the name '{}' doesn't exist.", specificationName);
+			return Response.status(Status.CONFLICT).entity("MeasurementSpecification with the given name doesn't exist.").build();	
+		}
+		
+		List<ConstantValueAssignment> listCVA = ms.getInitializationAssignemts();
+		
+		// check if the assignment is already there
+		boolean found = false;
+		for (ConstantValueAssignment cva : listCVA) {
+			
+			if (cva.getParameter().equals(param)) {
+				cva.setValue(parameterValue);
+				found = true;
+				break;
+			}
+			
+		}
+		
+		if (!found) {
+			ConstantValueAssignment cva = new ConstantValueAssignment();
+			cva.setParameter(param);
+			cva.setValue(parameterValue);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Removes an intiail assignment of a {@link MeasurementSpecification}.
@@ -407,13 +447,13 @@ public class MeasurementSpecificationService {
 	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
 	@DELETE
-	//@Path("{" + SCENARIONAME + "}/{" + ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME + "}/" + ServiceConfiguration.SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT)
-	@Path("{" + SCENARIONAME + "}/test")
+	@Path("{" + SCENARIONAME + "}/{" + ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME + "}/" + ServiceConfiguration.SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT)
+	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response removeInitialAssignments(@PathParam(ServiceConfiguration.SVC_MEASUREMENTSPEC_NAME) String specificationName,
 		      							  	 @PathParam(SCENARIONAME) String scenarioName,
 		      							  	 @QueryParam(TOKEN) String usertoken,
-		      							  	 @QueryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_PARAMETERDEF) ParameterDefinition param) {
+		      							  	 ParameterDefinition param) {
 
 		if (usertoken == null || specificationName == null || scenarioName == null || param == null) {
 			return Response.status(Status.CONFLICT).entity("One or more values are null.").build();

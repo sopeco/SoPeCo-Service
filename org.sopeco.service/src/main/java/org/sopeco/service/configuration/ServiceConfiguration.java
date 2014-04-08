@@ -134,7 +134,7 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_MEASUREMENTSPEC_LISTSPECS 	 = "listspecification";
 	public static final String SVC_MEASUREMENTSPEC_CREATE 		 = "create";
 	public static final String SVC_MEASUREMENTSPEC_RENAME 		 = "rename";
-	public static final String SVC_MEASUREMENTSPEC_NAME 		 = "name";
+	public static final String SVC_MEASUREMENTSPEC_NAME 		 = "measurementspecificationname";
 	public static final String SVCP_MEASUREMENTSPEC_TOKEN 		 = SVCP_TOKEN;
 	public static final String SVCP_MEASUREMENTSPEC_SPECNAME 	 = "specname";
 	public static final String SVCP_MEASUREMENTSPEC_SCENARIONAME = "scenarioname";

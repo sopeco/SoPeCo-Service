@@ -100,39 +100,39 @@ public class ExperimentSeriesDefinitionService {
 	 * @param newExpSerDefName 	the new name of the {@link ExperimentSeriesDefinition}
 	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@POST
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response renameExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
-//										   		  	 @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//											   		 @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   		  	 @QueryParam(ServiceConfiguration.SVCP_ESD_NEWEXPSERDEFNAME) String newExpSerDefName,
-//										   		     @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || newExpSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//
-//		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, newExpSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ScenarioDefinition or MeasurementSpecification or ExperimentSeriesDefinition with given name does not exist.").build();
-//		}
-//		
-//		esd.setName(newExpSerDefName);
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@POST
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response renameExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
+										   		  	 @PathParam(MEASURMENTSPECNAME) String measSpecName,
+											   		 @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   		  	 @QueryParam(ServiceConfiguration.SVCP_ESD_NEWEXPSERDEFNAME) String newExpSerDefName,
+										   		     @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || newExpSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, newExpSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ScenarioDefinition or MeasurementSpecification or ExperimentSeriesDefinition with given name does not exist.").build();
+		}
+		
+		esd.setName(newExpSerDefName);
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Returns all the {@link ExperimentSeriesDefinition} in the {@link MeasurementSpecification} of
@@ -144,32 +144,32 @@ public class ExperimentSeriesDefinitionService {
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 						OK with {@link List} of {@link ExperimentSeriesDefinition} as {@link Entity}
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getAllExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
-//										   			 @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   			 @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
-//		
-//		if (ms == null) {
-//			return Response.status(Status.CONFLICT).entity("Scenario or MeasurementSpecification with given name does not exist .").build();
-//		}
-//		
-//		return Response.ok(ms.getExperimentSeriesDefinitions()).build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getAllExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
+										   			 @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   			 @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		
+		if (ms == null) {
+			return Response.status(Status.CONFLICT).entity("Scenario or MeasurementSpecification with given name does not exist .").build();
+		}
+		
+		return Response.ok(ms.getExperimentSeriesDefinitions()).build();
+	}
 	
 	/**
 	 * Returns the {@link ExperimentSeriesDefinition} with the name in the URI.
@@ -181,43 +181,43 @@ public class ExperimentSeriesDefinitionService {
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 						OK with {@link List} of {@link ExperimentSeriesDefinition} as {@link Entity}
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
-//										   		  @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   		  @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   		  @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//
-//		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
-//		
-//		if (ms == null) {
-//			return Response.status(Status.CONFLICT).entity("ScenarioDefitnion or MeasurementSpecification with given name does not exist.").build();
-//		}
-//		
-//		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
-//		
-//		for (ExperimentSeriesDefinition esd : listESD) {
-//			
-//			if (esd.getName().equals(expSerDefName)) {
-//				return Response.ok(esd).build();
-//			}
-//			
-//		}
-//
-//		return Response.status(Status.CONFLICT).entity("No ExperimentSeries in the MeasurementSpecification with the given name.").build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
+										   		  @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   		  @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   		  @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		
+		if (ms == null) {
+			return Response.status(Status.CONFLICT).entity("ScenarioDefitnion or MeasurementSpecification with given name does not exist.").build();
+		}
+		
+		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
+		
+		for (ExperimentSeriesDefinition esd : listESD) {
+			
+			if (esd.getName().equals(expSerDefName)) {
+				return Response.ok(esd).build();
+			}
+			
+		}
+
+		return Response.status(Status.CONFLICT).entity("No ExperimentSeries in the MeasurementSpecification with the given name.").build();
+	}
 	
 	/**
 	 * Adds a the passed {@link ExperimentSeriesDefinition} to the {@link MeasurementSpecification}. If a {@link ExperimentSeriesDefinition}
@@ -229,56 +229,56 @@ public class ExperimentSeriesDefinitionService {
 	 * @param usertoken		the user identification
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@PUT
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}")
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response addExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
-//										   		  @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   		  @QueryParam(ServiceConfiguration.SVCP_ESD_EXPSERDEF) ExperimentSeriesDefinition expSerDef,
-//										   		  @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDef == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//
-//		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
-//		
-//		if (ms == null) {
-//			return Response.status(Status.CONFLICT).entity("Scenario with given name does not exist.").build();
-//		}
-//		
-//		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
-//		
-//		// search, if an ESD with the given name already exists
-//		boolean found = false;
-//		for (ExperimentSeriesDefinition esd : listESD) {
-//			
-//			if (esd.getName().equals(expSerDef.getName())) {
-//				found = true;
-//				esd = expSerDef;
-//				return Response.ok().build();
-//			}
-//			
-//		}
-//
-//		// when there is no ESD with the same name, it can be safely added
-//		if (!found) {
-//			listESD.add(expSerDef);
-//		}
-//
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}")
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
+										   		  @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   		  @QueryParam(TOKEN) String usertoken,
+										   		  ExperimentSeriesDefinition expSerDef) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDef == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		
+		if (ms == null) {
+			return Response.status(Status.CONFLICT).entity("Scenario with given name does not exist.").build();
+		}
+		
+		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
+		
+		// search, if an ESD with the given name already exists
+		boolean found = false;
+		for (ExperimentSeriesDefinition esd : listESD) {
+			
+			if (esd.getName().equals(expSerDef.getName())) {
+				found = true;
+				esd = expSerDef;
+				return Response.ok().build();
+			}
+			
+		}
+
+		// when there is no ESD with the same name, it can be safely added
+		if (!found) {
+			listESD.add(expSerDef);
+		}
+
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 
 	/**
 	 * Deletes the {@link ExperimentSeriesDefinition} with the given name.
@@ -289,52 +289,52 @@ public class ExperimentSeriesDefinitionService {
 	 * @param usertoken		the user identification
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@DELETE
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response removeExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
-//										   		     @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   		     @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   		     @QueryParam(TOKEN) String usertoken) {
-//		  
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//
-//		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
-//		
-//		if (ms == null) {
-//			return Response.status(Status.CONFLICT).entity("ScenarioDefitnion or MeasurementSpecification with given name does not exist.").build();
-//		}
-//		
-//		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
-//		
-//		ExperimentSeriesDefinition toRemove = null;
-//		for (ExperimentSeriesDefinition esd : listESD) {
-//			
-//			if (esd.getName().equals(expSerDefName)) {
-//				toRemove = esd;
-//				break;
-//			}
-//			
-//		}
-//		
-//		if (toRemove != null) {
-//			listESD.remove(toRemove);
-//		}
-//
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@DELETE
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}")
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removeExperimentSeriesDefinition(@PathParam(SCENARIONAME) String scenarioName,
+										   		     @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   		     @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   		     @QueryParam(TOKEN) String usertoken) {
+		  
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+
+		ScenarioDefinition sd 		= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		MeasurementSpecification ms = ServiceStorageModul.loadMeasurementSpecification(scenarioName, measSpecName, usertoken);
+		
+		if (ms == null) {
+			return Response.status(Status.CONFLICT).entity("ScenarioDefitnion or MeasurementSpecification with given name does not exist.").build();
+		}
+		
+		List<ExperimentSeriesDefinition> listESD = ms.getExperimentSeriesDefinitions();
+		
+		ExperimentSeriesDefinition toRemove = null;
+		for (ExperimentSeriesDefinition esd : listESD) {
+			
+			if (esd.getName().equals(expSerDefName)) {
+				toRemove = esd;
+				break;
+			}
+			
+		}
+		
+		if (toRemove != null) {
+			listESD.remove(toRemove);
+		}
+
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Returns the {@link ExplorationStrategy} of the {@link ExperimentSeriesDefinition}, which can be identified via the given
@@ -347,33 +347,33 @@ public class ExperimentSeriesDefinitionService {
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 						OK with {@link ExplorationStrategy} as {@link Entity}
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
-//										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		return Response.ok(esd.getExplorationStrategy()).build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
+										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		return Response.ok(esd.getExplorationStrategy()).build();
+	}
 	
 	/**
 	 * Adds the {@link ExplorationStrategy} of the {@link ExperimentSeriesDefinition}, which can be identified via the given
@@ -386,40 +386,40 @@ public class ExperimentSeriesDefinitionService {
 	 * @param explorationStrategy	the {@link ExplorationStrategy}
 	 * @return						{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@PUT
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response addExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
-//										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   @QueryParam(TOKEN) String usertoken,
-//										   @QueryParam(ServiceConfiguration.SVCP_ESD_EXPLORATIONSTRATEGY) ExplorationStrategy explorationStrategy) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || explorationStrategy == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		esd.setExplorationStrategy(explorationStrategy);
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
+										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   @QueryParam(TOKEN) String usertoken,
+										   ExplorationStrategy explorationStrategy) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || explorationStrategy == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		esd.setExplorationStrategy(explorationStrategy);
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Removes the {@link ExplorationStrategy} from the {@link ExperimentSeriesDefinition}.
@@ -430,39 +430,39 @@ public class ExperimentSeriesDefinitionService {
 	 * @param usertoken		the user identification
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@DELETE
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response removeExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
-//										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										   @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										   @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		esd.setExplorationStrategy(null);
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@DELETE
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPLORATIONSTRATEGY)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removeExplorationStrategy(@PathParam(SCENARIONAME) String scenarioName,
+										   @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										   @PathParam(EXPSERDEFNAME) String expSerDefName,
+										   @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		esd.setExplorationStrategy(null);
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Returns the {@link Set} of {@link ExperimentTerminationCondition} of the {@link ExperimentSeriesDefinition}, which can be
@@ -475,33 +475,33 @@ public class ExperimentSeriesDefinitionService {
 	 * @return				{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 						OK with {@link Set} of {@link ExperimentTerminationCondition} as {@link Entity}		
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
-//										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										    @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										    @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		return Response.ok(esd.getTerminationConditions()).build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
+										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										    @PathParam(EXPSERDEFNAME) String expSerDefName,
+										    @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		return Response.ok(esd.getTerminationConditions()).build();
+	}
 	
 	/**
 	 * Adds the given {@link ExperimentTerminationCondition} to the {@link Set} of {@link ExperimentSeriesDefinition}, which can be
@@ -514,55 +514,55 @@ public class ExperimentSeriesDefinitionService {
 	 * @param terminationCondition	the {@link ExperimentTerminationCondition} to set
 	 * @return						{@link Response} OK, UNAUTHORIZED or CONFLICT	
 	 */
-//	@PUT
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response setTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
-//										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										    @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										    @QueryParam(TOKEN) String usertoken,
-//										    @QueryParam(ServiceConfiguration.SVCP_ESD_TERMINATIONCONDITION) ExperimentTerminationCondition terminationCondition) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || terminationCondition == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		// now actually add the ExperimentTerminationCondition
-//		boolean found = false;
-//		for (ExperimentTerminationCondition etc : esd.getTerminationConditions()) {
-//			
-//			if (etc.getName().equals(terminationCondition.getName())) {
-//				etc = terminationCondition;
-//				found = true;
-//				break;
-//			}
-//			
-//		}
-//		
-//		if (!found) {
-//			esd.addTerminationCondition(terminationCondition);
-//		}
-//		
-//		// save changes in database
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response setTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
+										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										    @PathParam(EXPSERDEFNAME) String expSerDefName,
+										    @QueryParam(TOKEN) String usertoken,
+										    ExperimentTerminationCondition terminationCondition) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || terminationCondition == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		// now actually add the ExperimentTerminationCondition
+		boolean found = false;
+		for (ExperimentTerminationCondition etc : esd.getTerminationConditions()) {
+			
+			if (etc.getName().equals(terminationCondition.getName())) {
+				etc = terminationCondition;
+				found = true;
+				break;
+			}
+			
+		}
+		
+		if (!found) {
+			esd.addTerminationCondition(terminationCondition);
+		}
+		
+		// save changes in database
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Removes the given {@link ExperimentTerminationCondition} with the from the {@link Set} of {@link ExperimentSeriesDefinition}, which can be
@@ -576,51 +576,51 @@ public class ExperimentSeriesDefinitionService {
 	 * @param terminationCondition	the {@link ExperimentTerminationCondition} to set
 	 * @return						{@link Response} OK, UNAUTHORIZED or CONFLICT	
 	 */
-//	@DELETE
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response removeTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
-//										       @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										       @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										       @QueryParam(TOKEN) String usertoken,
-//										       @QueryParam(ServiceConfiguration.SVCP_ESD_TERMINATIONCONDITION) ExperimentTerminationCondition terminationCondition) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || terminationCondition == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		ExperimentTerminationCondition toRemove = null;
-//		for (ExperimentTerminationCondition etc : esd.getTerminationConditions()) {
-//			if (etc.getName().equals(terminationCondition.getName())) {
-//				toRemove = etc;
-//				break;
-//			}
-//		}
-//		
-//		// avoid concurrent modification of the traveresed set above
-//		if (toRemove != null) {
-//			esd.getTerminationConditions().remove(toRemove);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok().build();
-//	}
+	@DELETE
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_TERMINATIONCONDITIONS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removeTerminationCondition(@PathParam(SCENARIONAME) String scenarioName,
+										       @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										       @PathParam(EXPSERDEFNAME) String expSerDefName,
+										       @QueryParam(TOKEN) String usertoken,
+										       ExperimentTerminationCondition terminationCondition) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || terminationCondition == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd 			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		ExperimentTerminationCondition toRemove = null;
+		for (ExperimentTerminationCondition etc : esd.getTerminationConditions()) {
+			if (etc.getName().equals(terminationCondition.getName())) {
+				toRemove = etc;
+				break;
+			}
+		}
+		
+		// avoid concurrent modification of the traveresed set above
+		if (toRemove != null) {
+			esd.getTerminationConditions().remove(toRemove);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok().build();
+	}
 	
 	/**
 	 * Returns the experiment assignments ({@link List}<{@link ParameterValueAssignment}>) of the {@link ExperimentSeriesDefinition}.
@@ -632,33 +632,33 @@ public class ExperimentSeriesDefinitionService {
 	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 							OK with {@link List}<{@link ParameterValueAssignment}> as {@link Entity}
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										    @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										    @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		return Response.ok(esd.getExperimentAssignments()).build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										    @PathParam(EXPSERDEFNAME) String expSerDefName,
+										    @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		return Response.ok(esd.getExperimentAssignments()).build();
+	}
 	
 	/**
 	 * Adds a {@link ParameterValueAssignment} to the experiment assignments of the {@link ExperimentSeriesDefinition}.
@@ -672,55 +672,55 @@ public class ExperimentSeriesDefinitionService {
 	 * @param parameterValueAssignment	the {@link ParameterValueAssignment} to add to the experiment assignments
 	 * @return							{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@PUT
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response addExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										    @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										    @QueryParam(TOKEN) String usertoken,
-//										    @QueryParam(ServiceConfiguration.SVCP_ESD_EXPERIMENTASSIGNMENT) ParameterValueAssignment parameterValueAssignment ) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || parameterValueAssignment == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//
-//		boolean found = false;
-//		for (ParameterValueAssignment pva : esd.getExperimentAssignments()) {
-//			
-//			if (pva.getParameter().getName().equals(parameterValueAssignment.getParameter().getFullName())
-//					&& pva.getParameter().getNamespace().getName().equals(parameterValueAssignment.getParameter().getNamespace().getFullName())) {
-//				
-//				pva 	= parameterValueAssignment;
-//				found 	= true;
-//				break;
-//			}
-//			
-//		}
-//		
-//		if (!found) {
-//			esd.getExperimentAssignments().add(parameterValueAssignment);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok(esd.getExperimentAssignments()).build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										    @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										    @PathParam(EXPSERDEFNAME) String expSerDefName,
+										    @QueryParam(TOKEN) String usertoken,
+										    ParameterValueAssignment parameterValueAssignment ) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || parameterValueAssignment == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+
+		boolean found = false;
+		for (ParameterValueAssignment pva : esd.getExperimentAssignments()) {
+			
+			if (pva.getParameter().getName().equals(parameterValueAssignment.getParameter().getFullName())
+					&& pva.getParameter().getNamespace().getName().equals(parameterValueAssignment.getParameter().getNamespace().getFullName())) {
+				
+				pva 	= parameterValueAssignment;
+				found 	= true;
+				break;
+			}
+			
+		}
+		
+		if (!found) {
+			esd.getExperimentAssignments().add(parameterValueAssignment);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok(esd.getExperimentAssignments()).build();
+	}
 	
 	/**
 	 * Removes the experiment assignment, which is given as a {@link ParameterValueAssignment}. The {@link ParameterValueAssignment} is removed
@@ -735,54 +735,54 @@ public class ExperimentSeriesDefinitionService {
 	 * @param parameterValueAssignment	the {@link ParameterValueAssignment} to delete
 	 * @return							{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@DELETE
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response removeExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										       @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										       @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										       @QueryParam(TOKEN) String usertoken,
-//										       @QueryParam(ServiceConfiguration.SVCP_ESD_EXPERIMENTASSIGNMENT) ParameterValueAssignment parameterValueAssignment ) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || parameterValueAssignment == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//
-//		ParameterValueAssignment toRemove = null;
-//		for (ParameterValueAssignment pva : esd.getExperimentAssignments()) {
-//			
-//			if (pva.getParameter().getName().equals(parameterValueAssignment.getParameter().getFullName())
-//					&& pva.getParameter().getNamespace().getName().equals(parameterValueAssignment.getParameter().getNamespace().getFullName())) {
-//				
-//				toRemove = pva;
-//				break;
-//			}
-//			
-//		}
-//		
-//		if (toRemove != null) {
-//			esd.getExperimentAssignments().remove(toRemove);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok(esd.getExperimentAssignments()).build();
-//	}
+	@DELETE
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_EXPERIMENTASSIGNMENTS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removeExperimentAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										       @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										       @PathParam(EXPSERDEFNAME) String expSerDefName,
+										       @QueryParam(TOKEN) String usertoken,
+										       ParameterValueAssignment parameterValueAssignment ) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || parameterValueAssignment == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+
+		ParameterValueAssignment toRemove = null;
+		for (ParameterValueAssignment pva : esd.getExperimentAssignments()) {
+			
+			if (pva.getParameter().getName().equals(parameterValueAssignment.getParameter().getFullName())
+					&& pva.getParameter().getNamespace().getName().equals(parameterValueAssignment.getParameter().getNamespace().getFullName())) {
+				
+				toRemove = pva;
+				break;
+			}
+			
+		}
+		
+		if (toRemove != null) {
+			esd.getExperimentAssignments().remove(toRemove);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok(esd.getExperimentAssignments()).build();
+	}
 	
 	/**
 	 * Returns the preparation assignments ({@link List}<{@link ConstantValueAssignment}>) of the {@link ExperimentSeriesDefinition}.
@@ -794,33 +794,33 @@ public class ExperimentSeriesDefinitionService {
 	 * @return					{@link Response} OK, UNAUTHORIZED or CONFLICT<br />
 	 * 							OK with {@link List}<{@link ConstantValueAssignment}> as {@link Entity}
 	 */
-//	@GET
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response getPreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										     @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										     @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										     @QueryParam(TOKEN) String usertoken) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//		
-//		return Response.ok(esd.getPreperationAssignments()).build();
-//	}
+	@GET
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getPreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										     @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										     @PathParam(EXPSERDEFNAME) String expSerDefName,
+										     @QueryParam(TOKEN) String usertoken) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ExperimentSeriesDefinition esd = ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+		
+		return Response.ok(esd.getPreperationAssignments()).build();
+	}
 	
 	/**
 	 * Adds a {@link ConstantValueAssignment} to the preparation assignments of the {@link ExperimentSeriesDefinition}.
@@ -834,56 +834,56 @@ public class ExperimentSeriesDefinitionService {
 	 * @param constantValueAssignment	the {@link ConstantValueAssignment} to add to the experiment assignments
 	 * @return							{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@PUT
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response addPreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										     @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										     @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										     @QueryParam(TOKEN) String usertoken,
-//										     @QueryParam(ServiceConfiguration.SVCP_ESD_PREPARATIONASSIGNMENT) ConstantValueAssignment constantValueAssignment ) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || constantValueAssignment == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//
-//		boolean found = false;
-//		for (ConstantValueAssignment cva : esd.getPreperationAssignments()) {
-//			
-//			if (cva.getValue().equals(constantValueAssignment.getValue())
-//				&& cva.getParameter().getFullName().equals(constantValueAssignment.getParameter().getFullName())) {
-//				
-//				cva 	= constantValueAssignment;
-//				found 	= true;
-//				break;
-//				
-//			}
-//			
-//		}
-//		
-//		if (!found) {
-//			esd.getExperimentAssignments().add(constantValueAssignment);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok(esd.getExperimentAssignments()).build();
-//	}
+	@PUT
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response addPreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										     @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										     @PathParam(EXPSERDEFNAME) String expSerDefName,
+										     @QueryParam(TOKEN) String usertoken,
+										     ConstantValueAssignment constantValueAssignment ) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || constantValueAssignment == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+
+		boolean found = false;
+		for (ConstantValueAssignment cva : esd.getPreperationAssignments()) {
+			
+			if (cva.getValue().equals(constantValueAssignment.getValue())
+				&& cva.getParameter().getFullName().equals(constantValueAssignment.getParameter().getFullName())) {
+				
+				cva 	= constantValueAssignment;
+				found 	= true;
+				break;
+				
+			}
+			
+		}
+		
+		if (!found) {
+			esd.getExperimentAssignments().add(constantValueAssignment);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok(esd.getExperimentAssignments()).build();
+	}
 	
 	/**
 	 * Removes the preparation assignment, which is given as a {@link ConstantValueAssignment}. The {@link ConstantValueAssignment}
@@ -898,54 +898,54 @@ public class ExperimentSeriesDefinitionService {
 	 * @param constantValueAssignment	the {@link ConstantValueAssignment} to delete
 	 * @return							{@link Response} OK, UNAUTHORIZED or CONFLICT
 	 */
-//	@DELETE
-//	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
-//	@Consumes(MediaType.APPLICATION_JSON)
-//	@Produces(MediaType.APPLICATION_JSON)
-//	public Response removePreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
-//										        @PathParam(MEASURMENTSPECNAME) String measSpecName,
-//										        @PathParam(EXPSERDEFNAME) String expSerDefName,
-//										        @QueryParam(TOKEN) String usertoken,
-//										        @QueryParam(ServiceConfiguration.SVCP_ESD_PREPARATIONASSIGNMENT) ConstantValueAssignment constantValueAssignment ) {
-//		
-//		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || constantValueAssignment == null) {
-//			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
-//		}
-//		
-//		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
-//
-//		if (u == null) {
-//			LOGGER.warn("Invalid token '{}'!", usertoken);
-//			return Response.status(Status.UNAUTHORIZED).build();
-//		}
-//		
-//		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
-//		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
-//		
-//		if (esd == null) {
-//			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
-//		}
-//
-//		ConstantValueAssignment toRemove = null;
-//		for (ConstantValueAssignment cva : esd.getPreperationAssignments()) {
-//			
-//			if (cva.getValue().equals(constantValueAssignment.getValue())
-//				&& cva.getParameter().getFullName().equals(constantValueAssignment.getParameter().getFullName())) {
-//				
-//				toRemove = cva;
-//				break;
-//				
-//			}
-//			
-//		}
-//		
-//		if (toRemove != null) {
-//			esd.getExperimentAssignments().remove(toRemove);
-//		}
-//		
-//		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
-//		
-//		return Response.ok(esd.getExperimentAssignments()).build();
-//	}
+	@DELETE
+	@Path("{" + SCENARIONAME + "}/{" + MEASURMENTSPECNAME + "}/{" + EXPSERDEFNAME + "}/" + ServiceConfiguration.SVC_ESD_PREPARATIONASSIGNMENTS)
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response removePreparationAssignment(@PathParam(SCENARIONAME) String scenarioName,
+										        @PathParam(MEASURMENTSPECNAME) String measSpecName,
+										        @PathParam(EXPSERDEFNAME) String expSerDefName,
+										        @QueryParam(TOKEN) String usertoken,
+										        ConstantValueAssignment constantValueAssignment ) {
+		
+		if (scenarioName == null || measSpecName == null || expSerDefName == null || usertoken == null || constantValueAssignment == null) {
+			return Response.status(Status.CONFLICT).entity("One or more arguments are null.").build();
+		}
+		
+		Users u = ServicePersistenceProvider.getInstance().loadUser(usertoken);
+
+		if (u == null) {
+			LOGGER.warn("Invalid token '{}'!", usertoken);
+			return Response.status(Status.UNAUTHORIZED).build();
+		}
+		
+		ScenarioDefinition sd			= ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
+		ExperimentSeriesDefinition esd 	= ServiceStorageModul.loadExperimentSeriesDefinition(scenarioName, measSpecName, expSerDefName, usertoken);
+		
+		if (esd == null) {
+			return Response.status(Status.CONFLICT).entity("ExperimentSeriesDefinition cannot be found in database. Check the name of the ScenarioDefinition and MeasurementSpecification.").build();
+		}
+
+		ConstantValueAssignment toRemove = null;
+		for (ConstantValueAssignment cva : esd.getPreperationAssignments()) {
+			
+			if (cva.getValue().equals(constantValueAssignment.getValue())
+				&& cva.getParameter().getFullName().equals(constantValueAssignment.getParameter().getFullName())) {
+				
+				toRemove = cva;
+				break;
+				
+			}
+			
+		}
+		
+		if (toRemove != null) {
+			esd.getExperimentAssignments().remove(toRemove);
+		}
+		
+		ServiceStorageModul.storeScenarioDefition(usertoken, sd);
+		
+		return Response.ok(esd.getExperimentAssignments()).build();
+	}
 	
 }
