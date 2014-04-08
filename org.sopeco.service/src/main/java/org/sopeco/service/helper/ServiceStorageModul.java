@@ -107,7 +107,7 @@ public final class ServiceStorageModul {
 	 * @param token			the user identification
 	 * @return				the {@link MeasurementSpecification}, <code>null</code> possible
 	 */
-	public static MeasurementSpecification loadSpecification(String scenarioName, String measSpecName, String token) {
+	public static MeasurementSpecification loadMeasurementSpecification(String scenarioName, String measSpecName, String token) {
 
 		ScenarioDefinition sd = loadScenarioDefinition(scenarioName, token);
 		
