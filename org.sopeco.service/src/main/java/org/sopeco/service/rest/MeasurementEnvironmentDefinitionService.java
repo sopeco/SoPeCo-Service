@@ -109,7 +109,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -154,7 +154,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -199,7 +199,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 	
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -239,7 +239,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -288,7 +288,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -342,7 +342,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -403,7 +403,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -467,7 +467,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);
@@ -532,7 +532,7 @@ public class MeasurementEnvironmentDefinitionService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name.", usertoken);

@@ -122,7 +122,7 @@ public class ScenarioService {
 		scenarioName = scenarioName.replaceAll("[^a-zA-Z0-9_]", "_");
 		
 		// check if a scenario with the given name already exsists
-		if (loadScenarioDefinition(scenarioName, usertoken) != null) {
+		if (ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken) != null) {
 			LOGGER.info("A scenario with the given name '{}' already exsits!", scenarioName);
 			return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
 		}
@@ -193,7 +193,7 @@ public class ScenarioService {
 		}
 		
 		// check if a scenario with the given name already exsists
-		if (loadScenarioDefinition(scenario.getScenarioName(), usertoken) != null) {
+		if (ServiceStorageModul.loadScenarioDefinition(scenario.getScenarioName(), usertoken) != null) {
 			LOGGER.info("A scenario with the given name '{}' already exsits!", scenario.getScenarioName());
 			return Response.status(Status.CONFLICT).entity("scenario name already exsits").build();
 		}
@@ -390,7 +390,7 @@ public class ScenarioService {
 			return Response.status(Status.INTERNAL_SERVER_ERROR).entity("Cannot fetch database connection with given token.").build();
 		}
 		
-		ScenarioDefinition sd = loadScenarioDefinition(scenarioDefinitionName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioDefinitionName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("ScenarioDefinition name does not match as ScenarioDefintiion.");
@@ -464,7 +464,7 @@ public class ScenarioService {
 		
 		
 		String sdName 			= scenarioDefinition.getScenarioName();
-		ScenarioDefinition sd 	= loadScenarioDefinition(sdName, usertoken);
+		ScenarioDefinition sd 	= ServiceStorageModul.loadScenarioDefinition(sdName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("Cannot match ScenarioDefinition name to a given one!");
@@ -505,7 +505,7 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition definition = loadScenarioDefinition(scenarioname, usertoken);
+		ScenarioDefinition definition = ServiceStorageModul.loadScenarioDefinition(scenarioname, usertoken);
 
 		if (definition == null) {
 			LOGGER.info("No ScenarioDefinition with given name in database!");
@@ -631,7 +631,7 @@ public class ScenarioService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.info("No ScenarioDefinition with given name in database!");
@@ -644,35 +644,6 @@ public class ScenarioService {
 	//////////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////// HELPER /////////////////////////////////////////////////
 	//////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/**
-	 * Load a Scenario definition with the given name and user (via token).
-	 * 
-	 * @param scenarioname 	the name of the scenario which definition has to be loaded
-	 * @param token 		the token to identify the user
-	 * @return 				The scenario definition for the scenario with the given name.
-	 * 						Null if there is no scenario with the given name.
-	 */
-	protected static ScenarioDefinition loadScenarioDefinition(String scenarioname, String token) {
-
-		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(token);
-		
-		try {
-			
-			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
-			return definition;
-			
-			
-		} catch (DataNotFoundException e) {
-			
-			LOGGER.warn("Scenario '{}' not found.", scenarioname);
-			return null;
-		
-		} finally {
-			dbCon.closeProvider();
-		}
-		
-	}
 	
 	/**
 	 * Archiving old scenario results from the given {@code ScenarioInstance} into the

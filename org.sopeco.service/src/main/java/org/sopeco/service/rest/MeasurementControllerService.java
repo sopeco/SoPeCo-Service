@@ -313,7 +313,7 @@ public class MeasurementControllerService {
 
 			MeasurementEnvironmentDefinition med = r.readEntity(MeasurementEnvironmentDefinition.class);
 			
-			ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+			ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 			
 			if (sd == null) {
 				LOGGER.info("No ScenarioDefinition with given name.", usertoken);

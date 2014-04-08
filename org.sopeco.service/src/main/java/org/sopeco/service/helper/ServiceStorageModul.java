@@ -29,11 +29,13 @@ package org.sopeco.service.helper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sopeco.persistence.IPersistenceProvider;
+import org.sopeco.persistence.entities.definition.MeasurementSpecification;
 import org.sopeco.persistence.entities.definition.ScenarioDefinition;
+import org.sopeco.persistence.exceptions.DataNotFoundException;
 import org.sopeco.service.persistence.AccountPersistenceProvider;
 
 /**
- * The {@link ServiceStorageModul} is used to have general complex database storage methods
+ * The {@link ServiceStorageModul} is used to have general database access methods
  * in one class. The methods are needed most times in all the RESTful service classes and
  * can be accessed here in a static way.
  * 
@@ -65,5 +67,55 @@ public final class ServiceStorageModul {
 		dbCon.closeProvider();
 		
 		return true;
+	}
+	
+	/**
+	 * Load a Scenario definition with the given name and user (via token).
+	 * 
+	 * @param scenarioname 	the name of the scenario which definition has to be loaded
+	 * @param token 		the token to identify the user
+	 * @return 				The scenario definition for the scenario with the given name.
+	 * 						Null if there is no scenario with the given name.
+	 */
+	public static ScenarioDefinition loadScenarioDefinition(String scenarioname, String token) {
+
+		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider(token);
+		
+		try {
+			
+			ScenarioDefinition definition = dbCon.loadScenarioDefinition(scenarioname);
+			return definition;
+			
+		} catch (DataNotFoundException e) {
+			
+			LOGGER.warn("Scenario '{}' not found.", scenarioname);
+			return null;
+		
+		} finally {
+			dbCon.closeProvider();
+		}
+		
+	}
+	
+	/**
+	 * Loads the {@link ScenarioDefinition} with the given name out of the database. The {@link MeasurementSpecification}
+	 * with the given name is fetched from the loaded {@link ScenarioDefinition} and returned. Of coure, <code>null</code>
+	 * can be returned.
+	 * 
+	 * @param scenarioName	the name of the {@link ScenarioDefinition}
+	 * @param measSpecName	the name of the {@link MeasurementSpecification}
+	 * @param token			the user identification
+	 * @return				the {@link MeasurementSpecification}, <code>null</code> possible
+	 */
+	public static MeasurementSpecification loadSpecification(String scenarioName, String measSpecName, String token) {
+
+		ScenarioDefinition sd = loadScenarioDefinition(scenarioName, token);
+		
+		if (sd == null) {
+			LOGGER.info("Cannot find a ScenarioDefition with the given name in the database.");
+			return null;
+		}
+		
+		return sd.getMeasurementSpecification(measSpecName);
 	}
 }

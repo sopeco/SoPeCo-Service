@@ -213,7 +213,7 @@ public class MeasurementSpecificationService {
 
 		MeasurementSpecification ms = SimpleEntityFactory.createMeasurementSpecification(specificationName);
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
@@ -255,7 +255,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.CONFLICT).entity("Can't rename, because specification with the given name already exists.").build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
@@ -304,7 +304,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.CONFLICT).entity("Can't delete MeasurementSpecification, because it doesn't exist.").build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
@@ -357,7 +357,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
@@ -424,7 +424,7 @@ public class MeasurementSpecificationService {
 			return Response.status(Status.UNAUTHORIZED).build();
 		}
 		
-		ScenarioDefinition sd = ScenarioService.loadScenarioDefinition(scenarioName, usertoken);
+		ScenarioDefinition sd = ServiceStorageModul.loadScenarioDefinition(scenarioName, usertoken);
 		
 		if (sd == null) {
 			LOGGER.warn("ScenarioDefinition with the name '{}' doesn't exists.", scenarioName);
@@ -496,5 +496,4 @@ public class MeasurementSpecificationService {
 		
 		return false;
 	}
-	
 }
