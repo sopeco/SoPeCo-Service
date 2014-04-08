@@ -80,10 +80,10 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
-		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 							 .path(TEST_SCENARIO_NAME)
-							 .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+							 .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_LIST)
+							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
 							 .request(MediaType.APPLICATION_JSON)
 							 .get();
 
@@ -94,26 +94,26 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 		assertEquals(true, list.contains(TEST_MEASUREMENT_SPECIFICATION_NAME));
 		
 		// nwo create two more specifications
-		target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 		 		.path(TEST_SCENARIO_NAME)
-		        .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, measurementSpecName2)
+		        .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_CREATE)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, measurementSpecName2)
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
-		target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 				.path(TEST_SCENARIO_NAME)
-		        .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, measurementSpecName3)
+		        .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_CREATE)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, measurementSpecName3)
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
-		r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		r = target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 					.path(TEST_SCENARIO_NAME)
-       	    	    .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-       	    	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+       	    	    .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_LIST)
+       	    	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
     				.request(MediaType.APPLICATION_JSON)
        	    	    .get();
 
@@ -156,20 +156,20 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 
 		
 		// now create a new measurement spec for the user once
-		target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 				.path(TEST_SCENARIO_NAME)
-		        .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+		        .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_CREATE)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+		        .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 				.request(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		//create it now a second time, this must fail
-		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 							 .path(TEST_SCENARIO_NAME)
-							 .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+							 .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_CREATE)
+							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 							 .request(MediaType.APPLICATION_JSON)
 							 .post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
@@ -208,20 +208,20 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 				.post(Entity.entity(esd, MediaType.APPLICATION_JSON));
 		
 		// now create the measurement spec for the user once
-		target().path(ServiceConfiguration.SVC_MEASUREMENT)
-	          .path(ServiceConfiguration.SVC_MEASUREMENT_CREATE)
-	          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-	          .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
+		target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
+	          .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_CREATE)
+	          .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+	          .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, TEST_MEASUREMENT_SPECIFICATION_NAME)
 			  .request(MediaType.APPLICATION_JSON)
 			  .post(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
 		// rename the current selected measurementspecification
-		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		Response r = target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 							 .path(TEST_SCENARIO_NAME)
 							 .path(TEST_MEASUREMENT_SPECIFICATION_NAME)
-							 .path(ServiceConfiguration.SVC_MEASUREMENT_RENAME)
-							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
-							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_SPECNAME, newMeasurementSpecName)
+							 .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_RENAME)
+							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
+							 .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_SPECNAME, newMeasurementSpecName)
 							 .request(MediaType.APPLICATION_JSON)
 							 .put(Entity.entity(Null.class, MediaType.APPLICATION_JSON));
 		
@@ -229,10 +229,10 @@ public class MeasurementSpecServiceTest extends AbstractServiceTest {
 		assertEquals(Status.OK.getStatusCode(), r.getStatus());
 		
 		// now lookup the name we just added
-		r = target().path(ServiceConfiguration.SVC_MEASUREMENT)
+		r = target().path(ServiceConfiguration.SVC_MEASUREMENTSPEC)
 					.path(TEST_SCENARIO_NAME)
-	         	    .path(ServiceConfiguration.SVC_MEASUREMENT_LIST)
-	         	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENT_TOKEN, token)
+	         	    .path(ServiceConfiguration.SVC_MEASUREMENTSPEC_LIST)
+	         	    .queryParam(ServiceConfiguration.SVCP_MEASUREMENTSPEC_TOKEN, token)
 	         	    .request(MediaType.APPLICATION_JSON)
 	         	    .get();
 		

@@ -129,15 +129,18 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_SCENARIO_TOKEN 			= SVCP_TOKEN;
 	public static final String SVCP_SCENARIO_URL 			= "url";
 	
-	public static final String SVC_MEASUREMENT 				= "measurementspecification";
-	public static final String SVC_MEASUREMENT_LIST 		= "list";
-	public static final String SVC_MEASUREMENT_LISTSPECS 	= "listspecification";
-	public static final String SVC_MEASUREMENT_CREATE 		= "create";
-	public static final String SVC_MEASUREMENT_RENAME 		= "rename";
-	public static final String SVC_MEASUREMENT_NAME 		= "name";
-	public static final String SVCP_MEASUREMENT_TOKEN 		= SVCP_TOKEN;
-	public static final String SVCP_MEASUREMENT_SPECNAME 	= "specname";
-	public static final String SVCP_MEASUREMENT_SCENARIONAME = "scenarioname";
+	public static final String SVC_MEASUREMENTSPEC 				 = "measurementspecification";
+	public static final String SVC_MEASUREMENTSPEC_LIST 		 = "list";
+	public static final String SVC_MEASUREMENTSPEC_LISTSPECS 	 = "listspecification";
+	public static final String SVC_MEASUREMENTSPEC_CREATE 		 = "create";
+	public static final String SVC_MEASUREMENTSPEC_RENAME 		 = "rename";
+	public static final String SVC_MEASUREMENTSPEC_NAME 		 = "name";
+	public static final String SVCP_MEASUREMENTSPEC_TOKEN 		 = SVCP_TOKEN;
+	public static final String SVCP_MEASUREMENTSPEC_SPECNAME 	 = "specname";
+	public static final String SVCP_MEASUREMENTSPEC_SCENARIONAME = "scenarioname";
+	public static final String SVCP_MEASUREMENTSPEC_PARAMETERDEF = "parameterdefinition";
+	public static final String SVCP_MEASUREMENTSPEC_PARAMETERVAL = "parametervalue";
+	public static final String SVCP_MEASUREMENTSPEC_INITIALASSIGNMENT = "initialassignment";
 	
 	public static final String SVC_MEC 						= "mec";
 	public static final String SVC_MEC_STATUS 				= "status";
@@ -194,5 +197,8 @@ public abstract class ServiceConfiguration {
 	public static final String SVC_RESULT_DATASETAGGREGATED = "datasetaggregated";
 	public static final String SVCP_RESULT_ACCOUNTID 		= "accountid";
 	public static final String SVCP_RESULT_DATASETID 		= "datasetid";
+
+
+
 
 }
