@@ -198,6 +198,11 @@ public abstract class ServiceConfiguration {
 	public static final String SVCP_RESULT_ACCOUNTID 		= "accountid";
 	public static final String SVCP_RESULT_DATASETID 		= "datasetid";
 
+	public static final String SVC_EXPERIMENTSERIES = "experimentseries";
+	public static final String SVC_EXPERIMENTSERIES_SCENARIONAME = "scenarioname";
+	public static final String SVC_EXPERIMENTSERIES_MEASUREMENTSPECNAME = "measurementspecname";
+	public static final String SVCP_EXPERIMENTSERIES_TOKEN = "token";
+
 
 
 
