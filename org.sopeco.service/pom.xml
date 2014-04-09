@@ -170,7 +170,7 @@
 					
 					<webResources>
 						<resource>
-							<directory>persistence</directory>
+							<directory>rsc</directory>
 							<targetPath>/</targetPath>
 							<includes>
 								<include>**/META-INF/*</include>
