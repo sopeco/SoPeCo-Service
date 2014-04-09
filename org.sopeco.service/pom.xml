@@ -5,7 +5,7 @@
 	<groupId>org.sopeco.service</groupId>
 	<artifactId>org.sopeco.service</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Software Performance Cockpit - Service</name>
 
 	<!-- ================PROPERTIES================= -->
