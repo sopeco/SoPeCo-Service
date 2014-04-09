@@ -123,7 +123,6 @@ public class ExecutionService {
 			return Response.status(Status.CONFLICT).entity("The selected experiments are corrupt.").build();
 		}
 		
-		// TODO better check for correct MEController URL, rather then only for empty String
 		if (scheduledExperiment.getControllerUrl().equals("")) {
 			LOGGER.info("The URL to the MeasurementEnvironmentController is invalid.");
 			return Response.status(Status.CONFLICT).entity("The URL to the MeasurementEnvironmentController is invalid.").build();
@@ -261,7 +260,7 @@ public class ExecutionService {
 	public Response getScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 										   @QueryParam(TOKEN) String usertoken) {
 		
-		if (id < 0 || usertoken == null) {
+		if (usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -310,7 +309,7 @@ public class ExecutionService {
 	public Response setScheduledExperimentEnabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 												  @QueryParam(TOKEN) String usertoken) {
 		
-		if (id < 0 || usertoken == null) {
+		if (usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -365,7 +364,7 @@ public class ExecutionService {
 	public Response setScheduledExperimentDisabled(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 											  	   @QueryParam(TOKEN) String usertoken) {
 		
-		if (id < 0 || usertoken == null) {
+		if (usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -408,7 +407,7 @@ public class ExecutionService {
 	public Response removeScheduledExperiment(@PathParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id,
 									     	  @QueryParam(TOKEN) String usertoken) {
 		
-		if (id < 0 || usertoken == null) {
+		if (usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -525,7 +524,7 @@ public class ExecutionService {
 								  	  				 		 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 							  	  				 		 	 @QueryParam(TOKEN) String usertoken) {
 		
-		if (id < 0 || experimentseriesname == null || usertoken == null) {
+		if (experimentseriesname == null || usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -591,7 +590,7 @@ public class ExecutionService {
 								  	  				 @QueryParam(ServiceConfiguration.SVCP_EXECUTE_EXPERIMENTSERIES) String experimentseriesname,
 						  	  				 		 @QueryParam(TOKEN) String usertoken) {
 
-		if (id < 0 || experimentseriesname == null || usertoken == null) {
+		if (experimentseriesname == null || usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
@@ -697,7 +696,7 @@ public class ExecutionService {
 	public Response getMECLog(@QueryParam(TOKEN) String usertoken,
 				    		  @QueryParam(ServiceConfiguration.SVCP_EXECUTE_ID) long id) {
 		
-		if (id < 0 || usertoken == null) {
+		if (usertoken == null) {
 			LOGGER.warn("One or more arguments are null/invalid.");
 			return Response.status(Status.CONFLICT).entity("One or more arguments are null/invalid.").build();
 		}
