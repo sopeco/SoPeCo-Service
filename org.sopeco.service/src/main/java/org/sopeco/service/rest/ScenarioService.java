@@ -703,25 +703,7 @@ public class ScenarioService {
     		
     		for(ExperimentSeriesRun esr : es.getExperimentSeriesRuns()) {
     			
-    			// if the host is called on a special port, the port needs to be fetched
-    			String[] hostPort = splitHostURI(hostURI);
-    			
-    			ExperimentSeriesRunDecorator esrd;
-    			
-    			if (hostPort.length == 2) {
-    				
-    				esrd = new ExperimentSeriesRunDecorator(esr,
-															accountID,
-															hostPort[0],
-															hostPort[1]);
-    				
-    			} else {
-    				
-    				esrd = new ExperimentSeriesRunDecorator(esr,
-															accountID,
-															hostPort[0]);
-    				
-    			}
+    			ExperimentSeriesRunDecorator esrd = new ExperimentSeriesRunDecorator(esr, accountID, hostURI);
     			
     			esrToAdd.add(esrd);
     			esrToRemove.add(esr);
@@ -730,34 +712,6 @@ public class ScenarioService {
     		es.getExperimentSeriesRuns().removeAll(esrToRemove);
     		es.getExperimentSeriesRuns().addAll(esrToAdd);
     	}
-		
-	}
-
-	
-	/**
-	 * Splits the given URI up into a String array. This method is used to conver the passed 'host'
-	 * field in the HTTP header.
-	 * 
-	 * @param hostURI					the 'host' HTTP header param
-	 * @return							the hostURI split up, either into 2 substring (host+port) or <br />
-	 * 									1 string, which contains just the hostURI
-	 * @throws IllegalArgumentException If the hostURI contains more than one ':'
-	 */
-	private String[] splitHostURI(String hostURI) {
-		
-		if (hostURI.contains(":")) {
-
-			String[] splitted = hostURI.split(":");
-			
-			if (splitted.length == 2) {
-				return splitted;
-			} else {
-				throw new IllegalArgumentException("URI contains more than one ':'.");
-			}
-			
-		} else {
-			return new String[]{ hostURI };
-		}
 		
 	}
 }
