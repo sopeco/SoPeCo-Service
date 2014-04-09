@@ -28,6 +28,7 @@ package org.sopeco.service.test.persistence;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.service.persistence.ServicePersistenceProvider;
 
@@ -46,6 +47,7 @@ public class ServicePersistenceTest {
 	 * For the jersey-test-framework the eclipselink package must the up to date.
 	 */
 	@Test
+	@Ignore("Integration test")
 	public void persistenceTest() {
 		ServicePersistenceProvider spp = ServicePersistenceProvider.getInstance();
 		// account with ID 0 does never exist

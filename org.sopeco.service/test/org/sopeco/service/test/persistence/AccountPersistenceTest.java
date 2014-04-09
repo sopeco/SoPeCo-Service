@@ -28,6 +28,7 @@ package org.sopeco.service.test.persistence;
 
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.sopeco.persistence.IPersistenceProvider;
 import org.sopeco.service.persistence.AccountPersistenceProvider;
@@ -48,6 +49,7 @@ public class AccountPersistenceTest {
 	 * For the jersey-test-framework the eclipselink package must the up to date.
 	 */
 	@Test
+	@Ignore("Integration test")
 	public void persistenceTest() {
 		IPersistenceProvider dbCon = AccountPersistenceProvider.createPersistenceProvider((Account) null);
 		assertEquals(null, dbCon); // is the connection is null, the connection does not need to be closed

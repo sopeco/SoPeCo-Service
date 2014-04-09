@@ -5,13 +5,13 @@
 	<groupId>org.sopeco.service</groupId>
 	<artifactId>org.sopeco.service</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Software Performance Cockpit - Service</name>
 
 	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sopeco.version>5.0.2-SNAPSHOT</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
+		<sopeco.version>5.0.2</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
 		<jersey.version>2.6</jersey.version>
 		<jax-rs.version>2.0</jax-rs.version>
 		<jackson.version>2.3.0</jackson.version>

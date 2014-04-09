@@ -68,7 +68,7 @@ public abstract class AbstractServiceTest extends JerseyTest {
 	/**
 	 * True, when to skip all the test.
 	 */
-	protected static boolean skipTests = false;
+	protected static boolean skipTests = true;
 	
 	/**
 	 * This method is called on the Grizzly container creation of a {@link JerseyTest}.
