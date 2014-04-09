@@ -309,8 +309,7 @@ public final class ExecutionScheduler implements Runnable {
 	 */
 	private ExperimentStatus createExperimentStatus(long experimentKey, ExecutedExperimentDetails eed) {
 		
-		LOGGER.debug("+++++++++++++++++++++++++++++++++++++++");
-		LOGGER.debug("" + experimentKey);
+		LOGGER.debug("Experiment key: " + experimentKey);
 		
 		ExperimentStatus status = new ExperimentStatus();
 		status.setAccountId(eed.getAccountId());

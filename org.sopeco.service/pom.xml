@@ -1,12 +1,13 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.sopeco.service</groupId>
 	<artifactId>org.sopeco.service</artifactId>
 	<packaging>war</packaging>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>Software Performance Cockpit - Service</name>
-	
+
 	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -21,10 +22,10 @@
 		<org.apache.maven.compiler-plugins.version>3.1</org.apache.maven.compiler-plugins.version>
 		<org.apache.maven.install-plugins.version>2.5.1</org.apache.maven.install-plugins.version>
 	</properties>
-	
+
 	<!-- ================REPOSITORIES================= -->
 	<repositories>
-	    
+
 		<repository>
 			<id>LPE Releases</id>
 			<name>LPE-releases</name>
@@ -36,65 +37,65 @@
 			<name>Remote Repositories</name>
 			<url>http://i43vm-saas.ipd.uka.de:8081/artifactory/remote-repos</url>
 		</repository>
-		
+
 	</repositories>
-  
+
 	<!-- ================DEPENDENCIES================= -->
 	<dependencies>
-	    
-	    <!-- logging implementation for SLF4J -->
+
+		<!-- logging implementation for SLF4J -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
 			<artifactId>logback-classic</artifactId>
 			<version>${qos-logback.version}</version>
 		</dependency>
-	    
-	    <!-- Dependencies to the SoPeCo package -->
+
+		<!-- Dependencies to the SoPeCo package -->
 		<dependency>
 			<groupId>org.sopeco.core</groupId>
 			<artifactId>org.sopeco.persistence</artifactId>
 			<version>${sopeco.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.sopeco.core</groupId>
 			<artifactId>org.sopeco.core</artifactId>
 			<version>${sopeco.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.sopeco.core</groupId>
 			<artifactId>org.sopeco.runner</artifactId>
 			<version>${sopeco.version}</version>
 		</dependency>
-		
-	    <!-- Jersey dependencies -->
+
+		<!-- Jersey dependencies -->
 		<dependency>
-		    <groupId>org.glassfish.jersey.containers</groupId>
-		    <artifactId>jersey-container-servlet</artifactId>
-		    <version>${jersey.version}</version>
+			<groupId>org.glassfish.jersey.containers</groupId>
+			<artifactId>jersey-container-servlet</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.glassfish.jersey.core</groupId>
 			<artifactId>jersey-server</artifactId>
 			<version>${jersey.version}</version>
 		</dependency>
-         
+
 		<!-- JSON data exchange - These lines automtically enable jackson in jersey -->
 		<dependency>
 			<groupId>com.fasterxml.jackson.jaxrs</groupId>
 			<artifactId>jackson-jaxrs-json-provider</artifactId>
 			<version>${jackson.version}</version>
 		</dependency>
-		
+
 		<!-- Unittesting dependencies -->
 		<dependency>
-		    <groupId>org.glassfish.jersey.test-framework.providers</groupId>
-		    <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
-		    <version>${jersey.version}</version>
+			<groupId>org.glassfish.jersey.test-framework.providers</groupId>
+			<artifactId>jersey-test-framework-provider-grizzly2</artifactId>
+			<version>${jersey.version}</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -102,70 +103,91 @@
 		</dependency>
 
 		<!-- persistence stuff -->
-        <dependency>
+		<dependency>
 			<groupId>org.eclipse.persistence</groupId>
 			<artifactId>org.eclipse.persistence.jpa</artifactId>
 			<version>2.5.1</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>org.eclipse.persistence</groupId>
-		    <artifactId>javax.persistence</artifactId>
-		    <version>2.1.0</version>
-		  </dependency>
-		
-    </dependencies>
-  
+			<groupId>org.eclipse.persistence</groupId>
+			<artifactId>javax.persistence</artifactId>
+			<version>2.1.0</version>
+		</dependency>
+
+	</dependencies>
+
 	<!-- ================BUILD OPTIONS================= -->
 	<build>
-    	
-    	<!-- The class files are put anyway into the final jar. But in addition
-    		 the .java files and the gwt.xml files are included, too. Both are needed 
-    		 in GWT project. And the WebUI is a GWT project. 
-    		 The source files are needed for GWT to compile them into javascript. -->
-    	<resources>
-	    	<resource>
-				<directory>src/main/java</directory>
+
+		<!-- The class files are put anyway into the final jar. But in addition 
+			the .java files and the gwt.xml files are included, too. Both are needed 
+			in GWT project. And the WebUI is a GWT project. The source files are needed 
+			for GWT to compile them into javascript. -->
+		<!-- <resources> <resource> <directory>src/main/java</directory> <includes> 
+			<include>**/*.java</include> <include>**/*.gwt.xml</include> </includes> 
+			</resource> </resources> -->
+
+		<sourceDirectory>src</sourceDirectory>
+		<testSourceDirectory>test</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>rsc</directory>
 				<includes>
 					<include>**/*.java</include>
 					<include>**/*.gwt.xml</include>
 				</includes>
-	    	</resource>
+			</resource>
 		</resources>
-    	
-    	<!-- define all the outputs -->
-    	<plugins>
-	        
-    	    <!-- used to set the Java version Maven compiles with -->
+		<testResources>
+			<testResource>
+				<directory>rsc</directory>
+			</testResource>
+		</testResources>
+
+		<!-- define all the outputs -->
+		<plugins>
+
+			<!-- used to set the Java version Maven compiles with -->
 			<plugin>
-		        <groupId>org.apache.maven.plugins</groupId>
-		        <artifactId>maven-compiler-plugin</artifactId>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${org.apache.maven.compiler-plugins.version}</version>
-		        <configuration>
-		           <source>1.7</source>
-		           <target>1.7</target>
-		        </configuration> 
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
 			</plugin>
-			
+
 			<!-- layout of the created WAR file -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<version>${org.apache.maven.war-plugins.version}</version>
 				<configuration>
-				
-					<webXml>src/main/webapp/WEB-INF/web.xml</webXml>
+
+					<webXml>rsc/webapp/WEB-INF/web.xml</webXml>
 					
+					<webResources>
+						<resource>
+							<directory>persistence</directory>
+							<targetPath>/</targetPath>
+							<includes>
+								<include>**/META-INF/*</include>
+							</includes>
+						</resource>
+					</webResources>
+
 				</configuration>
 			</plugin>
-			
+
 			<!-- in addition to the war-file build a jar file -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-jar-plugin</artifactId>
 				<version>${org.apache.maven.jar-plugins.version}</version>
 				<executions>
-					<execution> 
+					<execution>
 						<id>make-a-jar</id>
 						<phase>compile</phase>
 						<goals>
@@ -174,7 +196,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<!-- move the jar into the local repository after building -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
@@ -198,9 +220,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 		</plugins>
-  
+
 	</build>
-  
+
 </project>
