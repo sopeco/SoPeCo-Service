@@ -17,9 +17,6 @@
 	<!-- execute path has MECLogEntry -->
   	<source path="execute" /> <!-- execute path has MECLogEntry -->
   	
-  	<!-- all the builder to build a scenario are in there -->
-  	<source path="builder" />
-  	
   	<!--
   		All the database elements are referenced.
   	 	More specially, the used files are in the subdirectory persistence/entities.
