@@ -27,9 +27,7 @@
 package org.sopeco.service.persistence;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -40,8 +38,6 @@ import javax.persistence.TypedQuery;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sopeco.config.exception.ConfigurationException;
-import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.execute.MECLogEntry;
 import org.sopeco.service.persistence.entities.Account;
 import org.sopeco.service.persistence.entities.ExecutedExperimentDetails;
@@ -70,13 +66,6 @@ public final class ServicePersistenceProvider {
 	 * Singleton instance for this persistence provider.
 	 */
 	private static ServicePersistenceProvider singleton;
-	
-	/**
-	 * Database settings for JDBC
-	 */
-	private static final String DB_URL = "javax.persistence.jdbc.url";
-	private static final String SERVER_URL_PREFIX = "jdbc:derby://";
-	private static final String SERVER_URL_SUFFIX = ";create=true";
 
 	/**
 	 * Hidden constructor as a contructor for singleton. Get an instance by calling {@link getInstance()}.
@@ -84,10 +73,7 @@ public final class ServicePersistenceProvider {
 	private ServicePersistenceProvider() {
 		
 		try {
-			emf = Persistence.createEntityManagerFactory("sopeco-service", getConfigOverrides());
-		} catch (ConfigurationException ce) {
-			LOGGER.warn("Could not load the configuration files");
-			LOGGER.warn(ce.getLocalizedMessage());
+			emf = Persistence.createEntityManagerFactory("sopeco-service");
 		} catch (Exception e) {
 			LOGGER.warn(e.getLocalizedMessage());
 			throw new IllegalArgumentException("Could not create persistence provider!", e);
@@ -322,42 +308,5 @@ public final class ServicePersistenceProvider {
 		}
 		
 		return singleton;
-	}
-
-	/**
-	 * Creates a configuration map, which contains the connection url to the
-	 * database.
-	 * 
-	 * @return configuration for database
-	 */
-	private static Map<String, Object> getConfigOverrides() throws ConfigurationException {
-		Map<String, Object> configOverrides = new HashMap<String, Object>();
-		configOverrides.put(DB_URL, getServerUrl());
-		LOGGER.debug("Database connection string: {}", configOverrides.get(DB_URL));
-		return configOverrides;
-	}
-
-	/**
-	 * Builds the connection-url of the SoPeCo service database.
-	 * 
-	 * @return connection-url to the database
-	 */
-	private static String getServerUrl() throws ConfigurationException {
-		
-		if (ServiceConfiguration.PERSISTENCE_HOST == null) {
-			throw new NullPointerException("No MetaDataHost defined.");
-		}
-		
-		String host = ServiceConfiguration.PERSISTENCE_HOST;
-		String port = String.valueOf(ServiceConfiguration.PERSISTENCE_PORT);
-		String name = ServiceConfiguration.PERSISTENCE_NAME;
-		String user = ServiceConfiguration.PERSISTENCE_USER;
-		String password = ServiceConfiguration.PERSISTENCE_PASSWORD;
-		
-		return SERVER_URL_PREFIX 	+ host + ":" + port
-									+ "/" + name
-									+ ";user=" + user
-									+ ";password=" + password
-									+ SERVER_URL_SUFFIX;
 	}
 }
