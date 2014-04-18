@@ -131,7 +131,10 @@
 				<includes> 
 					<include>**/*.java</include>
 					<include>**/*.gwt.xml</include>
-				</includes> 
+				</includes>
+			</resource>
+			<resource>
+				<directory>rsc</directory>
 			</resource>
 		</resources>
 		
