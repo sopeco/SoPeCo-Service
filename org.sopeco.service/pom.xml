@@ -5,14 +5,14 @@
 	<groupId>org.sopeco.service</groupId>
 	<artifactId>org.sopeco.service</artifactId>
 	<packaging>war</packaging>
-	<version>1.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>Software Performance Cockpit - Service</name>
 
 	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<sopeco.version>5.0.2</sopeco.version> <!-- the version must be at least 5.0.2 to have no conflict using jersey-test-framework -->
-		<jersey.version>2.6</jersey.version>
+		<jersey.version>2.7</jersey.version>
 		<jax-rs.version>2.0</jax-rs.version>
 		<jackson.version>2.3.0</jackson.version>
 		<qos-logback.version>1.0.13</qos-logback.version>
@@ -120,25 +120,22 @@
 	<!-- ================BUILD OPTIONS================= -->
 	<build>
 
-		<!-- The class files are put anyway into the final jar. But in addition 
-			the .java files and the gwt.xml files are included, too. Both are needed 
-			in GWT project. And the WebUI is a GWT project. The source files are needed 
-			for GWT to compile them into javascript. -->
-		<!-- <resources> <resource> <directory>src/main/java</directory> <includes> 
-			<include>**/*.java</include> <include>**/*.gwt.xml</include> </includes> 
-			</resource> </resources> -->
-
 		<sourceDirectory>src</sourceDirectory>
-		<testSourceDirectory>test</testSourceDirectory>
 		<resources>
 			<resource>
-				<directory>rsc</directory>
-				<includes>
+				<!-- The class files are put anyway into the final jar. But in addition 
+				the .java files and the gwt.xml files are included, too. Both are needed 
+				in GWT project. And the WebUI is a GWT project. The source files are needed 
+				for GWT to compile them into javascript. -->
+				<directory>src</directory>
+				<includes> 
 					<include>**/*.java</include>
 					<include>**/*.gwt.xml</include>
-				</includes>
+				</includes> 
 			</resource>
 		</resources>
+		
+		<testSourceDirectory>test</testSourceDirectory>
 		<testResources>
 			<testResource>
 				<directory>rsc</directory>
