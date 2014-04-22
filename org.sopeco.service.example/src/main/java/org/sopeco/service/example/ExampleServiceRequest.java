@@ -13,7 +13,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.glassfish.jersey.client.ClientConfig;
-import org.sopeco.persistence.entities.ScenarioInstance;
+import org.sopeco.persistence.entities.definition.ExperimentSeriesDefinition;
 import org.sopeco.service.configuration.ServiceConfiguration;
 import org.sopeco.service.rest.json.CustomObjectMapper;
 
@@ -21,9 +21,17 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 
 /**
  * This is an example class to request the SoPeCo Service Layer and interact with it.<br />
- * If you need inspiration, I advise to peek at the org.sopeco.test.rest package.<br />
- * This example program just creates an account and logs into this. You might want to adjust the
- * accountname, as it is often already taken.
+ * If you need inspiration, I advise to peek at the org.sopeco.service.test.rest package.<br />
+ * This example application:
+ * <ol>
+ * 		<li>Creates an account</li>
+ * 		<li>Logs into the created account</li>
+ * 		<li>Create an empty scenario</li>
+ * 		<li>Fetch all the scenario for the current account</li>
+ * 		<li>Fetch all the ExperimentSeriesDefinition for the current account</li>
+ * </ol>
+ * Please adjust all the class fields annotated with a TODO, to have the full joy at
+ * interacting with the Service Layer.
  * 
  * @author Peter Merkert
  */
@@ -48,6 +56,24 @@ public final class ExampleServiceRequest {
 	private static final String serviceUrl 		= "http://localhost:8080/";
 	
 	/**
+	 * TODO: choose a name for your dummy scenario.
+	 * Set the name for the dummy scenario which is created.
+	 */
+	private static final String scenarioName 	= "dummyScenario";
+
+	/**
+	 * TODO: choose a name for your dummy scenario.
+	 * Set the name for the dummy scenario which is created.
+	 */
+	private static final String measurementSpecificationName = "dummyMS";
+
+	/**
+	 * TODO: choose a name for your dummy ExperimentSeriesDefinition.
+	 * Set the name for the dummy ExperimentSeriesDefinition which is created.
+	 */
+	private static final String experimentSeriesDefinitionName = "dummyESD";
+	
+	/**
 	 * The token is fetched when loggin in and used for authentication
 	 * when doing a call to the Service Layer.
 	 */
@@ -63,14 +89,16 @@ public final class ExampleServiceRequest {
 	 * As this is only an example program, everything is done in the main
 	 * method.
 	 * 
-	 * @param args the args
+	 * @param args The program initialization arguments. They are dropped here.
 	 */
     public static void main(String[] args) {
     	init();
 
-		fetchGeneralInfo();
+    	createEmptyDummyScenario();
 	
-		fetchScenarioResults();
+		fetchScenarioList();
+		
+		fetchExperimentSeriesDefinitionInfo();
     }
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,51 +106,86 @@ public final class ExampleServiceRequest {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
     
     /**
-     * 
+     * This method provides an example how to setup a more complex call to a servlet.
+     * In addition, it's shown how to check the status of the response from the Service Layer
+     * and how you can read simple entities from the response.
      */
-	private static void fetchGeneralInfo() {
-		System.out.println("\n+++++++++++++++++++++++GENERAL INFO+++++++++++++++++++++++++++");
+	private static void createEmptyDummyScenario() {
+		System.out.println("\n++++++++++++++++++++++++SCENARIO CREATION+++++++++++++++++++++++++++");
 		
 		WebTarget webTarget = client.target(serviceUrl
+											+ ServiceConfiguration.SVC_SCENARIO + "/"
+											+ ServiceConfiguration.SVC_SCENARIO_ADD + "/"
+											+ scenarioName);
+		
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token);
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_SPECNAME, measurementSpecificationName);
+
+		// need to provide an ExperimentSeriesDefinition when creating a Scenario. However, it's possible to pass an
+		// empty one. Please be aware to provide a valid ExperimentSeriesDefinition when executing a real scenario.
+		ExperimentSeriesDefinition esd = new ExperimentSeriesDefinition();
+		esd.setName(experimentSeriesDefinitionName);
+    	Response r = webTarget.request(MediaType.APPLICATION_JSON).post(Entity.entity(esd, MediaType.APPLICATION_JSON));
+    	
+    	if (r.getStatus() == Status.OK.getStatusCode()) {
+    		System.out.println("Succesfully added scenario with the name '" + scenarioName + "'.");
+    	} else if (r.getStatus() == Status.CONFLICT.getStatusCode()) {
+    		// a CONFLICT has always a message as entity in the whole Service Layer
+    		// the message helps to identify the problem source
+    		System.out.println(r.readEntity(String.class));
+    	} else {
+    		System.out.println("Scenario addition call failed with code: " + r.getStatus());
+    	}
+	}
+    
+	/**
+     * This method provides an example how to fetch arrays.
+     */
+	private static void fetchScenarioList() {
+		System.out.println("\n++++++++++++++++++++++++SCENARIO LISTING+++++++++++++++++++++++++++");
+		
+		WebTarget webTarget = client.target(serviceUrl
+											+ ServiceConfiguration.SVC_SCENARIO + "/"
 											+ ServiceConfiguration.SVC_SCENARIO_LIST);
+		
+		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token);
+
+    	Response r = webTarget.request(MediaType.APPLICATION_JSON).get();
+
+		System.out.println("Fetching all scenarios the current account has.");
+		
+    	if (r.getStatus() == Status.OK.getStatusCode()) {
+        	String[] scenarioList = r.readEntity(String[].class);
+        	
+        	for (String scenario : scenarioList) {
+        		System.out.println("Scenario name: " + scenario + "'");
+        	}
+    	}
+	}
+	
+    /**
+     * This method provides an example how to fetch generic types from the Service Layer.
+     */
+	private static void fetchExperimentSeriesDefinitionInfo() {
+		System.out.println("\n++++++++++++++++++++++EXPERIMENT SERIES DEFINITION++++++++++++++++++++++++++");
+		
+		WebTarget webTarget = client.target(serviceUrl
+											+ ServiceConfiguration.SVC_ESD + "/"
+											+ scenarioName + "/"
+											+ measurementSpecificationName);
 		
 		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token);
 		
 		Response r = webTarget.request(MediaType.APPLICATION_JSON).get();
 		
 		if (r.getStatus() == Status.OK.getStatusCode()) {
-			String[] scenarioNames = r.readEntity(String[].class);
+			// magic call, which converts the object passed with the reponse into a generic type
+			List<ExperimentSeriesDefinition> ESDs = r.readEntity(new GenericType<List<ExperimentSeriesDefinition>>() { });
 			
-			for (String sn : scenarioNames) {
-				System.out.println("Scenario name: " + sn);
+			for (ExperimentSeriesDefinition ESD : ESDs) {
+				System.out.println("ESD name: '" + ESD.getName() + "'");
 			}
 		}
-	}
-
-    /**
-     * This method provides an example to fetch generic types from the Service Layer.
-     */
-	private static void fetchScenarioResults() {
-		System.out.println("\n+++++++++++++++++++++++++RESULT++++++++++++++++++++++++++++");
-		
-		WebTarget webTarget = client.target(serviceUrl
-											+ ServiceConfiguration.SVC_SCENARIO + "/"
-											+ ServiceConfiguration.SVC_SCENARIO_INSTANCES);
-		
-		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_TOKEN, token);
-		webTarget = webTarget.queryParam(ServiceConfiguration.SVCP_SCENARIO_NAME, "meneSzenario");
-
-    	Response r = webTarget.request(MediaType.APPLICATION_JSON).get();
-    	
-    	if (r.getStatus() == Status.OK.getStatusCode()) {
-        	List<ScenarioInstance> scenarioList = r.readEntity(new GenericType<List<ScenarioInstance>>() { });
-        	
-        	if (scenarioList.size() > 0) {
-        		System.out.println("At least one ScenarioInstance could be found.");
-            	System.out.println("1st ScenarioInstance name: " + scenarioList.get(0).getName());
-            	System.out.println("1st ScenarioInstance MEC URL: " + scenarioList.get(0).getMeasurementEnvironmentUrl());
-        	}
-    	}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
