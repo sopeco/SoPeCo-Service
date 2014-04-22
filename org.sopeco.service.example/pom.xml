@@ -4,14 +4,14 @@
   	<modelVersion>4.0.0</modelVersion>
   	<groupId>org.sopeco.service.example</groupId>
   	<artifactId>org.sopeco.service.example</artifactId>
-  	<version>1.0.0</version>
+  	<version>1.0.1-SNAPSHOT</version>
   	<packaging>jar</packaging>
  	<name>org.sopeco.service.example</name>
 
 	<!-- ================PROPERTIES================= -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<sopeco.service.version>1.0.0</sopeco.service.version>
+		<sopeco.service.version>1.0.1-SNAPSHOT</sopeco.service.version>
 		<org.glassfish.jersey.core.version>2.7</org.glassfish.jersey.core.version>
 	</properties>
   	
